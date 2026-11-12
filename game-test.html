@@ -1190,7 +1190,6 @@ $('elf-b').addEventListener('click',()=>{$('elf-b').hidden=true;});
   +'.open-ov .ring{width:92px;height:92px;border-radius:50%;border:3px solid #e8c36a;box-shadow:0 0 0 4px rgba(232,195,106,.2);background:radial-gradient(circle at 50% 40%,#3d3585,#1a1f5e);display:flex;align-items:center;justify-content:center;overflow:hidden}'
   +'.open-ov .tw{animation:optw 2.4s ease-in-out infinite}@keyframes optw{50%{opacity:.45}}';
   document.head.appendChild(css);
-  const titleOf=c=>c>=9?'銀河小樂手':c>=6?'星空探險家':c>=3?'小小星探':'星星見習生';
   function type(el,text,ms,done){
     const a=[...text];let i=0;el.textContent='';
     const t=setInterval(()=>{if(!el.isConnected){clearInterval(t);return;}el.textContent+=a[i++]||'';if(i>=a.length){clearInterval(t);done&&done();}},ms);
@@ -1224,12 +1223,10 @@ $('elf-b').addEventListener('click',()=>{$('elf-b').hidden=true;});
       go.onclick=p2;
     };
     const p2=()=>{
-      const ttl=titleOf(n),old=titleOf(n-1);
       ov.innerHTML='<div class="ow">'+SCENE2+top
         +'<div class="z" style="text-align:center"><h2>島民的謝禮</h2><small>謝謝你，「'+I.name+'」的居民都好開心！</small></div>'
         +'<div class="g2 z"><div class="oc2 loot"><svg width="60" height="60" viewBox="0 0 64 64" role="img" aria-label="金幣"><circle cx="32" cy="32" r="28" fill="#e9b93f" stroke="#fff0b3" stroke-width="3"/><circle cx="32" cy="32" r="20" fill="none" stroke="#a9781a" stroke-width="2" stroke-dasharray="3 3"/><path d="M32 18 L36 28 L47 29 L39 36 L41 47 L32 41 L23 47 L25 36 L17 29 L28 28Z" fill="#fff3c2" stroke="#a9781a" stroke-width="1.5" stroke-linejoin="round"/></svg><small>金幣</small><b>+'+OPEN_COIN+'</b></div>'
         +'<div class="oc2 loot"><svg width="60" height="60" viewBox="0 0 64 64" role="img" aria-label="地圖碎片"><path d="M8 14 L28 10 L30 18 Q38 14 38 22 L30 26 L34 34 L24 36 L26 54 L10 52Z" fill="#cfc6ee" stroke="#e8c36a" stroke-width="2.5" stroke-linejoin="round"/><path d="M38 22 L56 20 L54 48 L40 50 L36 40 Q44 38 40 32Z" fill="#8f86d4" stroke="#e8c36a" stroke-width="2.5" stroke-linejoin="round" opacity=".55"/></svg><small>地圖碎片</small><b style="font-size:22px">'+n+'／9</b></div></div>'
-        +'<div class="oc2 z" style="display:flex;align-items:center;gap:14px"><svg width="46" height="46" viewBox="0 0 48 48" role="img" aria-label="稱號徽章"><path d="M24 3 L42 12 V26 Q42 38 24 45 Q6 38 6 26 V12Z" fill="#3a2d6e" stroke="#e8c36a" stroke-width="2.5"/><path d="M24 13 L27 21 L35 22 L29 27 L31 35 L24 31 L17 35 L19 27 L13 22 L21 21Z" fill="#ffe08a"/></svg><div><small>'+(ttl!==old||n===1?'獲得新稱號':'目前稱號')+'</small><div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:#ffe08a">'+ttl+'</div></div></div>'
         +'<div class="oc2 z"><small>新加入圖鑑的朋友</small><div class="g2" style="margin-top:10px"><div class="loot"><div class="ring">'+ISLE_ART.plant(n,76)+'</div><small>植物</small><b style="font-size:16px;color:#f6ecd0">'+C[0]+'</b></div><div class="loot"><div class="ring">'+ISLE_ART.animal(n,76)+'</div><small>動物</small><b style="font-size:16px;color:#f6ecd0">'+C[1]+'</b></div></div></div>'
         +'<div class="sp"></div>'+dots(2)
         +'<div class="orow z"><button class="ob" id="o-shop">用金幣去商店</button><button class="ob go" id="o-go">繼續　›</button></div></div>';

@@ -290,7 +290,7 @@ function touchDay(){
    掉落量依「答錯次數」：0 錯＝2 顆（當島水晶碎片＋其他已開島水晶碎片 1 顆）、1–2 錯＝1 顆（當島）、3 錯以上＝0 顆。
    每日小遊戲掉落上限 6 顆（與每週練習的上限各自計）；每種水晶碎片背包上限 30。
    寫入飛船存檔 olm_ship_v1.el；每日紀錄存 olm_arcade_v1。金幣商店還是示範數字，所以 +5 只先記錄。 */
-const ARC_KEY='olm_arcade_v1',SHIP_KEY='olm_ship_v1',ARC_DAY_CAP=6,ARC_KIND_CAP=30,ARC_COIN=5;
+const ARC_KEY='olm_arcade_v1',SHIP_KEY='olm_ship_v1',ARC_DAY_CAP=6,ARC_KIND_CAP=30,ARC_COIN=5,ARC_COIN_SWORD=8;
 const ARC_ELEM=[['stardust','星塵'],['moonwater','月光水'],['rainbow','彩虹絲'],['cloud','雲絮'],['glowdew','螢光露'],['lantern','燈籠火'],['core','星核砂'],['seaglass','海玻璃'],['note','音符晶'],['aurora','極光冰'],['peak','星峰石'],['ruby','城堡紅玉']];
 function arcRead(k){return OLMSave.read(k);}
 function dropCount(w){return w<=0?2:w<=2?1:0;}
@@ -298,8 +298,11 @@ function arcSettle(wrong){
   const A=arcRead(ARC_KEY),S=arcRead(SHIP_KEY),today=dayStr(new Date());
   if(A.day!==today){A.day=today;A.n=0;A.coin=0;}
   const out={wrong:wrong,items:[],coin:0,capped:false,full:false,want:dropCount(wrong)};
-  if(!A.coin){A.coin=1;out.coin=ARC_COIN;
-    try{OLMSave.patch(OLMSave.K.TEST,function(T){T.coins=(T.coins==null?86:(T.coins|0))+ARC_COIN;});}catch(e){}   /* 金幣入帳（商店錢包） */
+  if(!A.coin){A.coin=1;
+    try{OLMSave.patch(OLMSave.K.TEST,function(T){
+      const sw=!!(T.worn&&T.worn.hand==='sword');          /* 穿水晶劍：每天第一次 +8 */
+      out.coin=sw?ARC_COIN_SWORD:ARC_COIN;out.sword=sw;
+      T.coins=(T.coins==null?86:(T.coins|0))+out.coin;});}catch(e){out.coin=ARC_COIN;}   /* 金幣入帳（商店錢包） */
   }
   const isle=(S.isle>=1&&S.isle<=12)?S.isle:4;
   S.el=S.el||{};S.isle=isle;
@@ -328,7 +331,7 @@ function dropHTML(d){
   }
   if(d.capped)h+='<div class="dn">今天的水晶碎片掉落已達上限（'+ARC_DAY_CAP+' 顆），明天再來！</div>';
   if(d.full)h+='<div class="dn">這種水晶碎片的背包滿了（'+ARC_KIND_CAP+' 顆），先去飛行船提煉用掉吧！</div>';
-  if(d.coin)h+='<div class="dc">今天第一次玩，金幣 +'+d.coin+'（已存進商店金幣）</div>';
+  if(d.coin)h+='<div class="dc">今天第一次玩，金幣 +'+d.coin+(d.sword?'（水晶劍加成）':'')+'（已存進商店金幣）</div>';
   return h+'</div>';
 }
 

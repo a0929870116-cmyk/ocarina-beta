@@ -335,6 +335,7 @@ function badgeOf(r){
 const Core=window.OLM_WK;
 const TASKS=Core.TASKS,BUDGET=Core.BUDGET,ELEM_CAP=Core.ELEM_CAP,ELEM_EVERY=Core.ELEM_EVERY;
 const TASK_ID=(new URLSearchParams(location.search).get('task'))||'basic-1-1';
+if(!TASKS.length){document.body.innerHTML='<div style="padding:40px 20px;text-align:center;font-size:18px">待老師指派任務<br><br><a href="game-test.html#practice">回練習</a></div>';throw new Error('待老師指派任務');}   /* 已登入但老師還沒指派：沒有任務可練 */
 const TASK=Core.taskById(TASK_ID)||TASKS[0],GOAL=TASK.T;
 if(TASK.speed){const sel=document.getElementById('bpm');let o=[...sel.options].find(x=>+x.value===TASK.speed);if(!o){o=document.createElement('option');o.value=String(TASK.speed);o.textContent='♩='+TASK.speed+'（老師指定）';sel.appendChild(o);}sel.value=String(TASK.speed);}   /* 後台指定速度：預設選這個，仍可自己改 */
 let P=Core.P;

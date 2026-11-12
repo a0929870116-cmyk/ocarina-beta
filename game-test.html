@@ -910,11 +910,12 @@ function wkState(){const P=OLM_WK.reload();return {tasks:P.tasks,given:P.given,w
 function renderWeekly(){
   const W=wkState(),TK=OLM_WK.TASKS,q=OLM_WK.weights();
   const e=$('wk-n');
-  if(e){let x=0,w=0;TK.forEach((t,i)=>{x+=Math.min((W.tasks[t.id]|0)/t.T,1)*q[i];w+=q[i];});e.textContent='完成度 '+Math.round(x/w*100)+'%';}
-  const k=$('wk-k');if(k)k.textContent='本週任務（'+TK.length+' 個）';
+  if(e){let x=0,w=0;TK.forEach((t,i)=>{x+=Math.min((W.tasks[t.id]|0)/t.T,1)*q[i];w+=q[i];});e.textContent=w?'完成度 '+Math.round(x/w*100)+'%':'';}
+  const k=$('wk-k');if(k)k.textContent=TK.length?'本週任務（'+TK.length+' 個）':'本週任務';
   const ul=$('wk-tasks');
   if(ul){
     ul.innerHTML='';
+    if(!TK.length){const li=document.createElement('li');li.className='wk-wait';li.textContent='待老師指派任務';li.style.cssText='padding:14px 10px;text-align:center;font-weight:700;opacity:.8';ul.appendChild(li);}
     TK.forEach(t=>{
       const n=W.tasks[t.id]|0,d=Math.min(n,t.T),li=document.createElement('li'),b=document.createElement('button');
       b.type='button';b.className='wk-item'+(n>=t.T?' done':'');b.dataset.task=t.id;

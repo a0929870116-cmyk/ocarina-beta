@@ -12,18 +12,18 @@ const DEFAULT_TASKS=[
   {id:'song-pig',type:'song',name:'豬之歌',song:'pig',from:1,to:4,T:20,mock:true}
 ];
 /* 後台任務（11/12）：已登入且老師有指派時，改用 cloud-tasks.js 存在手機的 olm_tasks_v1（任務內的 song／from／to／speed 決定內容，不從 id 推）；
-   沒登入（訪客）、沒指派、讀不到 → 用上面的預設任務。TASKS 是同一個陣列物件，原地換內容（各頁手上的參照不會失效）。 */
+   沒登入（訪客）→ 用上面的預設任務；已登入但老師還沒指派（或讀不到、快取不是自己的）→ 空清單，畫面顯示「待老師指派任務」（11/12 使用者決定）。TASKS 是同一個陣列物件，原地換內容（各頁手上的參照不會失效）。 */
 const TASKS=[];
 function cloudTasks(){
   try{
-    const sid=sessionStorage.getItem('olm_live_sid');if(!sid)return null;
+    const sid=sessionStorage.getItem('olm_live_sid');if(!sid)return null;   /* 訪客：用預設任務 */
     const c=OLMSave.read('olm_tasks_v1');
-    if(c.sid!==sid||!Array.isArray(c.tasks)||!c.tasks.length)return null;
+    if(c.sid!==sid||!Array.isArray(c.tasks))return [];   /* 已登入但沒有自己的快取：待老師指派 */
     return c.tasks;
   }catch(e){return null;}
 }
 function applyTasks(){
-  const src=cloudTasks()||DEFAULT_TASKS;
+  const src=cloudTasks()||DEFAULT_TASKS;   /* 陣列（可為空）＝已登入；null＝訪客 */
   TASKS.length=0;src.forEach(t=>TASKS.push(Object.assign({},t)));
 }
 applyTasks();
@@ -36,6 +36,7 @@ function weightOf(i,n){return n>3?Math.max(0.2,1-0.2*i):1;}
 function weights(){const n=TASKS.length;return TASKS.map((t,i)=>weightOf(i,n)*(t.weight||1));}
 function qList(){const w=weights(),s=w.reduce((a,b)=>a+b,0);return w.map(x=>BUDGET*x/s);}   /* 各任務的星星糖份額 Q */
 function qOf(t){return qList()[TASKS.indexOf(t)];}
+function waiting(){return TASKS.length===0;}   /* 已登入但老師還沒指派任務 */
 function taskById(id){return TASKS.find(t=>t.id===id)||null;}
 function taskUrl(t){return t.type==='song'?'song-practice.html?task='+encodeURIComponent(t.id):'weekly-practice.html?task='+encodeURIComponent(t.id);}
 function taskLabel(t){return t.type==='song'?t.name+'（第 '+t.from+'–'+t.to+' 小節）':t.name;}
@@ -53,7 +54,7 @@ function load(){
     let old=OLMSave.read(OLMSave.K.OLDWK);if(!Object.keys(old).length)old=null;
     o={v:2,start:todayKey(),week:0,played:(old&&old.done|0)||0,total:(old&&old.perfect|0)||0,tasks:{},given:0};
     TASKS.forEach(t=>{o.tasks[t.id]=0;});
-    if(old&&old.perfect)o.tasks[TASKS[0].id]=old.perfect|0;
+    if(old&&old.perfect&&TASKS[0])o.tasks[TASKS[0].id]=old.perfect|0;
     o.given=earned(o);o.elem=elemEarned(o);o.bag=0;
   }else{
     if(typeof o.week==='string'){o.start=o.week;o.week=0;}
@@ -137,6 +138,6 @@ function recordLog(taskId,perfect,errs){
 }
 
 g.OLM_WK={TASKS,BUDGET,NEED_STAR,WK,ELEM_EVERY,ELEM_CAP,weightOf,weights,qList,qOf,taskById,taskUrl,taskLabel,
-  todayKey,weekIdx,earned,overflow,elemEarned,load,save,reload,recordPlayed,recordPerfect,addTypedElem,recordLog,errsFrom,applyTasks,
+  todayKey,weekIdx,earned,overflow,elemEarned,load,save,reload,recordPlayed,recordPerfect,addTypedElem,recordLog,errsFrom,applyTasks,waiting,
   get P(){return P;}};
 })(window);

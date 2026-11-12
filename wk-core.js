@@ -7,10 +7,26 @@
 /* 任務清單（測試版寫死；歌名、小節範圍、T 之後由老師／Firebase 後台指定）。
    type：'drill'＝教材（weekly-practice.html）；'song'＝歌曲＋小節範圍（song-practice.html?task=）
    順序＝優先順序（任務一最優先）；mock:true＝內容是模擬假資料，畫面會標示。 */
-const TASKS=[
+const DEFAULT_TASKS=[
   {id:'basic-1-1',type:'drill',name:'基本指法 1-1',T:20},
   {id:'song-pig',type:'song',name:'豬之歌',song:'pig',from:1,to:4,T:20,mock:true}
 ];
+/* 後台任務（11/12）：已登入且老師有指派時，改用 cloud-tasks.js 存在手機的 olm_tasks_v1（任務內的 song／from／to／speed 決定內容，不從 id 推）；
+   沒登入（訪客）、沒指派、讀不到 → 用上面的預設任務。TASKS 是同一個陣列物件，原地換內容（各頁手上的參照不會失效）。 */
+const TASKS=[];
+function cloudTasks(){
+  try{
+    const sid=sessionStorage.getItem('olm_live_sid');if(!sid)return null;
+    const c=OLMSave.read('olm_tasks_v1');
+    if(c.sid!==sid||!Array.isArray(c.tasks)||!c.tasks.length)return null;
+    return c.tasks;
+  }catch(e){return null;}
+}
+function applyTasks(){
+  const src=cloudTasks()||DEFAULT_TASKS;
+  TASKS.length=0;src.forEach(t=>TASKS.push(Object.assign({},t)));
+}
+applyTasks();
 const BUDGET=20,NEED_STAR=40,WK='olm_wk_v2';
 const ELEM_ON=false;   /* 11/12 使用者決定：每週練習先停止掉水晶碎片（碎片只從星空試煉掉）；要恢復改成 true */
 const ELEM_EVERY=2,ELEM_CAP=10;   /* 超過目標的全對，每 ELEM_EVERY 次掉 1 個，每週所有任務合計上限 ELEM_CAP */
@@ -57,7 +73,7 @@ function load(){
 }
 let P=load();
 function save(){OLMSave.patch(WK,function(d){Object.assign(d,P);});}
-function reload(){P=load();return P;}
+function reload(){applyTasks();P=load();return P;}
 
 /* 元素種類：每島一種，依「目前練習的島」掉落（要和 ship-workshop.html 的元素順序一致） */
 const ISLE_ELEM=[['stardust','星塵'],['moonwater','月光水'],['rainbow','彩虹絲'],['cloud','雲絮'],['glowdew','螢光露'],['lantern','燈籠火'],['core','星核砂'],['seaglass','海玻璃'],['note','音符晶'],['aurora','極光冰'],['peak','星峰石'],['ruby','城堡紅玉']];
@@ -97,7 +113,30 @@ function recordPerfect(taskId){try{
   return '（本週星星糖 '+P.given+'／'+BUDGET+'）';
 }catch(e){return '';}}
 
+/* 練習紀錄（給後台「練習進度與錯誤熱點」）：每次有效吹奏（有吹完）一筆彙總，排進手機佇列 olm_logq_v1，由首頁的 cloud-tasks.js 送上雲端。
+   只有「已登入」的分頁（sessionStorage 有 olm_live_sid）才記，訪客不記；失敗不影響遊玩。格式同 admin-data.js：{sid,ts,task,perfect,errs:[{bar,k,c}]} */
+function errsFrom(res,barOf){
+  const out=[];
+  try{(res||[]).forEach((r,i)=>{
+    const bar=barOf(r,i)|0;
+    if(r.miss){out.push({bar,k:'miss'});return;}
+    if(r.pitch==='high'||r.pitch==='low')out.push({bar,k:r.pitch,c:Math.round(r.cents)});
+    else if(r.pitch==='wrong')out.push({bar,k:'wrong'});
+    if(r.timing==='early'||r.timing==='late')out.push({bar,k:r.timing});
+  });}catch(e){}
+  return out.slice(0,100);
+}
+function recordLog(taskId,perfect,errs){
+  try{
+    const sid=sessionStorage.getItem('olm_live_sid');if(!sid)return false;
+    let q=[];try{q=JSON.parse(OLMSave.raw.get('olm_logq_v1')||'[]');if(!Array.isArray(q))q=[];}catch(e){q=[];}
+    q.push({id:'l'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),sid,ts:new Date().toISOString(),task:String(taskId),perfect:!!perfect,errs:Array.isArray(errs)?errs.slice(0,100):[]});
+    if(q.length>200)q=q.slice(q.length-200);
+    return OLMSave.raw.set('olm_logq_v1',JSON.stringify(q));
+  }catch(e){return false;}
+}
+
 g.OLM_WK={TASKS,BUDGET,NEED_STAR,WK,ELEM_EVERY,ELEM_CAP,weightOf,weights,qList,qOf,taskById,taskUrl,taskLabel,
-  todayKey,weekIdx,earned,overflow,elemEarned,load,save,reload,recordPlayed,recordPerfect,addTypedElem,
+  todayKey,weekIdx,earned,overflow,elemEarned,load,save,reload,recordPlayed,recordPerfect,addTypedElem,recordLog,errsFrom,applyTasks,
   get P(){return P;}};
 })(window);

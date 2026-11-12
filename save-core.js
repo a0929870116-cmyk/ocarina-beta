@@ -12,7 +12,7 @@
 
   function rawGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   /* 每次寫入（非內部鍵）都記下「最後修改時間」olm_sync_ts，給 cloud-sync.js 判斷要不要上傳、哪邊比較新 */
-  var META=/^(olm_save_ver|olm_backup|olm_sync|olm_owner)/;
+  var META=/^(olm_save_ver|olm_backup|olm_sync|olm_owner|olm_tasks|olm_logq)/;
   function stamp(k){if(!META.test(k)){try{var p=parseInt(localStorage.getItem('olm_sync_ts'),10)||0;localStorage.setItem('olm_sync_ts',String(Math.max(Date.now(),p+1)));}catch(e){}}}   /* 單調遞增：同一毫秒內連寫也會變 */
   function rawSet(k,v){try{localStorage.setItem(k,v);stamp(k);return true;}catch(e){return false;}}
   function rawDel(k){try{localStorage.removeItem(k);stamp(k);return true;}catch(e){return false;}}

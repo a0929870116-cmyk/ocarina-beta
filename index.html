@@ -258,6 +258,7 @@ form{display:flex;flex-direction:column;gap:10px}
 <script src="firebase-config.js"></script>
 <script src="student-auth.js"></script>
 <script src="cloud-sync.js"></script>
+<script src="cloud-tasks.js"></script>
 <script>if(window.Sfx){Sfx.auto('.bk-next,.storybtn','nav');Sfx.auto('.enter,.btn','tap');}</script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -527,6 +528,7 @@ async function authSubmit(f,act){
     const svc=await OLMStudent.service();
     const u=act==='login'?await svc.login(v('n'),v('p')):await svc.register(v('n2'),v('p2'),f.querySelector('#ack').checked);
     await OLMSync.attach(svc,u);   /* 進度：決定用雲端或這支手機的存檔（失敗只有 net／denied） */
+    await OLMTasks.attach(svc,u);   /* 後台任務與練習紀錄（不會失敗、最多等 4 秒） */
     USER=u.name;SESSION=u;show('home');
   }catch(e){showErr(f,(e&&e.code)||'other');btn.disabled=false;btn.textContent=label}
 }
@@ -538,12 +540,12 @@ document.addEventListener('click',e=>{
   const d=e.target.closest('[data-do]');if(!d)return;
   if(d.dataset.do==='resume'&&SESSION){
     d.disabled=true;const t=d.textContent;d.textContent='請稍等…';
-    OLMStudent.service().then(s=>OLMSync.attach(s,SESSION)).then(()=>{USER=SESSION.name;show('home')},e=>{d.disabled=false;d.textContent=t;const a=ERR[(e&&e.code)||'other']||ERR.other;$('#resume').insertAdjacentHTML('afterbegin',err(a[0],a[1],a[2]))});
+    OLMStudent.service().then(s=>OLMSync.attach(s,SESSION).then(()=>OLMTasks.attach(s,SESSION))).then(()=>{USER=SESSION.name;show('home')},e=>{d.disabled=false;d.textContent=t;const a=ERR[(e&&e.code)||'other']||ERR.other;$('#resume').insertAdjacentHTML('afterbegin',err(a[0],a[1],a[2]))});
   }
   else if(d.dataset.do==='logout'){
     OLMSync.detach(true).then(ok=>{
       if(!ok){$('#resume').insertAdjacentHTML('afterbegin',err('sad','進度還沒存到雲端','請連上網路，等一下再按「換人登入」，不然你的進度可能會不見。'));return}
-      return OLMStudent.service().then(s=>s.logout()).catch(()=>{}).then(()=>{SESSION=null;renderResume()});
+      return OLMTasks.detach().then(()=>OLMStudent.service()).then(s=>s.logout()).catch(()=>{}).then(()=>{SESSION=null;renderResume()});
     });
   }
 });
@@ -551,7 +553,8 @@ document.addEventListener('click',e=>{
 OLMStudent.service().then(s=>s.current()).then(u=>{SESSION=u;if(curV==='login')renderResume()}).catch(()=>{});
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,act=f.dataset.act;
   if(act){authSubmit(f,act);return}
-  const g=f.dataset.go;if(g){const inp=f.querySelector('input');USER=(inp&&inp.value.trim())||'同學';show(g)}});
+  const g=f.dataset.go;if(g){try{sessionStorage.removeItem('olm_live_sid')}catch(e){}   /* 訪客：這個分頁不記練習紀錄、用預設任務 */
+    const inp=f.querySelector('input');USER=(inp&&inp.value.trim())||'同學';show(g)}});
 
 /* ===== 遊戲頁（game-test.html）：登入後載入；音樂與故事序章由這一層負責 ===== */
 let storyFromGame=false;

@@ -141,7 +141,7 @@ const COUNT_IN=4,MAX_BARS=16,STORE='olm_song_proto_v1';
 /* 任務模式：網址 ?task=任務id（由遊戲練習分頁的「本週任務」清單點進來）。曲子與小節範圍由任務指定、不可改；
    次數、星星糖、水晶碎片都走共用的 wk-core.js（olm_wk_v2）。沒有 ?task= 時是舊的原型模式（只存 olm_song_proto_v1，不計星星糖，供開發測試）。 */
 const Core=window.OLM_WK;
-const TASK=(function(){const id=new URLSearchParams(location.search).get('task');const t=id&&Core.taskById(id);return t&&t.type==='song'?t:null;})();
+const TASK=(function(){const id=new URLSearchParams(location.search).get('task');const t=id&&Core.taskById(id);return t&&t.type==='song'&&SONGS[t.song]?t:null;})();
 const GOAL=TASK?TASK.T:20;
 
 /* ========== 名稱與簡譜 ========== */
@@ -743,6 +743,7 @@ function showResult(res){
     try{window.Sfx&&(s.perfect?Sfx.ok():Sfx.bad());}catch(e){}
     if(TASK){
       Core.recordPlayed();
+      Core.recordLog(TASK.id,s.perfect,Core.errsFrom(res,r=>r.e.bar));
       if(s.perfect){
         const msg=Core.recordPerfect(TASK.id),n=Core.P.tasks[TASK.id];
         v.textContent=(n===GOAL?'🎉 恭喜完成本週任務！正確 '+GOAL+' 次達成':'全部都對！本週這個任務正確 '+n+' 次 🌟')+msg;v.style.color='var(--green)';
@@ -812,6 +813,7 @@ if(TASK){   /* 任務模式：曲子與範圍由任務指定，不給改；標�
   ['rowSong','rowPreset','rowRange'].forEach(id=>$(id).hidden=true);
   $('protoNote').hidden=true;$('mockNote').hidden=!TASK.mock;
   $('pageTitle').textContent='本週任務';
+  if(TASK.speed){const sel=$('bpm');let o=[...sel.options].find(x=>+x.value===TASK.speed);if(!o){o=document.createElement('option');o.value=String(TASK.speed);o.textContent='♩='+TASK.speed+'（老師指定）';sel.appendChild(o);}sel.value=String(TASK.speed);}   /* 後台指定速度：預設選這個，仍可自己改 */
   document.title='陶笛失落地圖｜本週任務：'+TASK.name;
 }
 

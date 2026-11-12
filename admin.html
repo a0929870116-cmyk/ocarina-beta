@@ -60,10 +60,31 @@ tr.sel td{background:var(--green2)}
 .kpis{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:120px}
 .kpi b{display:block;font-size:20px;color:var(--green)}.kpi span{font-size:12px;color:var(--sub)}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header .hx{flex:1;min-width:220px}
+header .hbtn{display:none;gap:8px;align-items:center;font-size:13px}
+header .hbtn button{font:inherit;font-size:13px;border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:8px;padding:4px 12px;cursor:pointer}
+#login{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;align-items:center;justify-content:center;padding:16px}
+#login.on{display:flex}
+#login .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;max-width:380px;width:100%}
+#login h2{margin:0 0 4px;color:var(--green);font-size:18px}
+#login label{margin-top:10px}
+#login .b{margin-top:14px;width:100%}
 </style>
 </head>
 <body>
-<header><h1>陶笛失落地圖｜管理後台</h1><p>測試站・不連線骨架版（資料只存在這台瀏覽器；尚未登入保護，之後接 Firebase）</p></header>
+<header>
+  <div class="hx"><h1>陶笛失落地圖｜管理後台</h1><p id="hsub">測試站・載入中…</p></div>
+  <div class="hbtn" id="hbtn"><span id="who"></span><button id="rf-btn" type="button">重新整理</button><button id="out-btn" type="button">登出</button></div>
+</header>
+<div id="login"><form class="box" id="login-form" autocomplete="on">
+  <h2>管理後台登入</h2>
+  <p class="muted" style="margin:0">只有管理者帳號能進入。學生資料只存在雲端資料庫，沒登入看不到。</p>
+  <label>電子郵件<input id="lg-email" type="email" autocomplete="username" required></label>
+  <label>密碼<input id="lg-pw" type="password" autocomplete="current-password" required></label>
+  <button class="b" id="lg-go" type="submit">登入</button>
+  <p class="msg" id="lg-msg"></p>
+</form></div>
 <div class="banner" id="banner">載入中…</div>
 <nav id="nav">
   <button data-t="students" class="on">學生名單</button>
@@ -91,7 +112,7 @@ tr.sel td{background:var(--green2)}
     <h2>名單 <span class="muted" id="st-count"></span></h2>
     <div class="row" style="margin-bottom:8px"><label>搜尋<input id="st-q" placeholder="姓名或備註"></label></div>
     <div class="tw"><table><thead><tr><th>名稱</th><th>備註</th><th>開始日</th><th>家長知悉</th><th>本週任務</th><th></th></tr></thead><tbody id="st-body"></tbody></table></div>
-    <p class="muted" id="st-empty" style="display:none">還沒有學生。可以到「資料與匯出」產生模擬資料先看看畫面。</p>
+    <p class="muted" id="st-empty" style="display:none">還沒有學生。在上面新增第一位學生。</p>
   </div>
 </section>
 
@@ -180,6 +201,7 @@ tr.sel td{background:var(--green2)}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 
 <script src="songs.js"></script>
+<script src="firebase-config.js"></script>
 <script src="admin-data.js"></script>
 <script>
 (function(){
@@ -226,7 +248,7 @@ function nm(s){return DN[s.id]||s.name;}
 function reload(){
   return A.all().then(function(o){
     D=o;DN=A.displayNames(D.students);
-    $('banner').textContent=(D.mock?'⚠️ 目前含模擬資料（不是真實學生）。 ':'')+'資料模式：'+(A.mode==='local'?'本機瀏覽器（不連線骨架）':A.mode)+'。學生 '+D.students.length+' 位、練習紀錄 '+D.logs.length+' 筆。';
+    $('banner').textContent=(D.mock?'⚠️ 目前含模擬資料（不是真實學生）。 ':'')+'資料模式：'+(A.mode==='local'?'本機瀏覽器（測試用，不連線）':'雲端 Firestore')+'。學生 '+D.students.length+' 位、練習紀錄 '+D.logs.length+' 筆。';
     renderAll();
   });
 }
@@ -473,7 +495,62 @@ $('dm-seed').onclick=function(){A.seedDemo(20).then(function(){msg('dm-msg','已
 $('dm-clear').onclick=function(){A.clearDemo().then(function(){msg('dm-msg','已清除模擬資料','ok');selAssign={};return reload();});};
 $('dm-all').onclick=function(){confirmBox('清除全部後台資料','<p>會刪除<b>所有學生、任務、練習紀錄</b>，無法復原。</p><p class="muted">建議先下載備份。</p>','全部清除',function(){A.clearAll().then(function(){msg('dm-msg','已全部清除','ok');selAssign={};curDetail=null;return reload();});},true);};
 
-reload();
+/* ===== 啟動：雲端模式要先登入；網址加 ?local=1 走本機模式（看畫面、模擬資料） ===== */
+var CLOUD=!!window.OLM_FIREBASE&&!/[?&]local=1/.test(location.search);
+var ADMIN=CLOUD?String(window.OLM_FIREBASE.adminEmail||'').toLowerCase():'';
+function showLogin(on,m,kind){$('login').classList.toggle('on',on);$('hbtn').style.display=on?'none':(CLOUD?'flex':'none');if(m!==undefined)msg('lg-msg',m,kind);}
+function authErr(e){
+  var c=e&&e.code||'';
+  if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c))return '帳號或密碼不對。';
+  if(c==='auth/too-many-requests')return '嘗試次數太多，請稍後再試。';
+  if(c==='auth/network-request-failed')return '連不上網路，請檢查連線。';
+  if(c==='auth/invalid-email')return '電子郵件格式不對。';
+  return '登入失敗：'+(e&&e.message||e);
+}
+function loadErr(e){
+  var t=String(e&&e.message||e);
+  $('banner').textContent='❌ 讀取資料失敗：'+t+(/permission|insufficient/i.test(t)?'（Firestore 安全規則尚未發佈，或登入的不是管理者帳號）':'');
+}
+if(!CLOUD){
+  $('hsub').textContent='測試站・本機模式（資料只存在這台瀏覽器；不連線、不需登入）';
+  reload();
+}else{
+  $('hsub').textContent='測試站・雲端模式（Firebase Firestore，需登入）';
+  $('banner').textContent='連線中…';
+  A.connectCloud().then(function(){
+    A.auth.onChange(function(u){
+      if(!u){showLogin(true,'');$('banner').textContent='請先登入。';return;}
+      if(String(u.email||'').toLowerCase()!==ADMIN){
+        A.auth.signOut();showLogin(true,'這個帳號不是管理者。','err');return;
+      }
+      $('who').textContent=u.email;showLogin(false,'');
+      $('banner').textContent='讀取資料中…';
+      reload().catch(loadErr);
+    });
+  },function(e){
+    $('banner').textContent='❌ 無法載入 Firebase：'+(e&&e.message||e)+'（請檢查網路，或網址加 ?local=1 用本機模式）';
+  });
+  $('login-form').onsubmit=function(ev){
+    ev.preventDefault();
+    var b=$('lg-go');b.disabled=true;msg('lg-msg','登入中…');
+    A.auth.signIn($('lg-email').value.trim(),$('lg-pw').value).then(function(){
+      $('lg-pw').value='';
+    }).catch(function(e){msg('lg-msg',authErr(e),'err');}).then(function(){b.disabled=false;});
+  };
+  $('out-btn').onclick=function(){A.auth.signOut();};
+  $('rf-btn').onclick=function(){
+    $('banner').textContent='重新讀取中…';
+    A.refresh().then(reload).catch(loadErr);
+  };
+  /* 雲端模式不提供模擬資料 */
+  $('dm-seed').style.display='none';$('dm-clear').style.display='none';
+}
+/* 漏接的失敗（例如雲端寫入被拒）：顯示在橫幅，並重新讀取讓畫面和雲端一致 */
+window.addEventListener('unhandledrejection',function(ev){
+  var m=ev.reason&&ev.reason.message||String(ev.reason);
+  ev.preventDefault();
+  reload().then(function(){$('banner').textContent='❌ 操作失敗：'+m+'（已重新讀取資料）';},function(){$('banner').textContent='❌ 操作失敗：'+m;});
+});
 window.__admin={A:A,reload:reload,get D(){return D;}};   /* 測試掛鉤 */
 })();
 </script>

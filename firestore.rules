@@ -1,0 +1,18 @@
+rules_version = '2';
+// 陶笛失落地圖｜Firestore 安全規則（第一版：只有管理者能讀寫）
+// 貼到 Firebase 控制台 → Firestore → 規則 → 發佈。
+// 學生端（讀自己的任務、寫自己的練習彙總）等學生登入做好後，再加規則。
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'a0929870116@gmail.com';
+    }
+
+    // 其餘一律拒絕；管理者可讀寫全部
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

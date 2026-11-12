@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>12 座島的動植物與水晶碎片（預覽）</title>
+<style>
+body{margin:0;background:#f3e7c9;color:#4a2f1a;font:16px/1.5 'Noto Sans TC',system-ui,sans-serif;padding:12px}
+h1{font-size:20px;margin:0 0 10px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.cell{background:#f9f0d8;border:2px solid #c9ae72;border-radius:12px;padding:8px 4px;text-align:center}
+.cell b{display:block;font-size:14px}.cell small{color:#7a5a36;font-size:12px}
+.isle{font-weight:700;margin:14px 0 4px}
+</style></head><body>
+<h1>12 座島的動植物與水晶碎片（外型暫定）</h1>
+<div id="o"></div>
+<script src="isle-art.js"></script>
+<script>
+document.getElementById('o').innerHTML=ISLE_ART.data.map(d=>`<div class="isle">第 ${d.n} 島 ${d.isle}</div><div class="row">
+<div class="cell">${ISLE_ART.plant(d.n,96)}<b>${d.plant}</b><small>植物</small></div>
+<div class="cell">${ISLE_ART.animal(d.n,96)}<b>${d.animal}</b><small>動物</small></div>
+<div class="cell">${ISLE_ART.crystal(d.n,96)}<b>${d.crystal}</b><small>水晶碎片</small></div></div>`).join('');
+</script></body></html>

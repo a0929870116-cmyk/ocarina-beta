@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>互動觀察測試頁</title>
+<style>
+:root{--vellum:#EFE1BF;--vellum-2:#F9F0D6;--ink:#3A2A1A;--ink-2:#6E5337;--gold:#C8963A;--shadow:#BFA470;--green:#2E5B46;--green-fg:#F6E7B4}
+body{margin:0;background:var(--vellum-2);color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;padding:24px 18px;max-width:520px;margin:0 auto;line-height:1.6}
+h1{font-size:22px;margin:0 0 4px}p{margin:6px 0 16px;color:var(--ink-2);font-size:15px}
+button.go{display:block;width:100%;min-height:56px;margin:0 0 12px;border:2.5px solid var(--ink);border-radius:14px;background:var(--green);color:var(--green-fg);font:inherit;font-size:18px;font-weight:700;box-shadow:0 3px 0 var(--shadow)}
+button.go.b{background:var(--vellum);color:var(--ink)}
+small{color:var(--ink-2)}
+</style></head><body>
+<h1>互動觀察測試頁</h1>
+<p>直接進入圖鑑的互動觀察，不用經過圖鑑。請用 Safari／Chrome 開（不要在 LINE 內開）。</p>
+<button class="go" id="g5">🌿 螢光蕨（吹陶笛）</button>
+<button class="go" id="g2" style="background:#3a4f8a">🪷 月光睡蓮（吹穩一個音）</button>
+<button class="go b" id="g9">🎵 音符花（點一點）</button>
+<small>進去後按「開始吹奏」並允許麥克風；沒麥克風可按住畫面。左上「‹」返回這一頁。</small>
+<script src="isle-art.js"></script>
+<script src="dex-observe.js"></script>
+<script>
+[2,5,9].forEach(function(n){
+  document.getElementById('g'+n).addEventListener('click',function(){
+    DexObserve.open(n,{note:ISLE_ART.info(n).pNote});
+  });
+});
+</script>
+</body></html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>陶笛失落地圖｜音準測試頁 v0.1</title>
+<style>
+:root{--paper:#f7efdc;--ink:#5b3f2d;--soft:#8a6a52;--card:#fffaf0;--ok:#4f9a5a;--warn:#d98b2b;--bad:#c4563f;--line:#d9c7a3;--gold:#f2c14e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.5;padding:16px 16px 56px}
+.wrap{max-width:480px;margin:0 auto}
+h1{font-size:22px;margin:4px 0 2px}
+h2{font-size:16px;margin:0 0 8px}
+.sub{color:var(--soft);font-size:14px;margin:0 0 14px}
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:18px 22px 16px 24px;padding:14px;margin:0 0 14px;box-shadow:3px 4px 0 rgba(91,63,45,.18)}
+.btn{width:100%;font-size:22px;font-weight:700;padding:16px;border:3px solid var(--ink);border-radius:20px 24px 18px 22px;background:var(--gold);color:var(--ink);cursor:pointer;font-family:inherit}
+.btn.stop{background:#e8d3c4}
+.btn.small{font-size:16px;padding:8px 14px;width:auto;background:#fff3d6}
+.btn:active{transform:translateY(2px)}
+.warn{background:#fde8d4;border-color:var(--bad);font-size:15px}
+.msg{font-size:15px;margin-top:10px;min-height:22px}
+.msg.err{color:var(--bad);font-weight:700}
+ul.diag{list-style:none;margin:0;padding:0;font-size:15px}
+ul.diag li{padding:3px 0;border-bottom:1px dashed var(--line)}
+ul.diag li:last-child{border:0}
+.note{font-size:64px;font-weight:800;text-align:center;line-height:1.1;min-height:70px}
+.jp{font-size:20px;text-align:center;color:var(--soft);min-height:30px}
+.verdict{font-size:24px;font-weight:800;text-align:center;margin:10px 0 4px;min-height:36px}
+.verdict.ok{color:var(--ok)}.verdict.warn{color:var(--warn)}.verdict.bad{color:var(--bad)}
+.meter{position:relative;height:30px;border:2.5px solid var(--ink);border-radius:14px;background:linear-gradient(90deg,#f3c9b8 0%,#f3c9b8 25%,#d6e8c7 38%,#d6e8c7 62%,#f3c9b8 75%,#f3c9b8 100%);margin:12px 0 4px;overflow:hidden}
+.meter .mid{position:absolute;left:50%;top:0;bottom:0;width:3px;background:var(--ink);transform:translateX(-50%)}
+.meter .needle{position:absolute;top:2px;bottom:2px;width:10px;border-radius:5px;background:var(--ink);left:50%;transform:translateX(-50%);transition:left .08s linear;opacity:.25}
+.scale{display:flex;justify-content:space-between;font-size:13px;color:var(--soft)}
+.vol{height:16px;border:2.5px solid var(--ink);border-radius:10px;overflow:hidden;background:#fff}
+.vol i{display:block;height:100%;width:0;background:var(--ok)}
+select{font-size:18px;padding:8px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);width:100%;font-family:inherit}
+label{font-size:15px;font-weight:700;display:block;margin:6px 0 4px}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.dot{display:inline-block;width:26px;height:26px;border-radius:50%;border:2.5px solid var(--ink);background:#fff;vertical-align:middle;margin-right:8px}
+.dot.hit{background:var(--gold)}
+.small{font-size:13px;color:var(--soft)}
+.dbg{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--soft);margin-top:8px;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎵 音準測試頁 <span class="small">v0.1</span></h1>
+  <p class="sub">先確認手機能不能收音、音高判斷準不準。請吹陶笛或唱一個長音。</p>
+
+  <div id="inappWarn" class="card warn" style="display:none">
+    ⚠️ 偵測到你可能在 LINE／臉書／IG 的內建瀏覽器，常常會擋麥克風。<br>
+    請點右上角「⋯」→「用預設瀏覽器開啟」（iPhone 是「用 Safari 開啟」）再試。
+  </div>
+
+  <div class="card">
+    <h2>① 環境檢查</h2>
+    <ul class="diag" id="diag"></ul>
+  </div>
+
+  <button class="btn" id="startBtn">🎤 開始收音</button>
+  <div class="msg" id="msg"></div>
+  <div style="height:10px"></div>
+
+  <div class="card" id="panel" style="display:none">
+    <h2>② 音準回饋</h2>
+    <div class="row">
+      <div>
+        <label for="target">目標音</label>
+        <select id="target"></select>
+      </div>
+      <div>
+        <label for="tol">容許誤差</label>
+        <select id="tol">
+          <option value="15">±15 音分（嚴）</option>
+          <option value="25" selected>±25 音分</option>
+          <option value="40">±40 音分（鬆）</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="note" id="noteName">—</div>
+    <div class="jp" id="noteJp">&nbsp;</div>
+    <div class="verdict" id="verdict">請吹一個音</div>
+    <div class="meter"><div class="mid"></div><div class="needle" id="needle"></div></div>
+    <div class="scale"><span>偏低</span><span>準</span><span>偏高</span></div>
+
+    <label style="margin-top:14px">音量</label>
+    <div class="vol"><i id="volBar"></i></div>
+    <div class="dbg" id="dbg"></div>
+  </div>
+
+  <div class="card" id="rhythmPanel" style="display:none">
+    <h2>③ 節奏起音（試驗）</h2>
+    <p class="small" style="margin:0 0 8px">每次吹出新的音（或用舌頭斷音），圓點會亮一下並記錄間隔。</p>
+    <div style="font-size:18px"><span class="dot" id="onsetDot"></span>起音次數：<b id="onsetCount">0</b></div>
+    <div class="small" id="intervals" style="margin-top:6px">間隔（毫秒）：—</div>
+    <div style="margin-top:10px"><button class="btn small" id="resetBtn">重置</button></div>
+  </div>
+
+  <button class="btn stop" id="stopBtn" style="display:none">⏹ 停止收音</button>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const JP    = ['1','♯1','2','♯2','3','4','♯4','5','♯5','6','♯6','7'];
+  function octLabel(o){ return o===4?'中音':o===5?'高音':o===6?'高高音':o===3?'低音':(o>6?'更高':'更低'); }
+  function info(m){ const n=((m%12)+12)%12, o=Math.floor(m/12)-1; return {name:NAMES[n]+o, jp:JP[n], oct:o, label:octLabel(o)}; }
+
+  // ---------- 目標音選單（1=C，自然音階 C4～C7）----------
+  (function buildTargets(){
+    const sel = $('target');
+    sel.innerHTML = '<option value="">不指定（只顯示偵測到的音）</option>';
+    const pcs = [0,2,4,5,7,9,11];
+    for(let o=4;o<=6;o++){
+      pcs.forEach(pc=>{
+        const m = 12*(o+1)+pc, i = info(m);
+        sel.insertAdjacentHTML('beforeend', `<option value="${m}">${i.jp}（${i.label}・${i.name}）</option>`);
+      });
+    }
+    const m7=12*8, i7=info(m7);
+    sel.insertAdjacentHTML('beforeend', `<option value="${m7}">${i7.jp}（更高・${i7.name}）</option>`);
+  })();
+
+  // ---------- 環境檢查 ----------
+  const ua = navigator.userAgent || '';
+  const inApp = /Line\/|FBAN|FBAV|Instagram|MicroMessenger|Messenger|Threads/i.test(ua);
+  const inFrame = (function(){ try{ return window.self !== window.top; }catch(e){ return true; } })();
+  const hasMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  function row(ok, text){ return `<li>${ok===true?'✅':ok===false?'❌':'➖'} ${text}</li>`; }
+  const diag = $('diag');
+  function renderDiag(permText){
+    diag.innerHTML =
+      row(window.isSecureContext, '安全連線（HTTPS）：' + location.protocol.replace(':','') + (window.isSecureContext?'':'　← 沒有 HTTPS 無法收音')) +
+      row(hasMedia, '瀏覽器支援收音：' + (hasMedia?'是':'否')) +
+      row(!inApp, '內建瀏覽器：' + (inApp?'是（可能被擋）':'否')) +
+      row(!inFrame, '嵌入視窗：' + (inFrame?'是（可能被擋，請用獨立網址開）':'否（獨立頁面）')) +
+      row(null, '麥克風權限：' + (permText||'尚未詢問'));
+  }
+  renderDiag();
+  if(inApp) $('inappWarn').style.display = 'block';
+  if(navigator.permissions && navigator.permissions.query){
+    navigator.permissions.query({name:'microphone'}).then(p=>{
+      const map = {granted:'已允許', denied:'已封鎖（請到瀏覽器設定開啟）', prompt:'尚未詢問'};
+      renderDiag(map[p.state]||p.state);
+      p.onchange = ()=>renderDiag(map[p.state]||p.state);
+    }).catch(()=>{});
+  }
+
+  // ---------- 音高偵測（MPM 風格：正規化自相關）----------
+  function detectPitch(buf, sr){
+    const n = buf.length;
+    const minLag = Math.max(2, Math.floor(sr/2200));
+    const maxLag = Math.min(n-2, Math.floor(sr/180));
+    const nsdf = new Float32Array(maxLag+2);
+    for(let lag=minLag-1; lag<=maxLag+1; lag++){
+      let acf=0, m=0;
+      for(let i=0;i<n-lag;i++){ const a=buf[i], b=buf[i+lag]; acf+=a*b; m+=a*a+b*b; }
+      nsdf[lag] = m>0 ? 2*acf/m : 0;
+    }
+    // 找各段正值區間的最高峰
+    const peaks=[]; let seenNeg=false, curMax=-1, curIdx=-1;
+    for(let lag=minLag; lag<=maxLag; lag++){
+      const v=nsdf[lag];
+      if(v<=0){
+        if(curIdx>=0){ peaks.push(curIdx); curIdx=-1; curMax=-1; }
+        seenNeg=true; continue;
+      }
+      if(!seenNeg) continue;
+      if(v>curMax){ curMax=v; curIdx=lag; }
+    }
+    if(curIdx>=0) peaks.push(curIdx);
+    if(!peaks.length) return null;
+    let high=-1; peaks.forEach(p=>{ if(nsdf[p]>high) high=nsdf[p]; });
+    let chosen=-1; for(const p of peaks){ if(nsdf[p]>=0.9*high){ chosen=p; break; } }
+    if(chosen<=minLag || chosen>=maxLag) return null;
+    const a=nsdf[chosen-1], b=nsdf[chosen], c=nsdf[chosen+1];
+    const den=(a-2*b+c);
+    const shift = den!==0 ? (a-c)/(2*den) : 0;
+    const lag = chosen + shift;
+    return { freq: sr/lag, clarity: nsdf[chosen] };
+  }
+
+  // ---------- 狀態 ----------
+  let ctx=null, stream=null, analyser=null, buf=null, raf=0, running=false;
+  let hist=[], miss=0;
+  let prevSmooth=0, lastOnset=0, onsetTimes=[];
+
+  function setMsg(t, err){ const m=$('msg'); m.textContent=t||''; m.className='msg'+(err?' err':''); }
+
+  async function start(){
+    setMsg('');
+    if(!window.isSecureContext){ setMsg('這個網址不是 HTTPS，瀏覽器不允許收音。請改用 https:// 開頭的網址。', true); return; }
+    if(!hasMedia){ setMsg('這個瀏覽器不支援收音。請改用 Chrome 或 Safari 開啟。', true); return; }
+    try{
+      // 必須在「點擊」當下建立 AudioContext（iPhone 需求）
+      ctx = new (window.AudioContext||window.webkitAudioContext)();
+      if(ctx.state==='suspended') await ctx.resume();
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false }
+      });
+      if(ctx.state==='suspended') await ctx.resume();
+      const src = ctx.createMediaStreamSource(stream);
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      src.connect(analyser);            // 不接到喇叭，避免回授
+      buf = new Float32Array(analyser.fftSize);
+      running = true;
+      hist=[]; miss=0; prevSmooth=0; lastOnset=0;
+      $('startBtn').style.display='none';
+      $('stopBtn').style.display='block';
+      $('panel').style.display='block';
+      $('rhythmPanel').style.display='block';
+      setMsg('收音中…請吹一個長音 🎶');
+      renderDiag('已允許');
+      loop();
+    }catch(e){
+      cleanup();
+      const name = e && e.name;
+      const map = {
+        NotAllowedError:'麥克風被拒絕或封鎖。請到瀏覽器／手機設定允許此網站使用麥克風，然後重新整理再試。（若在內建瀏覽器或嵌入視窗，請改用獨立網址）',
+        SecurityError:'瀏覽器基於安全限制擋住麥克風。請用 https 獨立網址、並在 Safari 或 Chrome 開啟。',
+        NotFoundError:'找不到麥克風裝置。',
+        NotReadableError:'麥克風可能被別的 App 佔用，請關掉其他錄音或通話 App 後再試。',
+        OverconstrainedError:'麥克風不支援要求的設定。'
+      };
+      setMsg((map[name]||'無法開啟麥克風') + '　［錯誤：' + (name||'未知') + (e&&e.message?'／'+e.message:'') + '］', true);
+    }
+  }
+
+  function cleanup(){
+    running=false; cancelAnimationFrame(raf);
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+    if(ctx){ try{ ctx.close(); }catch(e){} ctx=null; }
+    analyser=null;
+  }
+  function stop(){
+    cleanup();
+    $('stopBtn').style.display='none';
+    $('startBtn').style.display='block';
+    $('panel').style.display='none';
+    $('rhythmPanel').style.display='none';
+    setMsg('已停止。');
+  }
+
+  function median(a){ const s=a.slice().sort((x,y)=>x-y); return s[Math.floor(s.length/2)]; }
+
+  function showIdle(){
+    $('noteName').textContent='—'; $('noteJp').innerHTML='&nbsp;';
+    $('needle').style.opacity='.25'; $('needle').style.left='50%';
+    const v=$('verdict'); v.textContent='請吹一個音'; v.className='verdict';
+  }
+
+  function showPitch(midiF, freq, clarity){
+    const nearest = Math.round(midiF);
+    const ni = info(nearest);
+    $('noteName').textContent = ni.name;
+    $('noteJp').textContent = '簡譜 ' + ni.jp + '（' + ni.label + '）';
+    const tol = parseFloat($('tol').value);
+    const tv = $('target').value;
+    const v = $('verdict');
+    let cents, text, cls;
+    if(tv===''){
+      cents = (midiF-nearest)*100;
+      if(Math.abs(cents)<=tol){ text='準 ✅'; cls='ok'; }
+      else { text = cents>0 ? '偏高 ⬆️ '+Math.round(cents)+' 音分' : '偏低 ⬇️ '+Math.round(-cents)+' 音分'; cls='warn'; }
+    }else{
+      const tm = parseInt(tv,10), ti = info(tm);
+      cents = (midiF-tm)*100;
+      const ac = Math.abs(cents);
+      if(ac<=tol){ text='準 ✅ '+ti.jp; cls='ok'; }
+      else if(ac<=100){ text = (cents>0?'偏高 ⬆️ ':'偏低 ⬇️ ')+Math.round(ac)+' 音分'; cls='warn'; }
+      else {
+        const semi = Math.round(ac/100);
+        text = '音不對：目標 '+ti.jp+'，你吹的是 '+ni.jp+'（'+(cents>0?'高':'低')+' '+semi+' 個半音）'; cls='bad';
+      }
+    }
+    v.textContent=text; v.className='verdict '+cls;
+    const clamped = Math.max(-50, Math.min(50, cents));
+    const nd = $('needle'); nd.style.opacity='1'; nd.style.left = (50 + clamped) + '%';
+    $('dbg').textContent = '頻率 '+freq.toFixed(1)+' Hz｜清晰度 '+clarity.toFixed(2)+'｜取樣率 '+ctx.sampleRate+' Hz';
+  }
+
+  function loop(){
+    if(!running) return;
+    raf = requestAnimationFrame(loop);
+    analyser.getFloatTimeDomainData(buf);
+    let sum=0; for(let i=0;i<buf.length;i++) sum+=buf[i]*buf[i];
+    const rms = Math.sqrt(sum/buf.length);
+    $('volBar').style.width = Math.min(100, rms*400)+'%';
+
+    // 起音偵測
+    const now = performance.now();
+    if(rms>0.03 && rms>prevSmooth*1.8+0.01 && now-lastOnset>150){
+      if(lastOnset>0 && onsetTimes.length) onsetTimes.push(Math.round(now-lastOnset)); else onsetTimes.push(0);
+      lastOnset = now;
+      $('onsetCount').textContent = String(parseInt($('onsetCount').textContent,10)+1);
+      const ints = onsetTimes.slice(1).slice(-6);
+      $('intervals').textContent = '間隔（毫秒）：' + (ints.length?ints.join('、'):'—');
+      const d=$('onsetDot'); d.classList.add('hit'); setTimeout(()=>d.classList.remove('hit'),120);
+    }
+    prevSmooth = prevSmooth*0.85 + rms*0.15;
+
+    // 音高
+    if(rms<0.012){
+      if(++miss>8){ hist=[]; showIdle(); $('dbg').textContent='聲音太小或沒有聲音（音量 '+rms.toFixed(3)+'）'; }
+      return;
+    }
+    const r = detectPitch(buf, ctx.sampleRate);
+    if(!r || r.clarity<0.85){ if(++miss>8){ hist=[]; showIdle(); } return; }
+    miss=0;
+    const midiF = 69 + 12*Math.log2(r.freq/440);
+    hist.push(midiF); if(hist.length>5) hist.shift();
+    if(hist.length<3) return;
+    showPitch(median(hist), r.freq, r.clarity);
+  }
+
+  $('startBtn').addEventListener('click', start);
+  $('stopBtn').addEventListener('click', stop);
+  $('resetBtn').addEventListener('click', ()=>{
+    onsetTimes=[]; lastOnset=0; $('onsetCount').textContent='0'; $('intervals').textContent='間隔（毫秒）：—';
+  });
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden && running) stop(); });
+})();
+</script>
+</body>
+</html>

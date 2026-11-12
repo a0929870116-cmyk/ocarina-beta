@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>陶笛失落地圖｜最終呈現（測試版）</title>
+<style>
+:root{--vellum:#EFE1BF;--vellum-2:#F9F0D6;--ink:#3A2A1A;--ink-2:#6E5337;--gold:#C8963A;--shadow:#BFA470;--green:#2E5B46;--green-fg:#F6E7B4;--ok:#2E7D4F;--warn:#B8731F;--bad:#B03A2E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--vellum-2);color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;line-height:1.6;padding:20px 16px 48px;max-width:560px;margin:0 auto}
+h1{font-size:24px;margin:0}
+h2{font-size:18px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--gold)}
+.sub{color:var(--ink-2);font-size:14px;margin:2px 0 14px}
+.card{background:var(--vellum);border:2.5px solid var(--ink);border-radius:16px;padding:14px;margin:0 0 12px;box-shadow:0 3px 0 var(--shadow)}
+.warn{background:#fbe3c8;border-color:var(--warn);font-size:14px;display:none}
+a.btn,button.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;border:2.5px solid var(--ink);border-radius:14px;background:var(--green);color:var(--green-fg);font:inherit;font-size:18px;font-weight:700;text-decoration:none;box-shadow:0 3px 0 var(--shadow);cursor:pointer}
+a.btn.sec,button.btn.sec{background:var(--vellum-2);color:var(--ink)}
+.mod{display:block;text-decoration:none;color:inherit}
+.mod .t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;font-weight:700;font-size:17px}
+.mod .d{font-size:14px;color:var(--ink-2);margin-top:4px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;border:1.5px solid var(--ink-2);background:var(--vellum-2)}
+.tag.mic{background:#d8ead9;border-color:var(--ok)}
+.tag.ok{background:#d8ead9;border-color:var(--ok);color:#1f5a38}
+.tag.wait{background:#fbe9c6;border-color:var(--warn);color:#7a4a10}
+.tag.proto{background:#e6dcf3;border-color:#6a4aa0;color:#46307a}
+.dot{width:10px;height:10px;border-radius:50%;background:#aaa;flex:none;margin-top:8px}
+.dot.on{background:var(--ok)}.dot.off{background:var(--bad)}
+#meter{height:14px;border-radius:7px;background:#d9c79b;overflow:hidden;margin:10px 0}
+#meter i{display:block;height:100%;width:0;background:var(--green);transition:width .06s}
+#note{font-size:40px;font-weight:800;text-align:center;min-height:52px}
+#cents{text-align:center;font-size:15px;color:var(--ink-2);min-height:24px}
+#bar{position:relative;height:18px;border-radius:9px;background:#d9c79b;margin:6px 0}
+#bar b{position:absolute;left:50%;top:-3px;width:4px;height:24px;background:var(--gold);border-radius:2px;transform:translateX(-50%)}
+#bar i{position:absolute;top:-2px;width:10px;height:22px;border-radius:5px;background:var(--ink);left:50%;transform:translateX(-50%);transition:left .08s}
+#bar.in i{background:var(--ok)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{border-bottom:1px solid var(--shadow);padding:6px 4px;text-align:left;vertical-align:top}
+th{color:var(--ink-2);font-weight:600}
+.msg{font-size:14px;min-height:20px;color:var(--ink-2)}.msg.err{color:var(--bad)}
+small{color:var(--ink-2)}
+</style></head><body>
+<h1>陶笛失落地圖</h1>
+<p class="sub">最終呈現（測試版）｜2026/11/11｜所有頁面都在同一個網址下，可直接玩、可收音</p>
+
+<div class="card warn" id="inapp"><b>請改用 Safari／Chrome 開啟。</b><br>你現在可能在 LINE／Facebook／Instagram 內建瀏覽器，這類瀏覽器常常擋住麥克風。點右上角選單，選「用瀏覽器開啟」。</div>
+
+<a class="btn" href="index.html">▶ 進入遊戲（完整流程）</a>
+<p class="sub" style="margin-top:8px">首頁 → 登入（目前是測試用假登入，名字密碼隨便填）→ 故事序章 → 地圖／練習／商店／飛行船</p>
+
+<h2>① 先確認麥克風</h2>
+<div class="card">
+  <button class="btn sec" id="micBtn">🎤 開始測麥克風</button>
+  <div id="meter"><i></i></div>
+  <div id="note">–</div>
+  <div id="cents"></div>
+  <div id="bar"><b></b><i></i></div>
+  <div class="msg" id="micMsg">吹一個音（或唱一聲），這裡會顯示音名與偏高／偏低。判音方式與遊戲內相同。</div>
+</div>
+
+<h2>② 各個可玩的部分</h2>
+<div id="mods"></div>
+
+<h2>③ 目前版本（對照專案文件）</h2>
+<div class="card">
+<table>
+<tr><th>項目</th><th>版本</th></tr>
+<tr><td>交接摘要</td><td>11/11 21:45（最新版）</td></tr>
+<tr><td>故事大綱</td><td>v2.10（11/11 21:40）</td></tr>
+<tr><td>遊戲設計書</td><td>第 26 版（11/11 21:40）</td></tr>
+<tr><td>程式（GitHub main）</td><td>最新 commit 1ed9921（11/11 21:32，簡譜排版修正）</td></tr>
+</table>
+<p class="sub" style="margin:10px 0 0">⚠️ 文件尚未登記：分段練習（數星星、豬之歌）與聽示範，只寫在另外兩份決議／交接檔。</p>
+</div>
+
+<h2>④ 還沒做（下一階段：後台管理）</h2>
+<div class="card">
+<table>
+<tr><td>☐</td><td>真實登入（現在是假登入）</td></tr>
+<tr><td>☐</td><td>Firebase 後台：老師派每週任務、看練習進度、匯出 CSV</td></tr>
+<tr><td>☐</td><td>統一存檔（現在存在各人手機，換手機就沒了）</td></tr>
+<tr><td>☐</td><td>書面授權與家長告知文字</td></tr>
+</table>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- 內建瀏覽器提醒 ---------- */
+if(/Line\/|FBAN|FBAV|Instagram|Messenger|Threads/i.test(navigator.userAgent)) document.getElementById('inapp').style.display='block';
+
+/* ---------- 模組清單 ---------- */
+var MODS=[
+ {g:'練習',items:[
+  {u:'weekly-practice.html',t:'每週練習：基本指法 1-1',d:'任務一：音準＋節拍全對才算一次，星星糖與水晶碎片從這裡來。',mic:1,s:'wait'},
+  {u:'song-practice.html?task=song-pig',t:'每週練習：豬之歌（歌曲任務）',d:'任務二（模擬內容）：點開任務進樂譜頁，全對同樣計星星糖與水晶碎片。',mic:1,s:'wait'},
+  {u:'song-practice.html?song=star&from=1&to=8',t:'分段練習：數星星',d:'選小節範圍練習，有「🔊 聽示範」。',mic:1,s:'proto'},
+  {u:'song-practice.html?song=pig&from=1&to=8',t:'分段練習：豬之歌',d:'同上，豬之歌 94 小節。',mic:1,s:'proto'},
+  {u:'pitch-test.html',t:'音準測試頁',d:'判音標準來源，可調容許誤差。',mic:1,s:'ok'}
+ ]},
+ {g:'玩',items:[
+  {u:'ocarina-playground.html',t:'星空試煉（陶笛遊樂場）',d:'10 款小遊戲，結算會掉水晶碎片。整頁開啟收音最穩。',mic:1,s:'wait'},
+  {u:'observe-test.html',t:'圖鑑互動觀察',d:'螢光蕨、月光睡蓮（吹陶笛）、音符花（點一點）。',mic:1,s:'ok'}
+ ]},
+ {g:'收集與養成',items:[
+  {u:'ship-workshop.html',t:'飛行船・提煉工坊',d:'用水晶碎片升級 5 個部位、換配色。',s:'wait'},
+  {u:'game-test.html?open=12',t:'12 島圖鑑書頁',d:'圖鑑開到 12 島，點圖進書頁（只走「全部圖鑑」）。',s:'wait'},
+  {u:'isle-art-preview.html',t:'12 島動植物與水晶碎片預覽',d:'外型暫定。',s:'wait'}
+ ]}
+];
+var LBL={ok:['已手機實測','ok'],wait:['已上線・待手機實測','wait'],proto:['原型・待手機實測','proto']};
+var root=document.getElementById('mods');
+MODS.forEach(function(grp){
+  var h=document.createElement('div');h.className='sub';h.style.margin='14px 0 6px';h.style.fontWeight='700';h.textContent=grp.g;root.appendChild(h);
+  grp.items.forEach(function(m){
+    var a=document.createElement('a');a.className='card mod';a.href=m.u;
+    var t=document.createElement('div');t.className='t';
+    var s=document.createElement('span');s.textContent=m.t;
+    var dot=document.createElement('span');dot.className='dot';dot.title='檢查中';
+    t.appendChild(s);t.appendChild(dot);a.appendChild(t);
+    var d=document.createElement('div');d.className='d';d.textContent=m.d;a.appendChild(d);
+    var tg=document.createElement('div');tg.className='tags';
+    function tag(txt,c){var x=document.createElement('span');x.className='tag '+c;x.textContent=txt;tg.appendChild(x);}
+    if(m.mic)tag('需要麥克風','mic');
+    tag(LBL[m.s][0],LBL[m.s][1]);
+    a.appendChild(tg);root.appendChild(a);
+    /* 檢查頁面是否在線 */
+    fetch(m.u.split('?')[0],{method:'HEAD',cache:'no-store'}).then(function(r){
+      dot.className='dot '+(r.ok?'on':'off');dot.title=r.ok?'在線':'讀不到（'+r.status+'）';
+    }).catch(function(){dot.className='dot off';dot.title='讀不到';});
+  });
+});
+
+/* ---------- 麥克風快速檢查（判音方式同遊戲：正規化自相關） ---------- */
+var NAMES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+function detect(buf,sr){
+  var n=buf.length,minLag=Math.max(2,Math.floor(sr/3500)),maxLag=Math.min(n-2,Math.floor(sr/180));
+  var nsdf=new Float32Array(maxLag+2),lag,i;
+  for(lag=minLag-1;lag<=maxLag+1;lag++){var acf=0,m=0;for(i=0;i<n-lag;i++){var a=buf[i],b=buf[i+lag];acf+=a*b;m+=a*a+b*b;}nsdf[lag]=m>0?2*acf/m:0;}
+  var peaks=[],seenNeg=false,curMax=-1,curIdx=-1;
+  for(lag=minLag;lag<=maxLag;lag++){var v=nsdf[lag];
+    if(v<=0){if(curIdx>=0){peaks.push(curIdx);curIdx=-1;curMax=-1;}seenNeg=true;continue;}
+    if(!seenNeg)continue;if(v>curMax){curMax=v;curIdx=lag;}}
+  if(curIdx>=0)peaks.push(curIdx);
+  if(!peaks.length)return null;
+  var high=-1;peaks.forEach(function(p){if(nsdf[p]>high)high=nsdf[p];});
+  var ch=-1;for(i=0;i<peaks.length;i++){if(nsdf[peaks[i]]>=0.9*high){ch=peaks[i];break;}}
+  if(ch<=minLag||ch>=maxLag)return null;
+  var A=nsdf[ch-1],B=nsdf[ch],C=nsdf[ch+1],den=A-2*B+C,sh=den?(A-C)/(2*den):0;
+  return {freq:sr/(ch+sh),clarity:nsdf[ch]};
+}
+var $=function(id){return document.getElementById(id);};
+var ctx=null,stream=null,an=null,buf=null,raf=0,running=false,hist=[];
+function msg(t,err){var m=$('micMsg');m.textContent=t;m.className='msg'+(err?' err':'');}
+function stop(){running=false;cancelAnimationFrame(raf);
+  if(stream){stream.getTracks().forEach(function(t){t.stop();});stream=null;}
+  if(ctx){ctx.close();ctx=null;}
+  $('micBtn').textContent='🎤 開始測麥克風';$('meter').firstChild.style.width='0';
+  $('note').textContent='–';$('cents').textContent='';$('bar').className='';$('bar').lastChild.style.left='50%';}
+async function start(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg('這個瀏覽器不支援收音，請改用 Safari／Chrome。',1);return;}
+  try{
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    var src=ctx.createMediaStreamSource(stream);an=ctx.createAnalyser();an.fftSize=2048;src.connect(an);
+    buf=new Float32Array(an.fftSize);running=true;hist=[];
+    $('micBtn').textContent='⏹ 停止';msg('正在聽…吹一個音試試。');loop();
+  }catch(e){
+    stop();
+    var n=e&&e.name;
+    msg(n==='NotAllowedError'?'麥克風被拒絕了。請在瀏覽器設定允許麥克風後重新整理。':n==='NotFoundError'?'找不到麥克風。':'無法開啟麥克風：'+(n||e),1);
+  }
+}
+function loop(){
+  if(!running)return;
+  an.getFloatTimeDomainData(buf);
+  var s=0;for(var i=0;i<buf.length;i++)s+=buf[i]*buf[i];
+  var rms=Math.sqrt(s/buf.length);
+  $('meter').firstChild.style.width=Math.min(100,rms*600)+'%';
+  var r=rms<0.012?null:detect(buf,ctx.sampleRate);
+  if(r&&r.clarity>=0.85){hist.push(r.freq);if(hist.length>5)hist.shift();}else{hist.push(null);if(hist.length>5)hist.shift();}
+  var ok=hist.filter(function(x){return x;}).sort(function(a,b){return a-b;});
+  if(ok.length>=3){
+    var f=ok[Math.floor(ok.length/2)],midi=69+12*Math.log2(f/440),rd=Math.round(midi),cents=Math.round((midi-rd)*100);
+    $('note').textContent=NAMES[((rd%12)+12)%12]+(Math.floor(rd/12)-1);
+    $('cents').textContent=Math.round(f)+' Hz｜'+(Math.abs(cents)<=25?'很準':cents>0?'偏高 '+cents:'偏低 '+(-cents))+'（±25 音分內算準）';
+    var bar=$('bar');bar.className=Math.abs(cents)<=25?'in':'';bar.lastChild.style.left=(50+Math.max(-50,Math.min(50,cents)))+'%';
+  }else if(!ok.length){$('note').textContent='–';$('cents').textContent='';$('bar').className='';$('bar').lastChild.style.left='50%';}
+  raf=requestAnimationFrame(loop);
+}
+$('micBtn').addEventListener('click',function(){running?stop():start();});
+document.addEventListener('visibilitychange',function(){if(document.hidden&&running)stop();});
+})();
+</script>
+</body></html>

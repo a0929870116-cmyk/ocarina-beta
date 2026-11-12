@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>凱爾特飛船工坊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Iansui&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 飛行船分頁內容。由 game-test.html 以 iframe 載入，也可單獨開啟測試。
+   手機直式：上方飛船舞台，下方兩個分頁：提煉工坊／背包。單一亮色主題（羊皮紙底）。 */
+:root{
+  --parch:#f3e7c9; --parch2:#e6d3a4; --ink:#4a2f1a; --green:#2f5d46; --gold:#b8892f; --night:#14213d;
+  --line:#c9ae72; --ok:#2f7a4f; --warn:#a4472b;
+  --font-d:'Iansui','Noto Sans TC',serif; --font-b:'Noto Sans TC',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--parch);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:480px;margin:0 auto;padding:10px 12px 14px}
+.stage{border:3px double var(--gold);border-radius:14px;overflow:hidden;background:var(--night);position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.stage.flash::after{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(255,240,190,.55),transparent 70%);animation:fade .9s ease-out forwards;pointer-events:none}
+@keyframes fade{from{opacity:1}to{opacity:0}}
+.status{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0;font-size:13px}
+.pill{white-space:nowrap;display:inline-block;margin:0 4px 4px 0;background:var(--parch2);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.msg{min-height:44px;margin:8px 0;padding:8px 12px;border-left:4px solid var(--green);background:#efe0b8;border-radius:6px;font-size:15px}
+.tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:6px 0 10px}
+.tabs button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;font:700 16px var(--font-b);color:var(--ink);background:var(--parch2);border:2px solid var(--line);border-radius:10px}
+.tabs button[aria-selected="true"]{background:var(--green);color:#fdf6dd;border-color:var(--green)}
+button{cursor:pointer}
+button:focus-visible{outline:3px solid #1d6fd1;outline-offset:2px}
+h2{font-family:var(--font-d);font-size:20px;margin:14px 0 6px;font-weight:400}
+.card{background:#f9f0d8;border:2px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px}
+.card.gift{border-color:var(--gold);background:#fbefc7}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sname{font-weight:700;font-size:17px}
+.pips{display:flex;gap:4px}
+.pip{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold);background:transparent}
+.pip.on{background:var(--gold)}
+.desc{font-size:14px;margin:4px 0 8px;color:#6b4c2a}
+.need{font-size:14px;margin:0 0 8px}
+.btn{min-height:48px;padding:0 16px;font:700 16px var(--font-b);border-radius:10px;border:2px solid var(--green);background:var(--green);color:#fdf6dd;width:100%}
+.btn[disabled]{background:#d9cba4;border-color:#cdbb8a;color:#8d7a52;cursor:not-allowed}
+.btn.alt{background:transparent;color:var(--green)}
+.btn.small{width:auto;min-height:40px;padding:0 12px;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chip{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:76px;padding:8px 4px;background:#fbf4de;border:2px solid var(--line);border-radius:10px;font:500 14px var(--font-b);color:var(--ink)}
+.chip b{font-size:15px}
+.chip small{color:#7a5a36;font-size:12px}
+.chip[disabled]{opacity:.45;cursor:not-allowed}
+.gem{width:26px;height:26px}
+.circle{display:flex;align-items:center;justify-content:center;gap:12px;margin:6px 0 10px}
+.slotbox{width:84px;height:84px;border-radius:50%;border:3px dashed var(--gold);background:#fbf4de;display:flex;flex-direction:column;align-items:center;justify-content:center;font:500 13px var(--font-b);color:var(--ink);padding:0}
+.slotbox.full{border-style:solid}
+.plus{font:700 24px var(--font-d);color:var(--gold)}
+.preview{text-align:center;min-height:48px;margin:0 0 8px;font-size:15px}
+.preview.bad{color:var(--warn)}
+details{margin:6px 0}
+summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700}
+.rec{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.rec:last-child{border-bottom:0}
+.tag{font-size:12px;border-radius:6px;padding:1px 6px;border:1px solid var(--line);background:var(--parch2);white-space:nowrap}
+.sw{width:18px;height:18px;border-radius:50%;border:1px solid var(--ink);flex:none}
+select{min-height:44px;font:500 16px var(--font-b);border:2px solid var(--line);border-radius:8px;background:#fbf4de;color:var(--ink);padding:0 8px}
+.notes{font-size:13px;color:#6b4c2a;padding-left:18px;margin:6px 0}
+.notes li{margin:3px 0}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bob{animation:bob 4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.flame{transform-origin:28px 221px;animation:fl .35s ease-in-out infinite alternate}
+@keyframes fl{to{transform:scaleX(.78)}}
+.pulse{animation:pl 2s ease-in-out infinite}
+@keyframes pl{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.spin,.bob,.flame,.pulse,.stage.flash::after{animation:none}}
+.ic{flex:none}.ic.inl{vertical-align:-6px;color:var(--gold)}
+.tabs button .ic{color:var(--gold)}.tabs button[aria-selected="true"] .ic{color:#f1d98a}
+.partrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 10px}
+.partbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:62px;padding:4px 2px;border:2px solid var(--line);border-radius:10px;background:#fbf4de;color:var(--ink);font:700 13px var(--font-b)}
+.partbtn .ic{color:var(--gold)}
+.partbtn[aria-pressed="true"]{background:var(--green);color:#fdf6dd;border-color:var(--green)}.partbtn[aria-pressed="true"] .ic{color:#f1d98a}
+.mc{display:block;width:100%;max-width:340px;margin:0 auto}
+.preview .gem{width:20px;height:20px;vertical-align:-5px}
+</style>
+<script src="save-core.js"></script>
+<script src="sfx.js"></script>
+<script src="wk-core.js"></script>
+<script>if(window.Sfx){Sfx.auto('[data-tab]','nav');Sfx.auto('.btn','tap');}</script>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="stage" id="stage"></div>
+  <div class="status" id="status"></div>
+  <div class="msg" id="msg" role="status" aria-live="polite"></div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="panel"></div>
+  <div class="card lab" aria-disabled="true" style="margin-top:16px"><div class="row"><span class="sname"><span id="labic"></span>解鎖生物研究室</span><span class="tag">未開放</span></div><p class="desc" style="margin:6px 0 8px">之後可以在這裡飼養、養殖各島的動植物。</p><button class="btn" disabled>尚未開放</button></div>
+</div>
+
+<script src="isle-art.js"></script>
+<script>
+/* ===== 資料（名稱、配方、數值都是暫定） ===== */
+const EL=ISLE_ART.data.map(d=>({id:d.cid,n:d.crystal,isle:d.isle,c:d.c}));   /* 12 島各一種水晶碎片，資料在 isle-art.js */
+const SLOTS=[
+  {id:'hull',n:'船體',d:['木造小船身','加上欄杆與提燈','加上甲板小屋與第二根桅桿']},
+  {id:'sail',n:'風帆',d:['簡單帆面，一個三圈紋','加上後帆與紋樣邊','加上旗幟與符文光環']},
+  {id:'wing',n:'機翼',d:['單層羽翼','雙層羽翼','三層羽翼，翼尖有螺旋']},
+  {id:'engine',n:'引擎',d:['一組齒輪','兩組齒輪連動','三組齒輪、活塞與長尾焰']},
+  {id:'prow',n:'船頭',d:['簡單船頭','螺旋船首像','導航水晶與紋環']}
+];
+const byId=(arr,id)=>arr.find(x=>x.id===id);
+const nameOf=id=>byId(EL,id).n;
+const COST=3; /* 每次升級放入 3 顆水晶碎片（任意種類）；位置決定顏色 */
+
+/* ===== 每週任務（要和 weekly-practice.html 一致；讀它的存檔 olm_wk_v2） ===== */
+const TASKS=OLM_WK.TASKS;   /* 任務清單在共用的 wk-core.js（含歌曲任務） */
+function todayKey(){return new Date(Date.now()+8*3600e3).toISOString().slice(0,10);}
+function weekIdx(start){return Math.max(0,Math.floor((Date.parse(todayKey()+'T00:00:00Z')-Date.parse(start+'T00:00:00Z'))/864e5/7));}
+function wk(){
+  try{
+    const o=OLMSave.read(OLMSave.K.WK);
+    if(o&&o.v===2){
+      const st=o.start||todayKey(), idx=weekIdx(st), prev=typeof o.week==='number'?o.week:0;
+      return {has:true,week:idx,tasks:prev===idx?(o.tasks||{}):{}};
+    }
+  }catch(e){}
+  return {has:false,week:0,tasks:{}};
+}
+function weekDone(w){return TASKS.every(t=>(w.tasks[t.id]|0)>=t.T)&&w.has;}
+
+/* ===== 狀態 ===== */
+const KEY='olm_ship_v1';
+const DEFAULT_ISLE=4;   /* 測試版不真的開島，「目前練習的島」暫定為地圖上的第 4 島；weekly-practice.html 讀同一個欄位決定掉哪種元素 */
+function fresh(){
+  return {el:Object.fromEntries(EL.map(e=>[e.id,0])),
+    lv:{hull:1,sail:1,wing:1,engine:1,prow:1},cr:{},isle:DEFAULT_ISLE,claimed:-1,fake:-1};
+}
+function load(){
+  const f=fresh();
+  try{
+    const s=OLMSave.read(KEY); if(!Object.keys(s).length) return f;
+    ['el','lv'].forEach(k=>Object.assign(f[k],s[k]||{}));
+    if(s.cr&&typeof s.cr==='object') f.cr=s.cr;
+    if(s.isle>=1&&s.isle<=12) f.isle=s.isle;
+    if(typeof s.claimed==='number') f.claimed=s.claimed;
+    if(typeof s.fake==='number') f.fake=s.fake;
+  }catch(e){}
+  return f;
+}
+/* 只寫本頁負責的欄位（el、lv、cr、isle），其餘欄位（如別頁新增的）不動 */
+function save(){OLMSave.patch(KEY,function(d){d.el=S.el;d.lv=S.lv;d.cr=S.cr;d.isle=S.isle;});}
+let S=load(), tab='craft', pick=[null,null,null], mcPart='hull', msg='', openD={tools:false};
+
+/* ===== 繪圖輔助 ===== */
+const D='#3a2414', W='#8b5a33', G='#d9b25b';
+let GEARC=G, BRAIDC=G;
+function gearPath(cx,cy,r,t){
+  const ri=r*0.78, step=Math.PI*2/t, pts=[];
+  for(let i=0;i<t;i++){
+    [[-0.28,ri],[-0.16,r],[0.16,r],[0.28,ri]].forEach(([d,rad])=>{
+      const a=i*step+d*step;
+      pts.push((cx+Math.cos(a)*rad).toFixed(1)+','+(cy+Math.sin(a)*rad).toFixed(1));
+    });
+  }
+  return 'M'+pts.join('L')+'Z';
+}
+function spiral(cx,cy,r0,r1,turns){
+  let d=''; const n=60;
+  for(let i=0;i<=n;i++){
+    const t=i/n, a=t*turns*Math.PI*2, r=r0+(r1-r0)*t;
+    d+=(i?'L':'M')+(cx+Math.cos(a)*r).toFixed(1)+','+(cy+Math.sin(a)*r).toFixed(1);
+  }
+  return d;
+}
+function gear(cx,cy,r,t,dur,rev){
+  return `<g class="spin" style="animation-duration:${dur}s;animation-direction:${rev?'reverse':'normal'}"><path d="${gearPath(cx,cy,r,t)}" fill="#a07a3e" stroke="${D}" stroke-width="1.6" stroke-linejoin="round"/><circle cx="${cx}" cy="${cy}" r="${(r*0.58).toFixed(1)}" fill="#6d4b24" stroke="${D}" stroke-width="1"/><path d="${spiral(cx,cy,1.5,r*0.5,2.2)}" fill="none" stroke="${GEARC}" stroke-width="1.6" stroke-linecap="round"/></g>`;
+}
+function emblem(cx,cy,r,col){
+  const pts=[0,120,240].map(d=>{const a=(d-90)*Math.PI/180;return [cx+Math.cos(a)*r*0.55,cy+Math.sin(a)*r*0.55];});
+  return pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${(r*0.6).toFixed(1)}" fill="none" stroke="${col}" stroke-width="2.2"/>`).join('')
+    +`<circle cx="${cx}" cy="${cy}" r="${(r*1.25).toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.6"/>`;
+}
+function braid(x1,x2,y,amp,wl,id){
+  let a='',b='';
+  for(let x=x1;x<=x2;x+=2){
+    const t=(x-x1)/wl*Math.PI*2;
+    a+=(x===x1?'M':'L')+x+','+(y+Math.sin(t)*amp).toFixed(1);
+    b+=(x===x1?'M':'L')+x+','+(y-Math.sin(t)*amp).toFixed(1);
+  }
+  const st=d=>`<path d="${d}" fill="none" stroke="${D}" stroke-width="6" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${BRAIDC}" stroke-width="3.2" stroke-linecap="round"/>`;
+  let s=st(a)+st(b), k=0;
+  for(let x=x1+wl/2;x<x2;x+=wl){
+    k++;
+    s+=`<clipPath id="${id}${k}"><rect x="${x-7}" y="${y-amp-6}" width="14" height="${amp*2+12}"/></clipPath><g clip-path="url(#${id}${k})">${st(a)}</g>`;
+  }
+  return s;
+}
+const STARS=[[-70,80],[-60,140],[430,110],[425,160],[-75,30],[-40,50],[-20,110],[404,70],[410,30],[-50,20],[20,20],[60,60],[110,24],[150,70],[300,26],[350,60],[380,18],[270,64],[40,120],[372,118],[330,92],[90,96],[180,30],[240,18]];
+
+/* ===== 飛船 ===== */
+// 船體大小隨總等級（4～12）從 0.72 長到 1.0
+function totalLv(){return SLOTS.reduce((n,s)=>n+S.lv[s.id],0);}
+function hullTier(){return [0,2,3][(S.lv.hull||1)-1];}
+function hullScale(){return 0.72+0.28*(totalLv()-5)/10;}
+function ship(){
+  const L=S.lv, P=Object.fromEntries(SLOTS.map(s=>[s.id,pcol(s.id)]));
+  const sc=hullScale(), tier=hullTier(), dl=[0,12,24,34][tier], dr=[0,14,28,40][tier], xl=70-dl, xr=330+dr;
+  const wingShape=`<path d="M180 196 C150 168 112 158 60 158 C98 178 128 200 152 214 Z" fill="${P.wing.m}" stroke="${D}" stroke-width="2" stroke-linejoin="round"/>`
+    +`<path d="M172 198 Q125 176 78 164 M162 206 Q124 190 92 178 M152 212 Q124 200 108 190" fill="none" stroke="${D}" stroke-opacity=".35" stroke-width="1.4"/>`;
+  const wingSpiral=`<path d="${spiral(60,158,1,7,2)}" fill="none" stroke="${P.wing.t}" stroke-width="2" stroke-linecap="round"/>`;
+  let wings='';
+  if(L.wing>=3) wings+=`<g transform="translate(26,-62) scale(.8)" opacity=".55">${wingShape}${wingSpiral}</g>`;
+  if(L.wing>=2) wings+=`<g transform="translate(12,-32) scale(.92)" opacity=".78">${wingShape}${L.wing>=3?wingSpiral:''}</g>`;
+  wings+=`<g>${wingShape}${L.wing>=3?wingSpiral:''}</g>`;
+
+  GEARC=P.engine.t;
+  const fl=[0,22,38,58][L.engine];
+  const glow=L.engine>=2?`<circle cx="60" cy="222" r="${L.engine>=3?52:36}" fill="${P.engine.g}" opacity=".22"/>`:'';
+  let engine=`<rect x="28" y="198" width="62" height="46" rx="8" fill="${P.engine.e}" stroke="${D}" stroke-width="2"/>`
+    +gear(52,222,16,8,7,false);
+  if(L.engine>=2) engine+=gear(76,214,11,7,5,true)+`<path d="M60 198 L60 182 L74 182" fill="none" stroke="${P.engine.t}" stroke-width="3" stroke-linecap="round"/>`;
+  if(L.engine>=3) engine+=gear(74,238,10,7,5.5,false)
+    +`<rect x="84" y="206" width="14" height="6" rx="2" fill="${P.engine.t}" stroke="${D}" stroke-width="1.2"><animate attributeName="x" values="84;88;84" dur="1.1s" repeatCount="indefinite"/></rect>`;
+  const flame=`<g class="flame"><path d="M28 210 Q${(28-fl*0.55).toFixed(1)} 212 ${28-fl} 221 Q${(28-fl*0.55).toFixed(1)} 230 28 232Z" fill="${P.engine.g}"/><path d="M28 215 Q${(28-fl*0.3).toFixed(1)} 217 ${(28-fl*0.55).toFixed(1)} 221 Q${(28-fl*0.3).toFixed(1)} 225 28 227Z" fill="#fff7d6" opacity=".85"/></g>`;
+
+  BRAIDC=P.hull.t;
+  let ports='';
+  for(let x=xl+95;x<=xr-95;x+=35) ports+=`<circle cx="${x}" cy="234" r="5" fill="${P.hull.g}" stroke="${D}" stroke-width="1.5"/>`;
+  const hull=`<path d="M${xl} 188 L${xr} 188 Q${xr-12} 238 ${xr-68} 252 L${xl+68} 252 Q${xl+12} 238 ${xl} 188 Z" fill="${P.hull.b}" stroke="${D}" stroke-width="3" stroke-linejoin="round"/>`
+    +`<path d="M${xl+26} 236 Q${(xl+xr)/2} 262 ${xr-26} 232" fill="none" stroke="${D}" stroke-opacity=".35" stroke-width="2"/>`
+    +braid(xl+26,xr-24,208,5,28,'hb')+ports;
+  let cabin='';
+  if(tier>=3){
+    const cx=xl+36;
+    cabin=`<rect x="${cx}" y="152" width="58" height="36" rx="4" fill="#6d4b24" stroke="${D}" stroke-width="2.4"/>`
+      +`<path d="M${cx-5} 153 Q${cx+29} 128 ${cx+63} 153 Z" fill="${P.hull.b}" stroke="${D}" stroke-width="2.4" stroke-linejoin="round"/>`
+      +`<path d="${spiral(cx+29,143,1,6,2)}" fill="none" stroke="${P.hull.t}" stroke-width="1.8" stroke-linecap="round"/>`
+      +`<rect x="${cx+7}" y="162" width="12" height="12" rx="3" fill="${P.hull.g}" stroke="${D}" stroke-width="1.6"/><rect x="${cx+39}" y="162" width="12" height="12" rx="3" fill="${P.hull.g}" stroke="${D}" stroke-width="1.6"/>`
+      +`<path d="M${cx+22} 188 V170 Q${cx+29} 164 ${cx+36} 170 V188" fill="#3a2414" stroke="${D}" stroke-width="1.4"/>`;
+  }
+  let rail='';
+  if(tier>=1){
+    const rx1=xl+22, rx2=xr-22;
+    rail+=`<path d="M${rx1} 176 H${rx2}" stroke="${D}" stroke-width="5" stroke-linecap="round"/><path d="M${rx1} 176 H${rx2}" stroke="${P.hull.t}" stroke-width="2.6" stroke-linecap="round"/>`;
+    for(let x=rx1;x<=rx2+1;x+=18) rail+=`<path d="M${x} 176 V188" stroke="${D}" stroke-width="3.4" stroke-linecap="round"/><path d="M${x} 176 V188" stroke="${P.hull.t}" stroke-width="1.6" stroke-linecap="round"/>`;
+  }
+  if(tier>=2){
+    rail+=`<path d="M${xl+22} 182 H${xr-22}" stroke="${P.hull.t}" stroke-width="1.6"/>`;
+    [xl+22,xr-22].forEach(x=>{rail+=`<circle class="pulse" cx="${x}" cy="168" r="11" fill="${P.hull.g}" opacity=".35"/><circle cx="${x}" cy="168" r="5" fill="${P.hull.g}" stroke="${D}" stroke-width="1.6"/><path d="M${x} 173 V176" stroke="${D}" stroke-width="2"/>`;});
+  }
+
+  let sails=`<line x1="215" y1="36" x2="215" y2="190" stroke="${D}" stroke-width="5" stroke-linecap="round"/><circle cx="215" cy="34" r="4" fill="${P.sail.t}" stroke="${D}" stroke-width="1.5"/>`;
+  if(L.sail>=2) sails+=`<path d="M211 62 C160 90 150 140 158 182 L211 182 Z" fill="${P.sail.m}" fill-opacity=".85" stroke="${D}" stroke-width="2.2" stroke-linejoin="round"/>${emblem(186,138,9,P.sail.t)}`;
+  sails+=`<path d="M215 40 C290 70 305 135 288 182 L215 182 Z" fill="${P.sail.m}" fill-opacity=".95" stroke="${D}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  if(L.sail>=2) sails+=`<path d="M222 56 C282 84 294 136 280 174" fill="none" stroke="${P.sail.t}" stroke-width="2.2" stroke-dasharray="2 5" stroke-linecap="round"/><path d="${spiral(278,170,1,9,2.2)}" fill="none" stroke="${P.sail.t}" stroke-width="2" stroke-linecap="round"/>`;
+  sails+=emblem(255,118,12,P.sail.t);
+  if(L.sail>=3) sails+=`<path d="M215 22 L254 31 L215 42 Z" fill="${P.sail.g}" stroke="${D}" stroke-width="1.8" stroke-linejoin="round"/><circle class="pulse" cx="255" cy="118" r="30" fill="none" stroke="${P.sail.g}" stroke-width="2.4"/><circle class="pulse" cx="255" cy="118" r="38" fill="none" stroke="${P.sail.g}" stroke-width="1.2" stroke-dasharray="3 5"/>`;
+
+  if(tier>=3){
+    sails+=`<line x1="215" y1="36" x2="318" y2="104" stroke="${P.sail.t}" stroke-width="1.4" stroke-opacity=".8"/>`
+      +`<line x1="318" y1="188" x2="318" y2="98" stroke="${D}" stroke-width="4.4" stroke-linecap="round"/><circle cx="318" cy="96" r="3.4" fill="${P.sail.t}" stroke="${D}" stroke-width="1.3"/>`
+      +`<path d="M318 104 Q356 134 354 182 L318 182 Z" fill="${P.sail.m}" fill-opacity=".92" stroke="${D}" stroke-width="2.2" stroke-linejoin="round"/>`
+      +emblem(334,148,7,P.sail.t)
+      +`<path d="M318 82 L346 89 L318 96 Z" fill="${P.sail.g}" stroke="${D}" stroke-width="1.5" stroke-linejoin="round"/>`;
+  }
+  let prow=`<path d="M318 190 C346 190 358 170 354 146 C342 168 326 176 304 178 Z" fill="${P.prow.b}" stroke="${D}" stroke-width="2.6" stroke-linejoin="round"/>`;
+  if(L.prow>=2) prow+=`<path d="${spiral(352,140,1.5,13,2.3)}" fill="none" stroke="${D}" stroke-width="5.5" stroke-linecap="round"/><path d="${spiral(352,140,1.5,13,2.3)}" fill="none" stroke="${P.prow.t}" stroke-width="3" stroke-linecap="round"/>`;
+  if(L.prow>=3) prow+=`<circle cx="352" cy="112" r="24" fill="${P.prow.g}" opacity=".25" class="pulse"/><circle cx="352" cy="112" r="18" fill="none" stroke="${P.prow.t}" stroke-width="2" stroke-dasharray="4 4"/><path d="M352 98 L362 112 L352 128 L342 112 Z" fill="${P.prow.g}" stroke="${D}" stroke-width="2" stroke-linejoin="round"/>`;
+
+  const stars=STARS.map(s=>`<circle cx="${s[0]}" cy="${s[1]}" r="1.4" fill="#fdf6dd" opacity=".8"/>`).join('');
+  return `<svg viewBox="-80 0 520 290" role="img" aria-label="凱爾特風格飛船，總等級${totalLv()}、船體${L.hull}級、風帆${L.sail}級、機翼${L.wing}級、引擎${L.engine}級、船頭${L.prow}級">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e1a38"/><stop offset="1" stop-color="#2a3b6b"/></linearGradient></defs>
+<rect x="-80" width="520" height="290" fill="url(#sky)"/>${stars}
+<g transform="translate(200 266) scale(${sc.toFixed(3)}) translate(-200 -266)"><g class="bob"><g transform="translate(${-dl} 0)">${glow}</g>${wings}<g transform="translate(${-dl} 0)">${flame}</g>${hull}${cabin}${rail}<g transform="translate(${-dl} 0)">${engine}</g>${sails}<g transform="translate(${dr} 0)">${prow}</g></g></g></svg>`;
+}
+
+/* ===== 介面 ===== */
+const DEF_MSG='提煉水晶碎片能量，升級飛行船設備！';
+function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const x=p(a),y=p(b);return '#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+/* 每個零件的配色：第 1 顆＝主色、第 2 顆＝紋飾、第 3 顆＝光暈（放入魔法陣的位置決定） */
+function pcol(id){
+  const cr=S.cr&&S.cr[id], def={m:'#f0e2b8',t:G,g:'#ffb84a',b:W,e:'#5b3a22'};
+  if(!cr||cr.length<3||cr.some(x=>!byId(EL,x))) return def;
+  const c=cr.map(x=>byId(EL,x).c);
+  return {m:c[0],t:c[1],g:c[2],b:mix(W,c[0],.55),e:mix('#5b3a22',c[0],.5)};
+}
+/* ===== 凱爾特風格圖示（單線、圓角、跟著文字顏色） ===== */
+const IC={
+  hull:`<path d="M5 19 H35 Q31 31 24 32 H16 Q9 31 5 19Z"/><path d="M9 25 q3-4 6 0 t6 0 t6 0 t4 0"/><path d="M13 19 V11 M27 19 V11"/>`,
+  sail:`<path d="M20 4 V33"/><path d="M20 7 C33 12 34 24 31 30 H20Z"/><path d="${spiral(26,21,.8,4.5,1.8)}"/><path d="M9 35 H31"/>`,
+  wing:`<path d="M5 29 C8 15 21 9 35 10 C29 14 25 20 21 26 C16 31 9 32 5 29Z"/><path d="M13 25 Q22 17 30 12"/><path d="${spiral(11,27,.6,3,1.6)}"/>`,
+  engine:`<path d="${gearPath(20,20,13,8)}"/><path d="${spiral(20,20,.8,6,2)}"/>`,
+  prow:`<path d="M5 33 C19 35 33 28 34 14"/><path d="${spiral(29,13,1,7,2.2)}"/><path d="M5 33 V26"/>`,
+  build:`<circle cx="20" cy="20" r="5"/><circle cx="20" cy="10" r="5.5"/><circle cx="20" cy="30" r="5.5"/><circle cx="10" cy="20" r="5.5"/><circle cx="30" cy="20" r="5.5"/>`,
+  craft:`<circle cx="20" cy="20" r="2"/><path d="M20 20 V10"/><path d="${spiral(20,8,.5,5,1.7)}"/><path d="M20 20 L28.7 25"/><path d="${spiral(31,26.5,.5,5,1.7)}"/><path d="M20 20 L11.3 25"/><path d="${spiral(9,26.5,.5,5,1.7)}"/>`,
+  lab:`<path d="M16 5H24M17.5 5V16L8 32H32L22.5 16V5"/><path d="${spiral(20,26,.8,3.6,1.8)}"/><circle cx="26" cy="20" r="1.2"/>`,
+  bag:`<path d="M12 16 C6 22 6 33 20 34 C34 33 34 22 28 16Z"/><path d="M12 16 L10 7 H30 L28 16"/><path d="M14 11 H26"/><path d="M15 25 q5-5 10 0 q-5 5 -10 0"/>`
+};
+function icon(k,sz,cls){return `<svg class="ic ${cls||''}" width="${sz}" height="${sz}" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;}
+const TABS=[['craft','提煉工坊'],['bag','背包']];
+
+function gemSvg(c){return (ISLE_ART.crystalByColor(c,26)||'').replace('<svg ','<svg class="gem" ');}
+function setMsg(t,flash){
+  msg=t; if(flash){const st=document.getElementById('stage');st.classList.remove('flash');void st.offsetWidth;st.classList.add('flash');}
+}
+function renderTop(){
+  document.getElementById('stage').innerHTML=ship();
+  document.getElementById('status').innerHTML=SLOTS.map(s=>`<span class="pill">${s.n} Lv${S.lv[s.id]}</span>`).join('');
+  document.getElementById('msg').textContent=msg||DEF_MSG;
+  document.getElementById('tabs').innerHTML=TABS.map(([k,n])=>`<button role="tab" data-tab="${k}" aria-selected="${tab===k}">${icon(k,24)}<span>${n}</span></button>`).join('');
+}
+function giftCard(){
+  return `<div class="card gift"><div class="row"><span class="sname">水晶碎片取得方式</span></div><p class="need">解星空試煉場－陶笛遊樂場<br>隨機掉落！</p></div>`;
+}
+function avail(id){return S.el[id]-pick.filter(p=>p===id).length;}
+/* 魔法陣 */
+const MC={cx:150,cy:150,R:118};
+const SP=[0,1,2].map(i=>{const a=(-90+i*120)*Math.PI/180;return [MC.cx+Math.cos(a)*MC.R,MC.cy+Math.sin(a)*MC.R];});
+function ringBraid(cx,cy,R,a,k,id){
+  const N=240, pa=[],pb=[];
+  for(let i=0;i<=N;i++){const th=i/N*Math.PI*2, d=Math.sin(th*k)*a;
+    pa.push((cx+Math.cos(th)*(R+d)).toFixed(1)+','+(cy+Math.sin(th)*(R+d)).toFixed(1));
+    pb.push((cx+Math.cos(th)*(R-d)).toFixed(1)+','+(cy+Math.sin(th)*(R-d)).toFixed(1));}
+  const da='M'+pa.join('L')+'Z', db='M'+pb.join('L')+'Z';
+  const st=d=>`<path d="${d}" fill="none" stroke="${D}" stroke-width="6.5" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${G}" stroke-width="3.4" stroke-linecap="round"/>`;
+  let s=st(da)+st(db);
+  for(let j=1;j<2*k;j+=2){const th=j*Math.PI/k;
+    s+=`<clipPath id="${id}${j}"><circle cx="${(cx+Math.cos(th)*R).toFixed(1)}" cy="${(cy+Math.sin(th)*R).toFixed(1)}" r="7"/></clipPath><g clip-path="url(#${id}${j})">${st(da)}</g>`;}
+  return s;
+}
+function circleSvg(){
+  const part=byId(SLOTS,mcPart);
+  const [p0,p1,p2]=SP;
+  const mid=(a,b)=>[(a[0]+b[0])/2*0.82+MC.cx*0.18,(a[1]+b[1])/2*0.82+MC.cy*0.18];
+  const arc=(a,b)=>`Q${mid(a,b)[0].toFixed(1)} ${mid(a,b)[1].toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
+  const tri=`M${p0[0].toFixed(1)} ${p0[1].toFixed(1)} ${arc(p0,p1)} ${arc(p1,p2)} ${arc(p2,p0)}Z`;
+  const trik=`<path d="${tri}" fill="none" stroke="${D}" stroke-width="6" stroke-linejoin="round"/><path d="${tri}" fill="none" stroke="${G}" stroke-width="3" stroke-linejoin="round"/>`;
+  const slots=SP.map((p,i)=>{
+    const id=pick[i], c=id?byId(EL,id).c:null, nm=['主色','紋飾','光暈'][i];
+    const inner=id?`<circle cx="${p[0]}" cy="${p[1]}" r="38" fill="${c}" opacity=".22" class="pulse"/><g transform="translate(${p[0]-20} ${p[1]-20}) scale(1.25)">${ISLE_ART.crystalInner(EL.findIndex(e=>e.id===id)+1)}</g>`
+      :`<text x="${p[0]}" y="${p[1]+5}" text-anchor="middle" font-size="13" fill="#8d7a52">${nm}</text>`;
+    return `<g ${id?`data-act="clear" data-i="${i}" role="button" tabindex="0" aria-label="取出${byId(EL,id).n}（${nm}）" style="cursor:pointer"`:`aria-label="${nm}空格"`}><circle cx="${p[0]}" cy="${p[1]}" r="31" fill="#fbf4de" stroke="${G}" stroke-width="3" ${id?'':'stroke-dasharray="6 5"'}/>${inner}</g>`;
+  }).join('');
+  const center=`<g data-act="cycle" role="button" tabindex="0" aria-label="目前部位：${part.n}，點一下換下一個部位" style="cursor:pointer"><circle cx="150" cy="150" r="50" fill="#fbf4de" stroke="${D}" stroke-width="3"/><circle cx="150" cy="150" r="44" fill="none" stroke="${G}" stroke-width="2" stroke-dasharray="3 4"/><g transform="translate(112 110) scale(1.9)" color="${D}">${icon(mcPart,40).replace(/<svg[^>]*>/,'<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">').replace('</svg>','</g>')}</g><text x="150" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="${D}">${part.n}</text></g>`;
+  return `<svg class="mc" viewBox="-12 -12 324 324" role="group" aria-label="提煉陣，選 ${part.n}，三個水晶碎片格">${ringBraid(MC.cx,MC.cy,MC.R,5.5,12,'rb')}${trik}${center}${slots}</svg>`;
+}
+function craftPanel(){
+  const part=byId(SLOTS,mcPart), lv=S.lv[mcPart], full=pick.every(Boolean);
+  const n=pick.filter(Boolean).length;
+  let prev;
+  if(full){
+    const cs=pick.map(x=>byId(EL,x));
+    prev=`${lv>=3?`${part.n}已滿級，提煉只會換顏色`:`${part.n} Lv${lv} → Lv${lv+1}`}　主色 ${gemSvg(cs[0].c)} 紋飾 ${gemSvg(cs[1].c)} 光暈 ${gemSvg(cs[2].c)}`;
+  }else prev=`放入 ${COST} 顆水晶碎片（現在 ${n}／${COST}）。位置決定顏色：上方＝主色、右下＝紋飾、左下＝光暈。`;
+  const parts=SLOTS.map(s=>`<button class="partbtn" data-act="part" data-slot="${s.id}" aria-pressed="${s.id===mcPart}">${icon(s.id,28)}<span>${s.n}</span></button>`).join('');
+  const chips=EL.map(e=>`<button class="chip" data-act="put" data-id="${e.id}" ${avail(e.id)>0&&!full?'':'disabled'}>${gemSvg(e.c)}<b>${e.n}</b><small>×${avail(e.id)}</small></button>`).join('');
+  const pips=[1,2,3].map(i=>`<span class="pip${i<=lv?' on':''}"></span>`).join('');
+  return giftCard()+`<h2>提煉工坊</h2><p class="desc" style="margin:0 0 6px">提煉水晶碎片能量，升級飛行船設備！</p>
+<div class="partrow" role="group" aria-label="選擇升級部位">${parts}</div>
+<div class="card"><div class="row"><span class="sname">${part.n}</span><span class="pips" aria-label="等級 ${lv}／3">${pips}</span></div><p class="desc">Lv${lv}：${part.d[lv-1]}</p>${circleSvg()}<p class="preview">${prev}</p>
+<button class="btn" data-act="inject" ${full?'':'disabled'}>提煉水晶碎片能量</button>
+<button class="btn alt small" style="margin-top:8px" data-act="reset-color" ${S.cr[mcPart]?'':'disabled'}>恢復${part.n}原色</button></div>
+<h2>我的水晶碎片</h2><p class="notes" style="padding-left:0;list-style:none">解任務拾獲島嶼結晶，全對多掉一顆稀有水晶碎片！</p>
+<div class="grid">${chips}</div>`;
+}
+function bagPanel(){
+  const els=EL.map(e=>`<div class="chip" style="cursor:default">${gemSvg(e.c)}<b>${e.n}</b><small>${e.isle}</small><small>×${S.el[e.id]}</small></div>`).join('');
+  const opts=EL.map((e,i)=>`<option value="${i+1}" ${S.isle===i+1?'selected':''}>第 ${i+1} 島 ${e.isle}</option>`).join('');
+  const w=wk();
+  return `<h2>水晶碎片（每島一種）</h2><div class="grid">${els}</div>
+<p class="notes">解任務拾獲島嶼結晶，全對多掉一顆稀有水晶碎片！在「練習」頁超過任務目標後掉落，依「目前練習的島」決定是哪一種。</p>
+<details data-d="tools" ${openD.tools?'open':''}><summary>測試工具</summary><div class="card">
+<label for="isle" class="need" style="display:block">目前練習的島（練習頁掉的水晶碎片會跟著變）</label>
+<select id="isle" data-act="isle" style="width:100%;margin-bottom:8px">${opts}</select>
+<button class="btn" data-act="drop">模擬掉落 1 次（${EL[S.isle-1].n}）</button>
+<div class="grid2" style="margin-top:8px">
+<button class="btn alt" data-act="all3">每種 +3</button><button class="btn alt" data-act="reset">重設飛船</button></div>
+<button class="btn alt" style="margin-top:8px" data-act="jar10">星星罐 +10（測試開島，罐滿 40 就會開島）</button>
+<button class="btn alt" style="margin-top:8px" data-act="resetOpen">重設開島進度（回第 3 島、星星罐 9、金幣 86）</button></div></details>
+<h2>這版的暫定假設</h2><ul class="notes">
+<li>水晶碎片名稱第 5～12 島是暫擬。每次升級放入任意 3 顆水晶碎片（Lv1→2、Lv2→3 各一次）。</li>
+<li>放入的位置決定該部位的顏色：上方＝主色、右下＝紋飾、左下＝光暈。滿級後仍可重新提煉換色。</li>
+<li>水晶碎片只靠「星空試煉場－陶笛遊樂場」隨機掉落；每週任務不再另外給。</li>
+<li>重設飛船只清飛船資料，不動星星罐與練習進度。</li></ul>`;
+}
+document.getElementById('labic').innerHTML=icon('lab',26,'inl')+' ';
+function renderPanel(){
+  document.getElementById('panel').innerHTML=tab==='craft'?craftPanel():bagPanel();
+}
+function report(){try{if(parent!==window)parent.postMessage({type:'ship-h',h:document.getElementById('wrap').offsetHeight},'*');}catch(e){}}
+function render(){renderTop();renderPanel();report();}
+
+/* ===== 事件 ===== */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab],[data-act]'); if(!t) return;
+  if(t.dataset.tab){tab=t.dataset.tab;pick=[null,null,null];render();return;}
+  const act=t.dataset.act;
+  S=load();   /* 先讀最新存檔，避免蓋掉練習頁剛掉的水晶碎片 */
+  if(act==='part'){mcPart=t.dataset.slot;pick=[null,null,null];}
+  else if(act==='cycle'){const i=SLOTS.findIndex(s=>s.id===mcPart);mcPart=SLOTS[(i+1)%SLOTS.length].id;pick=[null,null,null];}
+  else if(act==='claim'){
+    const w=wk(), id=t.dataset.id;
+    if((weekDone(w)||S.fake===w.week)&&S.claimed!==w.week&&byId(EL,id)){
+      S.el[id]++;S.claimed=w.week;setMsg(`領到「${nameOf(id)}」×1。到「提煉工坊」提煉升級吧。`,true);
+    }
+  }
+  else if(act==='put'){const i=pick.indexOf(null);if(i>=0&&avail(t.dataset.id)>0)pick[i]=t.dataset.id;}
+  else if(act==='clear'){pick[+t.dataset.i]=null;}
+  else if(act==='inject'){
+    const ids=pick.slice(), sid=mcPart, lv=S.lv[sid];
+    const need={};ids.forEach(x=>{if(x)need[x]=(need[x]||0)+1;});
+    if(ids.every(Boolean)&&Object.entries(need).every(([k,v])=>S.el[k]>=v)){
+      Object.entries(need).forEach(([k,v])=>S.el[k]-=v);
+      S.cr[sid]=ids;
+      if(lv<3){S.lv[sid]=lv+1;setMsg(`提煉完成！${byId(SLOTS,sid).n}升到 Lv${lv+1}。`,true);}
+      else setMsg(`提煉完成！${byId(SLOTS,sid).n}換上新的顏色。`,true);
+      pick=[null,null,null];
+    }
+  }
+  else if(act==='reset-color'){delete S.cr[mcPart];setMsg(`${byId(SLOTS,mcPart).n}已恢復原色。`);}
+  else if(act==='drop'){const el=EL[S.isle-1];S.el[el.id]++;setMsg(`掉落「${el.n}」×1（第 ${S.isle} 島）。`);}
+  else if(act==='all3'){EL.forEach(x=>S.el[x.id]+=3);setMsg('每種水晶碎片 +3。');}
+  else if(act==='reset'){S=Object.assign(fresh(),{isle:S.isle});pick=[null,null,null];setMsg('飛船已重設。');}
+  else if(act==='fake'){const w=wk();S.fake=S.fake===w.week?-1:w.week;setMsg(S.fake===w.week?'已假裝本週任務完成，可到「提煉工坊」領水晶碎片。':'已取消。');}
+  else if(act==='unclaim'){S.claimed=-1;setMsg('已重設本週領取。');}
+  else if(act==='jar10'||act==='resetOpen'){
+    try{OLMSave.patch(OLMSave.K.TEST,function(T){
+      if(act==='jar10'){T.jar=Math.min(79,(T.jar==null?9:(T.jar|0))+10);setMsg('星星罐 +10（現在 '+T.jar+'）。罐滿 40 顆，回地圖頁會開島。');}
+      else{T.jar=9;T.open=3;T.coins=86;T.own=['hat_straw','bow','book'];T.worn={head:'hat_straw'};S.isle=4;setMsg('開島進度已重設。');}
+    });}catch(e){setMsg('寫入失敗');}
+  }
+  save();render();
+});
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('svg [data-act]')){e.preventDefault();e.target.closest('[data-act]').dispatchEvent(new MouseEvent('click',{bubbles:true}));}
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='isle'){S=load();S.isle=+e.target.value;save();render();document.getElementById('isle').focus();}
+});
+document.addEventListener('toggle',e=>{const d=e.target.dataset&&e.target.dataset.d;if(d)openD[d]=e.target.open;},true);
+function refresh(){S=load();pick=[null,null,null];render();}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='ship-refresh')refresh();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+window.addEventListener('storage',e=>{if(e.key===KEY||e.key==='olm_wk_v2')refresh();});
+if(window.ResizeObserver)new ResizeObserver(report).observe(document.getElementById('wrap'));
+window.addEventListener('load',report);
+render();
+</script>
+</body>
+</html>

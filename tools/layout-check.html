@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><title>樂譜排版間距檢查</title>
+<style>body{font-family:system-ui,'Noto Sans TC',sans-serif;margin:16px;max-width:760px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:4px 8px;font-size:14px}.ok{color:#2E5B46;font-weight:700}.bad{color:#9C3B30;font-weight:700}iframe{position:absolute;left:-9999px;width:400px;height:800px}</style></head>
+<body>
+<h1>樂譜排版間距檢查</h1>
+<p>檢查 <code>song-practice.html</code> 內所有曲子：每首用 8、16 小節兩種範圍各排一遍，找出相鄰符號（數字、♭♯、附點、「－」、五線譜音符頭）距離小於 2 px 或重疊的位置。新增曲子後開這頁看結果。</p>
+<div id="sum">檢查中…</div><table id="tb" hidden><tr><th>曲子</th><th>小節</th><th>類型</th><th>距離(px)</th><th>範圍</th></tr></table>
+<iframe id="f" src="../song-practice.html"></iframe>
+<script>
+const GAPMIN=2.0, WINDOWS=[16,8];
+function rectDist(a,b){const dx=Math.max(a.x-(b.x+b.w),b.x-(a.x+a.w),0),dy=Math.max(a.y-(b.y+b.h),b.y-(a.y+a.h),0);
+  const ox=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x),oy=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);
+  if(ox>0&&oy>0)return -Math.min(ox,oy);return Math.hypot(dx,dy);}
+function glyphs(n){
+  const st=[],jp=[];if(n.rest||!n.gEl)return {st,jp};
+  const base=n.bottom+38;
+  [...n.gEl.children].forEach(c=>{
+    if(c===n.hl||c===n.badge)return;
+    let b;try{b=c.getBBox();}catch(e){return;}
+    let r={x:b.x,y:b.y,w:b.width,h:b.height};const tag=c.tagName;
+    if(r.y>=n.bottom+10){
+      let kind=tag==='text'?'num':tag==='circle'?'dot':'line';
+      if(tag==='text')r={x:r.x,y:base-11,w:r.w,h:12};
+      if(tag==='circle')kind=(Math.abs((r.y+r.h/2)-(base-4))<0.6)?'durdot':'octdot';
+      if(tag==='line')kind=Math.abs((r.y+r.h/2)-(base-5))<1?'dash':'under';
+      jp.push({r,kind});
+    }else if(r.y>n.top-40&&['ellipse','text','line','circle'].includes(tag)){
+      st.push({r,kind:tag==='text'?'acc':tag==='ellipse'?'head':tag==='circle'?'sdot':'stem'});
+    }
+  });
+  return {st,jp};
+}
+function run(sp){
+  const flags=[];
+  function runRange(song,from,to){
+    sp.cfg.song=song;sp.cfg.from=from;sp.cfg.to=to;sp.applyRange();
+    const notes=sp.R.notes.filter(n=>!n.rest),G=new Map();notes.forEach(n=>G.set(n,glyphs(n)));
+    notes.forEach(n=>{const g=G.get(n).jp;
+      for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){
+        const a=g[i],b=g[j];
+        if(a.kind==='under'||b.kind==='under')continue;
+        if((a.kind==='num'&&b.kind==='octdot')||(b.kind==='num'&&a.kind==='octdot'))continue;
+        if(a.kind==='num'&&b.kind==='num')continue;
+        const d=rectDist(a.r,b.r);
+        if(d<0.5)flags.push({song,from,to,bar:n.bar,type:'同音內重疊 '+a.kind+'/'+b.kind,d:+d.toFixed(1)});
+      }});
+    const rows={};notes.forEach(n=>{(rows[n.row]=rows[n.row]||[]).push(n);});
+    Object.values(rows).forEach(list=>{list.sort((a,b)=>a.x-b.x);
+      for(let k=0;k+1<list.length;k++){const A=list[k],B=list[k+1];
+        for(const part of ['jp','st']){let md=1e9,what='';
+          G.get(A)[part].forEach(a=>G.get(B)[part].forEach(b=>{
+            if(part==='jp'&&a.kind==='under'&&b.kind==='under')return;
+            const d=rectDist(a.r,b.r);if(d<md){md=d;what=a.kind+'/'+b.kind;}}));
+          if(md<GAPMIN)flags.push({song,from,to,bar:B.bar,type:(part==='jp'?'簡譜':'五線譜')+'相鄰擠 '+what,d:+md.toFixed(1)});
+        }}});
+  }
+  Object.values(sp.SONGS).forEach(sg=>{const N=sg.bars.length;
+    for(const w of WINDOWS)for(let f=1;f<=N;f+=w)runRange(sg.id,f,Math.min(N,f+w-1));});
+  const key={};flags.forEach(f=>{const k=f.song+'|'+f.bar+'|'+f.type;if(!key[k]||f.d<key[k].d)key[k]=f;});
+  return Object.values(key).sort((a,b)=>a.song.localeCompare(b.song)||a.bar-b.bar);
+}
+document.getElementById('f').addEventListener('load',()=>{
+  let list;try{list=run(document.getElementById('f').contentWindow.__sp);}catch(e){document.getElementById('sum').textContent='檢查失敗：'+e.message;console.log('CHK_ERR '+e.message);return;}
+  const s=document.getElementById('sum');
+  s.innerHTML=list.length?'<span class="bad">有 '+list.length+' 處太擠或重疊</span>':'<span class="ok">全部通過（共掃 '+Object.keys(window.frames[0].__sp.SONGS).length+' 首）</span>';
+  if(list.length){const tb=document.getElementById('tb');tb.hidden=false;
+    list.forEach(x=>{const tr=tb.insertRow();[x.song,'m'+x.bar,x.type,x.d,x.from+'–'+x.to].forEach(v=>tr.insertCell().textContent=v);});}
+  console.log('CHK_START\n'+JSON.stringify({uniq:list.length,list})+'\nCHK_END');
+});
+</script></body></html>

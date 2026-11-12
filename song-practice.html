@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>陶笛失落地圖｜分段練習（原型）</title>
+<style>
+:root{
+  --vellum:#EFE1BF; --vellum-2:#F9F0D6; --edge:#D9C494; --ink:#3A2A1A; --ink-2:#6E5337; --line:#BFA470;
+  --green:#2E5B46; --green-fg:#F6E7B4; --gold:#C8963A; --gold-hi:#E8BC58; --ruby:#9C3B30; --amber:#C0701F;
+  --shadow:rgba(58,42,26,.28);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--vellum);color:var(--ink);font-family:'Noto Sans TC',system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;font-weight:500;font-size:16px;line-height:1.55;padding:12px 12px calc(40px + env(safe-area-inset-bottom))}
+.wrap{max-width:480px;margin:0 auto}
+h1{font-size:22px;margin:6px 0 2px}
+h2{font-size:17px;margin:0 0 8px}
+.card{background:var(--vellum-2);border:2px solid var(--ink-2);border-radius:16px;padding:12px;margin:0 0 12px;box-shadow:2px 3px 0 var(--shadow)}
+.back{background:none;border:0;color:var(--ink-2);font:inherit;font-size:15px;padding:4px 0;cursor:pointer}
+.btn{width:100%;font:inherit;font-size:20px;font-weight:800;padding:13px;border:2.5px solid var(--ink);border-radius:16px;background:var(--gold-hi);color:var(--ink);cursor:pointer}
+.btn:active{transform:translateY(2px)}
+.btn.alt{background:var(--vellum-2);font-size:16px;padding:9px}
+.btn:disabled{opacity:.5}
+.btnrow{display:flex;gap:8px}
+.btnrow .btn{width:auto}
+#goBtn{flex:1.5}
+#demoBtn{flex:1;font-size:17px;background:var(--vellum-2)}
+#demoBtn.on{background:var(--gold-hi)}
+.hint{font-size:13px;color:var(--ink-2);margin:6px 0 0}
+.task{font-size:18px;font-weight:800}
+.bar{height:16px;border:2px solid var(--ink);border-radius:10px;background:#fff8;overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--green);transition:width .4s}
+.stat{display:flex;justify-content:space-between;font-size:14px;color:var(--ink-2)}
+.row{display:flex;gap:10px;align-items:center;margin-top:10px}
+.row label{font-size:14px;font-weight:700;white-space:nowrap}
+select{font:inherit;font-size:16px;padding:6px 8px;border:2px solid var(--ink-2);border-radius:10px;background:#fff;color:var(--ink);flex:1}
+svg.score{width:100%;height:auto;display:block;touch-action:manipulation}
+.count{font-size:64px;font-weight:900;text-align:center;line-height:1.1;min-height:72px}
+.live{text-align:center;font-size:15px;color:var(--ink-2);min-height:24px}
+.warn{background:#fde8d4;border-color:var(--ruby);font-size:14px}
+.err{color:var(--ruby);font-weight:700;font-size:14px;margin-top:8px}
+.sum{display:flex;gap:8px;margin:6px 0 10px}
+.sum div{flex:1;text-align:center;border:2px solid var(--ink-2);border-radius:12px;padding:6px 2px;background:#fff6}
+.sum b{display:block;font-size:22px}
+.sum span{font-size:12px;color:var(--ink-2)}
+.verdict{font-size:20px;font-weight:800;text-align:center;margin:4px 0 8px}
+ul.errs{list-style:none;margin:0;padding:0}
+ul.errs li{padding:7px 8px;border-radius:10px;margin-bottom:6px;border:1.5px solid var(--line);background:#fff7;font-size:15px}
+ul.errs li.sel{border-color:var(--ink);background:var(--gold-hi)}
+ul.errs li b{font-weight:800}
+.tag{display:inline-block;font-size:12px;padding:0 7px;border-radius:9px;color:#fff;margin-right:4px}
+.tag.bad{background:var(--ruby)}.tag.mid{background:var(--amber)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--ink-2);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.gauge{position:relative;height:26px;margin:8px 0 4px;border:2px solid var(--ink-2);border-radius:13px;background:linear-gradient(90deg,#f3d9c8,#fff8 38%,#fff8 62%,#f3d9c8);overflow:hidden}
+.gauge .zone{position:absolute;top:0;bottom:0;background:#8fc9a0aa;border-left:2px solid var(--green);border-right:2px solid var(--green)}
+.gauge .needle{position:absolute;top:-2px;bottom:-2px;width:6px;margin-left:-3px;border-radius:3px;background:var(--ink);transition:left .08s linear,opacity .2s;opacity:.15}
+.gauge .gl,.gauge .gr{position:absolute;top:3px;font-size:12px;color:var(--ink-2)}
+.gauge .gl{left:8px}.gauge .gr{right:8px}
+.gtext{text-align:center;font-size:20px;font-weight:800;min-height:30px}
+.vol{height:8px;border-radius:5px;background:#fff8;border:1.5px solid var(--ink-2);overflow:hidden;margin-top:6px}
+.vol i{display:block;height:100%;width:0;background:var(--green)}
+[hidden]{display:none!important}
+</style>
+<script src="save-core.js"></script>
+<script src="sfx.js"></script>
+<script src="wk-core.js"></script>
+<script>if(window.Sfx){Sfx.auto('.back','nav');Sfx.auto('.btn:not(#goBtn):not(#stopBtn):not(#demoBtn)','tap');}</script>
+</head>
+<body>
+<div class="wrap">
+  <button class="back" id="back">← 返回</button>
+  <h1 id="pageTitle">分段練習（原型）</h1>
+
+  <div class="card warn" id="inapp" hidden>⚠️ 看起來在 LINE／臉書／IG 的內建瀏覽器，常常擋麥克風。請點右上角「⋯」→ 用 Safari／Chrome 開啟。</div>
+  <div class="card warn" id="protoNote" style="font-size:13px">原型版：正確次數只存在這支手機，<b>不計星星糖、不掉水晶碎片</b>，只用來測試判分。</div>
+  <div class="card warn" id="mockNote" style="font-size:13px" hidden>這是測試版的模擬任務：歌曲與小節範圍是暫時假資料，正式內容由老師指定。</div>
+
+  <section class="card" id="taskCard">
+    <div class="task" id="taskName">—</div>
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="stat"><span id="doneTxt">正確 0／20 次</span><span id="perfTxt">這段總共吹了 0 次</span></div>
+    <div id="doneMsg" class="verdict" style="color:var(--green);margin-top:8px" hidden>🎉 本週任務完成！</div>
+  </section>
+
+  <section class="card">
+    <h2 id="scoreTitle">—　<span id="scoreSub" style="font-size:13px;font-weight:500;color:var(--ink-2)"></span></h2>
+    <svg class="score" id="score" viewBox="0 0 340 330" role="img" aria-label="樂譜"></svg>
+    <div class="legend" id="legend" hidden>
+      <span><i style="background:var(--green)"></i>音準、節拍都對</span>
+      <span><i style="background:var(--amber)"></i>音偏一點或拍子不準</span>
+      <span><i style="background:var(--ruby)"></i>吹錯音、漏吹或太早停</span>
+    </div>
+    <div id="liveBox" hidden>
+      <div class="count" id="count">—</div>
+      <div class="live" id="live">&nbsp;</div>
+      <div class="gauge" id="gauge" aria-hidden="true"><span class="gl">太低</span><div class="zone" id="gZone"></div><i class="needle" id="gNeedle"></i><span class="gr">太高</span></div>
+      <div class="gtext" id="gText" role="status" aria-live="off">&nbsp;</div>
+      <div class="vol"><i id="volBar"></i></div>
+    </div>
+  </section>
+
+  <section class="card" id="ctlCard">
+    <div class="btnrow"><button class="btn" id="goBtn" data-nosfx>🎤 開始吹奏</button><button class="btn alt" id="demoBtn" data-nosfx>🔊 聽示範</button></div>
+    <button class="btn alt" id="stopBtn" data-nosfx hidden style="margin-top:8px">⏹ 中途停止（這次不算）</button>
+    <div class="row" id="rowSong"><label for="song">曲子</label><select id="song"></select></div>
+    <div class="row" id="rowPreset"><label for="preset">範圍</label><select id="preset"></select></div>
+    <div class="row" id="rowRange"><label for="from">小節</label>
+      <input id="from" type="number" inputmode="numeric" min="1" style="width:70px;font:inherit;font-size:16px;padding:6px;border:2px solid var(--ink-2);border-radius:10px">
+      <span>到</span>
+      <input id="to" type="number" inputmode="numeric" min="1" style="width:70px;font:inherit;font-size:16px;padding:6px;border:2px solid var(--ink-2);border-radius:10px">
+      <span id="rangeMax" style="font-size:12px;color:var(--ink-2)"></span></div>
+    <div class="row"><label for="bpm">速度</label>
+      <select id="bpm"><option value="40">♩=40（很慢）</option><option value="50">♩=50（慢）</option><option value="60" selected>♩=60（標準）</option><option value="72">♩=72（稍快）</option><option value="90">♩=90（快）</option></select></div>
+    <div class="row"><label for="tol">音準容許</label>
+      <select id="tol"><option value="10">±10 音分</option><option value="15">±15 音分</option><option value="25" selected>±25 音分（鬆）</option><option value="40">±40 音分（很鬆）</option></select></div>
+    <p class="hint">「聽示範」會用目前選的小節與速度，先 4 拍預備拍再播一遍（合成音，不是真陶笛），樂譜游標會跟著走；示範時麥克風是關的。<br>按「開始吹奏」後先聽 4 拍預備拍，接著照譜吹；休止符就停下來。音準、節拍都對，才算一次「正確」。相同的音連著吹時，請用舌頭輕輕「tu」斷開。建議戴耳機，節拍聲才不會被麥克風收進去。一次最多練 16 小節。</p>
+    <div class="err" id="errMsg" hidden></div>
+  </section>
+
+  <section class="card" id="resCard" hidden>
+    <h2>這次的結果</h2>
+    <div class="verdict" id="verdict"></div>
+    <div class="sum">
+      <div><b id="sPitch">–</b><span>音準正確</span></div>
+      <div><b id="sBeat">–</b><span>節拍正確</span></div>
+      <div><b id="sErr">–</b><span>要改的音</span></div>
+    </div>
+    <div class="hint" id="offTxt" style="margin:0 0 8px"></div>
+    <ul class="errs" id="errList"></ul>
+  </section>
+</div>
+<script src="songs.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const {SONGS,build}=window.OLM_SONGS;
+const SVGNS='http://www.w3.org/2000/svg';
+const COUNT_IN=4,MAX_BARS=16,STORE='olm_song_proto_v1';
+/* 任務模式：網址 ?task=任務id（由遊戲練習分頁的「本週任務」清單點進來）。曲子與小節範圍由任務指定、不可改；
+   次數、星星糖、水晶碎片都走共用的 wk-core.js（olm_wk_v2）。沒有 ?task= 時是舊的原型模式（只存 olm_song_proto_v1，不計星星糖，供開發測試）。 */
+const Core=window.OLM_WK;
+const TASK=(function(){const id=new URLSearchParams(location.search).get('task');const t=id&&Core.taskById(id);return t&&t.type==='song'?t:null;})();
+const GOAL=TASK?TASK.T:20;
+
+/* ========== 名稱與簡譜 ========== */
+const PCN={0:'1',1:'♯1',2:'2',3:'♯2',4:'3',5:'4',6:'♯4',7:'5',8:'♯5',9:'6',10:'♭7',11:'7'};
+function jpName(m){const pc=((Math.round(m)%12)+12)%12;const reg=m<72?'低音':m<84?'中音':m<96?'高音':'最高音';return reg+PCN[pc];}
+function jpNum(n){return (n.acc>0?'♯':n.acc<0?'♭':'')+n.deg;}
+function beatLabel(b){
+  const k=Math.floor(b+1e-6),f=b-k;
+  if(f<1e-6)return '第 '+(k+1)+' 拍';
+  if(Math.abs(f-0.5)<1e-6)return '第 '+(k+1)+' 拍後半';
+  if(Math.abs(f-0.25)<1e-6)return '第 '+(k+1)+' 拍的 ¼ 處';
+  if(Math.abs(f-0.75)<1e-6)return '第 '+(k+1)+' 拍的 ¾ 處';
+  return '第 '+(k+1)+' 拍＋'+f.toFixed(2);
+}
+
+/* ========== 畫譜（SVG）：依小節範圍動態排版 ========== */
+const ACC_PAD=1.0;   /* 有升降記號的音符，左邊多留的寬度（單位同 wOf） */
+const W=340,CLEF_W=46,ROW_H=106,STEP=4,LINE_GAP=8,AVAIL=W-CLEF_W-6;
+function el(tag,attrs,parent,text){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+function stepOf(n){return (4+n.oct)*7+(n.deg-1)-(4*7+2);}   /* 相對 E4（下加一線）的音階級數；譜面低一個八度 */
+/* 簡譜時值記號：8 分下加一條線、16 分兩條；2 拍以上在右邊加「－」（每多一拍一條）；附點加「·」 */
+function durMarks(n,x,ty,g,ink){
+  const d=n.dur,lines=d<=0.25+1e-9?2:d<=0.75+1e-9?1:0;
+  let hw=5;try{const b=n.num.getBBox();if(b.width>0)hw=b.width/2;}catch(e){}   /* 數字實際半寬 */
+  for(let k=0;k<lines;k++)el('line',{x1:x-6,x2:x+6,y1:ty+4+k*3.5,y2:ty+4+k*3.5,stroke:ink,'stroke-width':1.5,'stroke-linecap':'round'},g);
+  /* 簡譜附點只用在 0.75、1.5 拍；3 拍以上已由「－」表達時值，不再加附點 */
+  if([0.75,1.5].some(v=>Math.abs(d-v)<1e-9))el('circle',{cx:x+hw+3.5,cy:ty-4,r:1.7,fill:ink},g);
+  if(d>=2-1e-9){const m=Math.round(d)-1;for(let k=0;k<m;k++)el('line',{x1:x+hw+4+k*13,x2:x+hw+13+k*13,y1:ty-5,y2:ty-5,stroke:ink,'stroke-width':1.8,'stroke-linecap':'round'},g);}
+  return lines;
+}
+function wOf(n){let w;
+  if(n.dur>=2)w=(8+18+13*(Math.round(n.dur)-2)+6)/15;   /* 長音：數字靠左，右邊留給「－」（每多一條加寬） */
+  else if(n.dur>=1.5)w=1.6;
+  else if(n.dur>=1)w=1.3;
+  else if(n.dur>=0.75)w=1.5;   /* 附點 8 分：附點要留位 */
+  else if(n.dur>=0.5)w=0.95;
+  else w=0.9;
+  if(!n.rest&&n.acc)w+=ACC_PAD;return w;}
+function barMin(b){return 14+b.notes.reduce((a,n)=>a+wOf(n),0)*15;}
+let R=null;            /* 目前範圍 build() 的結果 */
+function layoutRows(bars){
+  const rows=[];let cur=[],w=0;
+  bars.forEach(b=>{const bw=barMin(b);if(cur.length&&w+bw>AVAIL){rows.push(cur);cur=[];w=0;}cur.push(b);w+=bw;});
+  if(cur.length)rows.push(cur);
+  return rows;
+}
+function drawScore(){
+  const svg=$('score');svg.innerHTML='';
+  const ink='var(--ink)',ink2='var(--ink-2)';
+  const rows=layoutRows(R.bars),ts=R.song.ts;
+  const ties=[];
+  rows.forEach((row,r)=>{
+    const top=r*ROW_H+30,bottom=top+4*LINE_GAP;
+    for(let l=0;l<5;l++)el('line',{x1:2,x2:W-4,y1:top+l*LINE_GAP,y2:top+l*LINE_GAP,stroke:ink2,'stroke-width':1},svg);
+    el('line',{x1:2,x2:2,y1:top,y2:bottom,stroke:ink,'stroke-width':1.4},svg);
+    el('path',{d:'M 17 33 C 9 31 6 21 12 13 C 17 6 20 1 17 -6 C 13 0 12 9 15 20 C 17 29 18 38 18 44 C 18 51 11 52 10 47 C 9 43 14 42 15 46 M 17 33 C 25 34 27 24 20 21 C 15 19 12 23 15 27',
+      fill:'none',stroke:ink,'stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round',transform:`translate(0,${top})`},svg);
+    if(r===0){
+      el('text',{x:36,y:top+14,'font-size':15,'font-weight':800,'text-anchor':'middle',fill:ink},svg,String(ts[0]));
+      el('text',{x:36,y:top+30,'font-size':15,'font-weight':800,'text-anchor':'middle',fill:ink},svg,String(ts[1]));
+    }
+    const mins=row.map(barMin),sum=mins.reduce((a,b)=>a+b,0);
+    const scale=Math.min(AVAIL/sum,r===rows.length-1?1.5:9);
+    let x0=CLEF_W;
+    row.forEach((bar,bi)=>{
+      const bw=mins[bi]*scale,inner=bw-14,tw=bar.notes.reduce((a,n)=>a+wOf(n),0);
+      const isEnd=(r===rows.length-1&&bi===row.length-1);
+      let cum=0;
+      bar.notes.forEach(n=>{const w=wOf(n),pad=(!n.rest&&n.acc)?ACC_PAD:0;const off=n.dur>=2?pad+8/15:pad+(w-pad)/2;n.x=x0+7+(cum+off)/tw*inner;cum+=w;n.row=r;n.top=top;n.bottom=bottom;});
+      x0+=bw;
+      const mx=x0;
+      el('line',{x1:mx-(isEnd?4:0),x2:mx-(isEnd?4:0),y1:top,y2:bottom,stroke:ink,'stroke-width':1.2},svg);
+      if(isEnd)el('line',{x1:mx-0.5,x2:mx-0.5,y1:top,y2:bottom,stroke:ink,'stroke-width':3.6},svg);
+      el('text',{x:mx-bw+3,y:top-6,'font-size':9,fill:ink2},svg,String(bar.no));   /* 小節號 */
+    });
+  });
+  /* 音符、休止、符桿、連桁 */
+  R.bars.forEach(bar=>{
+    const groups=[];let g=null;
+    bar.notes.forEach(n=>{
+      if(!n.rest&&n.dur<1){const key=Math.floor(n.beatInBar+1e-6);if(g&&g.key===key)g.list.push(n);else{g={key,list:[n]};groups.push(g);}}
+      else g=null;
+    });
+    const grp=new Map();groups.forEach(G=>{if(G.list.length>=2)G.list.forEach(n=>grp.set(n,G));});
+    bar.notes.forEach(n=>{
+      const top=n.top,bottom=n.bottom,x=n.x;
+      const gEl=el('g',{'data-i':n.i,style:'cursor:pointer'},svg);
+      n.g=gEl;
+      n.hl=el('rect',{x:x-13,y:top-14,width:26,height:ROW_H-6,rx:8,fill:'var(--gold-hi)',opacity:0},gEl);
+      const ty=bottom+38;
+      if(n.rest){
+        const my=bottom-16;
+        if(n.dur>=4)el('rect',{x:x-6,y:top+8,width:12,height:4,fill:ink},gEl);
+        else if(n.dur>=2)el('rect',{x:x-6,y:top+12,width:12,height:4,fill:ink},gEl);
+        else{el('circle',{cx:x-2,cy:my-4,r:2,fill:ink},gEl);el('path',{d:`M ${x+3} ${my-8} L ${x-3} ${my+8}`,stroke:ink,'stroke-width':2,'stroke-linecap':'round',fill:'none'},gEl);
+          if(n.dur<1)el('circle',{cx:x-3,cy:my+3,r:1.8,fill:ink},gEl);}
+        n.head=null;n.stems=[];
+        n.num=el('text',{x:x,y:ty,'font-size':15,'font-weight':800,'text-anchor':'middle',fill:ink},gEl,'0');
+        durMarks(n,x,ty,gEl,ink);
+        n.badge=el('text',{x:x,y:ty+22,'font-size':10.5,'font-weight':800,'text-anchor':'middle',fill:ink2},gEl,'');
+        n.gEl=gEl;return;
+      }
+      const st=stepOf(n),y=bottom-st*STEP;n.y=y;
+      for(let s=-2;s>=st;s-=2)el('line',{x1:x-9,x2:x+9,y1:bottom-s*STEP,y2:bottom-s*STEP,stroke:ink2,'stroke-width':1},gEl);
+      for(let s=10;s<=st;s+=2)el('line',{x1:x-9,x2:x+9,y1:bottom-s*STEP,y2:bottom-s*STEP,stroke:ink2,'stroke-width':1},gEl);
+      if(n.acc)el('text',{x:x-11.5,y:y+5,'font-size':14,'font-weight':800,'text-anchor':'middle',fill:ink},gEl,n.acc>0?'♯':'♭');
+      const hollow=n.dur>=2;
+      n.head=el('ellipse',{cx:x,cy:y,rx:5.6,ry:4.2,transform:`rotate(-20 ${x} ${y})`,fill:hollow?'var(--vellum-2)':ink,stroke:ink,'stroke-width':1.6},gEl);
+      if(Math.abs(n.dur*4-Math.round(n.dur*4))<1e-9&&[0.75,1.5,3].some(d=>Math.abs(n.dur-d)<1e-9))
+        el('circle',{cx:x+9,cy:(st%2===0)?y-3:y,r:1.6,fill:ink},gEl);
+      n.stems=[];
+      if(n.dur<4){
+        const G=grp.get(n);
+        let up;
+        if(G){up=G.list.reduce((a,m)=>a+stepOf(m),0)/G.list.length<4;}
+        else up=st<4;
+        const sx=up?x+5.2:x-5.2;
+        let ey;
+        if(G){ey=up?Math.min(...G.list.map(m=>bottom-stepOf(m)*STEP))-26:Math.max(...G.list.map(m=>bottom-stepOf(m)*STEP))+26;}
+        else ey=up?y-26:y+26;
+        n.stem=el('line',{x1:sx,x2:sx,y1:y,y2:ey,stroke:ink,'stroke-width':1.5},gEl);n.stems.push(n.stem);
+        n.sx=sx;n.ey=ey;n.up=up;
+        if(!G&&n.dur<1){ /* 單獨的 8 分／16 分音符：畫符尾 */
+          const d=up?`M ${sx} ${ey} c 1 7 9 8 8 19`:`M ${sx} ${ey} c 1 -7 9 -8 8 -19`;
+          const f=el('path',{d,fill:'none',stroke:ink,'stroke-width':1.8,'stroke-linecap':'round'},gEl);f.setAttribute('data-flag','1');n.stems.push(f);
+          if(n.dur<=0.25){const d2=up?`M ${sx} ${ey+6} c 1 7 9 8 8 19`:`M ${sx} ${ey-6} c 1 -7 9 -8 8 -19`;const f2=el('path',{d:d2,fill:'none',stroke:ink,'stroke-width':1.8,'stroke-linecap':'round'},gEl);f2.setAttribute('data-flag','1');n.stems.push(f2);}
+        }
+      }
+      n.num=el('text',{x:x,y:ty,'font-size':15,'font-weight':800,'text-anchor':'middle',fill:ink},gEl,String(n.deg));
+      n.accJ=n.acc?el('text',{x:x-9.5,y:ty,'font-size':12,'font-weight':800,'text-anchor':'middle',fill:ink},gEl,n.acc>0?'♯':'♭'):null;
+      const nl=durMarks(n,x,ty,gEl,ink);
+      if(n.oct===-1)el('circle',{cx:x,cy:ty+5+nl*3.5,r:1.7,fill:ink},gEl);
+      if(n.oct>=1)el('circle',{cx:x,cy:ty-15,r:1.7,fill:ink},gEl);
+      if(n.oct>=2)el('circle',{cx:x,cy:ty-21,r:1.7,fill:ink},gEl);
+      n.badge=el('text',{x:x,y:ty+22,'font-size':10.5,'font-weight':800,'text-anchor':'middle',fill:ink2},gEl,'');
+      if(n.tieNext)ties.push(n);
+    });
+    /* 連桁（8 分一條、16 分第二條） */
+    groups.forEach(G=>{
+      if(G.list.length<2)return;
+      const a=G.list[0],b=G.list[G.list.length-1];
+      const up=a.up,by=a.ey;
+      const bw=(y)=>el('line',{x1:a.sx,x2:b.sx,y1:y,y2:y,stroke:ink,'stroke-width':3.2,'stroke-linecap':'butt'},svg);
+      bw(by);
+      G.list.forEach((n,k)=>{
+        if(n.dur>0.25)return;
+        const nx=G.list[k+1],pv=G.list[k-1];
+        const yy=up?by+5:by-5;
+        if(nx&&nx.dur<=0.25)el('line',{x1:n.sx,x2:nx.sx,y1:yy,y2:yy,stroke:ink,'stroke-width':3.2},svg);
+        else if(!(pv&&pv.dur<=0.25)){const dx=k===0?7:-7;el('line',{x1:n.sx,x2:n.sx+dx,y1:yy,y2:yy,stroke:ink,'stroke-width':3.2},svg);}
+      });
+    });
+  });
+  /* 延音線 */
+  ties.forEach(n=>{
+    const m=R.notes[n.i+1];if(!m||m.rest)return;
+    const below=n.up!==false;const dy=below?8:-8,y1=n.y+dy*0.7,cy=n.y+dy*2.2;
+    if(n.row===m.row){
+      el('path',{d:`M ${n.x} ${y1} Q ${(n.x+m.x)/2} ${cy} ${m.x} ${y1}`,fill:'none',stroke:'var(--ink)','stroke-width':1.4},svg);
+    }else{
+      el('path',{d:`M ${n.x} ${y1} Q ${(n.x+W-6)/2} ${cy} ${W-6} ${y1}`,fill:'none',stroke:'var(--ink)','stroke-width':1.4},svg);
+      const y2=m.y+dy*0.7,c2=m.y+dy*2.2;
+      el('path',{d:`M ${CLEF_W} ${y2} Q ${(CLEF_W+m.x)/2} ${c2} ${m.x} ${y2}`,fill:'none',stroke:'var(--ink)','stroke-width':1.4},svg);
+    }
+  });
+  R.notes.forEach(n=>{n.gEl=n.g;n.g.addEventListener('click',()=>selectNote(n.i));});
+  svg.setAttribute('viewBox',`0 0 ${W} ${rows.length*ROW_H+44}`);
+}
+function paintNote(n,color,badgeTxt){
+  if(n.head){n.head.setAttribute('stroke',color);n.head.setAttribute('fill',n.dur>=2?'var(--vellum-2)':color);}
+  (n.stems||[]).forEach(l=>{l.setAttribute('stroke',l.getAttribute('data-flag')?color:color);});
+  n.num.setAttribute('fill',color);if(n.accJ)n.accJ.setAttribute('fill',color);
+  n.badge.textContent=badgeTxt||'';n.badge.setAttribute('fill',color);
+}
+function resetPaint(){R.notes.forEach(n=>{paintNote(n,'var(--ink)','');n.hl.setAttribute('opacity',0);});$('legend').hidden=true;}
+
+/* ========== 音高偵測（與音準測試頁相同：正規化自相關，180–3500 Hz） ========== */
+function detectPitch(buf,sr){
+  const n=buf.length,minLag=Math.max(2,Math.floor(sr/5000)),maxLag=Math.min(n-2,Math.floor(sr/180));
+  const nsdf=new Float32Array(maxLag+2);
+  for(let lag=minLag-1;lag<=maxLag+1;lag++){let acf=0,m=0;for(let i=0;i<n-lag;i++){const a=buf[i],b=buf[i+lag];acf+=a*b;m+=a*a+b*b;}nsdf[lag]=m>0?2*acf/m:0;}
+  const peaks=[];let seenNeg=false,curMax=-1,curIdx=-1;
+  for(let lag=minLag;lag<=maxLag;lag++){
+    const v=nsdf[lag];
+    if(v<=0){if(curIdx>=0){peaks.push(curIdx);curIdx=-1;curMax=-1;}seenNeg=true;continue;}
+    if(!seenNeg)continue;
+    if(v>curMax){curMax=v;curIdx=lag;}
+  }
+  if(curIdx>=0)peaks.push(curIdx);
+  if(!peaks.length)return null;
+  let high=-1;peaks.forEach(p=>{if(nsdf[p]>high)high=nsdf[p];});
+  let chosen=-1;for(const p of peaks){if(nsdf[p]>=0.9*high){chosen=p;break;}}
+  if(chosen<=minLag||chosen>=maxLag)return null;
+  const a=nsdf[chosen-1],b=nsdf[chosen],c=nsdf[chosen+1],den=a-2*b+c,shift=den!==0?(a-c)/(2*den):0;
+  const fq=sr/(chosen+shift);if(fq>3500)return null;
+  return {freq:fq,clarity:nsdf[chosen]};
+}
+function median(a){const t=a.slice().sort((x,y)=>x-y);return t[Math.floor(t.length/2)];}
+
+/* ========== 評分（純函式，可用假資料測試） ==========
+   frames：[{t,m}] 有聲音的畫格（t=秒，m=浮點 MIDI）；amps：[{t,rms}] 每一畫格的音量（含無聲）
+   S：第 1 個音的預定時間；beat：一拍秒數；outLat：喇叭輸出延遲；tol：音準容許（音分）；EV：判分用的音（延音線已合併） */
+const BEAT_TOL=0.25;     /* 起音與預定拍點差超過 0.25 拍算不準；短音符另依音長縮小（見 tolT） */
+const GAP=0.12;          /* 同一個音裡，畫格中斷不超過 0.12 秒仍算連續 */
+const SUSTAIN_CAP=3;     /* 長音至少要吹滿 min(音長×0.7, 3 拍)，再長的延音線不再加碼 */
+function pitchRuns(frames,target,ctol){
+  const out=[];let cur=null;
+  for(const f of frames){
+    const ok=Math.abs((f.m-target)*100)<=ctol;
+    if(cur&&f.t-cur.t1>GAP){out.push(cur);cur=null;}
+    if(ok){if(cur)cur.t1=f.t;else cur={t0:f.t,t1:f.t};}
+    else if(cur){out.push(cur);cur=null;}
+  }
+  if(cur)out.push(cur);
+  return out;
+}
+/* 音量起音：目前音量比前 0.03～0.15 秒內的最小音量明顯變大（用來分辨同音連吹） */
+function ampOnsets(amps){
+  const out=[];let last=-9;
+  for(let i=0;i<amps.length;i++){
+    const a=amps[i];if(a.rms<0.02)continue;
+    let mn=Infinity,cnt=0;
+    for(let j=i-1;j>=0&&a.t-amps[j].t<=0.15;j--){if(a.t-amps[j].t>=0.03){mn=Math.min(mn,amps[j].rms);cnt++;}}
+    if(cnt<2||!isFinite(mn))continue;
+    if(a.rms>=mn*1.35+0.004&&a.t-last>0.12){out.push(a.t);last=a.t;}
+  }
+  return out;
+}
+function median(a){const t=a.slice().sort((x,y)=>x-y);return t[Math.floor(t.length/2)];}
+function runEnd(frames,target,ctol,from){
+  const fs=frames.filter(f=>f.t>=from);let last=null;
+  for(const f of fs){
+    if(last===null){if(Math.abs((f.m-target)*100)<=ctol){last=f.t;}continue;}
+    if(f.t-last>GAP)break;
+    if(Math.abs((f.m-target)*100)<=ctol)last=f.t;
+  }
+  return last;
+}
+function judge(frames,amps,S,beat,outLat,tol,EV){
+  const aOn=ampOnsets(amps||[]);
+  return EV.map(e=>{
+    const s=S+e.beat*beat+outLat,len=e.dur*beat,end=s+len,target=e.midi;
+    const r={e,pitch:'ok',cents:0,played:null,timing:null,terr:null,short:false,miss:false,sameHint:false};
+    const tolT=Math.min(BEAT_TOL*beat,0.45*Math.min(len,beat));   /* 起音容許（秒）：短音符更嚴 */
+    const lo=s-Math.min(0.5*beat,0.8*len),hi=s+Math.min(1.0*beat,0.8*len);
+    const minRun=Math.min(0.09,0.5*len);
+    let onset=null;
+    if(e.prevSame){   /* 同音連吹：視為前一個音的延續，只判音準；有沒有斷開只提示、不扣分 */
+      const ts0=s+0.25*Math.min(len,beat),te0=Math.max(ts0+0.12,s+len*0.9);
+      const sel0=frames.filter(f=>f.t>=ts0&&f.t<=te0);
+      if(sel0.length<3){r.miss=true;r.pitch='miss';return r;}
+      const med0=median(sel0.map(f=>f.m));
+      r.cents=(med0-target)*100;r.played=Math.round(med0);
+      const ac0=Math.abs(r.cents);
+      r.pitch=ac0<=tol?'ok':(ac0<=70?(r.cents>0?'high':'low'):'wrong');
+      r.timing='ok';   /* 不判拍點；terr 保持 null，不影響整體快慢統計 */
+      r.sameHint=!aOn.some(t=>t>=lo&&t<=hi);
+      return r;
+    }
+    for(const ctol of [50,70]){
+      const cands=pitchRuns(frames,target,ctol).filter(u=>u.t0>=lo&&u.t0<=hi&&(u.t1-u.t0)>=minRun).map(u=>u.t0);
+      if(cands.length){onset=cands.reduce((a,b)=>Math.abs(b-s)<Math.abs(a-s)?b:a);break;}
+    }
+    let ts,te;
+    if(onset!==null){ts=onset+Math.min(0.10,0.25*len);te=Math.max(ts+0.12,Math.min(end-0.02,s+len*0.9));}
+    else{ts=s+0.25*Math.min(len,beat);te=Math.max(ts+0.12,s+len*0.9);}
+    const sel=frames.filter(f=>f.t>=ts&&f.t<=te);
+    if(sel.length<3){r.miss=true;r.pitch='miss';return r;}
+    const med=median(sel.map(f=>f.m));
+    r.cents=(med-target)*100;r.played=Math.round(med);
+    const ac=Math.abs(r.cents);
+    if(ac<=tol)r.pitch='ok';else if(ac<=70)r.pitch=r.cents>0?'high':'low';else r.pitch='wrong';
+    if(onset!==null){
+      r.terr=(onset-s)/beat;
+      r.timing=Math.abs(onset-s)<=tolT?'ok':(onset<s?'early':'late');
+      if(e.dur>=1.5){
+        const re=runEnd(frames,target,70,onset);
+        if(re!==null&&re<s+Math.min(len*0.7,SUSTAIN_CAP*beat))r.short=true;
+      }
+    }
+    return r;
+  });
+}
+function summarize(res){
+  const played=res.filter(r=>!r.miss).length;
+  const pitchOk=res.filter(r=>r.pitch==='ok').length;
+  const beatOk=res.filter(r=>r.timing==='ok'&&!r.short).length;
+  const bad=res.filter(r=>r.pitch!=='ok'||r.timing!=='ok'||r.short);
+  const terrs=res.filter(r=>r.terr!==null).map(r=>r.terr);
+  const offset=terrs.length?median(terrs):0;
+  return {played,pitchOk,beatOk,bad,offset,counted:played>=Math.ceil(res.length*0.5),perfect:bad.length===0};
+}
+function describe(r){
+  const e=r.e,tags=[];
+  if(r.miss)tags.push({c:'bad',t:'漏吹（沒聽到聲音）'});
+  else{
+    if(r.pitch==='high')tags.push({c:'mid',t:'音偏高 '+Math.round(Math.abs(r.cents))+' 音分'});
+    else if(r.pitch==='low')tags.push({c:'mid',t:'音偏低 '+Math.round(Math.abs(r.cents))+' 音分'});
+    else if(r.pitch==='wrong')tags.push({c:'bad',t:'吹成 '+jpName(r.played)+'，應該是 '+jpName(e.midi)});
+    if(r.timing==='early')tags.push({c:'mid',t:'拍子太早 '+Math.abs(r.terr).toFixed(2)+' 拍'});
+    else if(r.timing==='late')tags.push({c:'mid',t:'拍子太晚 '+Math.abs(r.terr).toFixed(2)+' 拍'});
+    else if(r.timing===null&&r.pitch==='wrong')tags.push({c:'mid',t:'拍子無法判斷（音不對）'});
+    else if(r.timing===null)tags.push({c:'mid',t:'起音位置不清楚（可能中間有雜音或不穩）'});
+    if(r.short)tags.push({c:'bad',t:'沒吹滿，太早停'});
+  }
+  return tags;
+}
+function colorOf(r){
+  if(r.miss||r.pitch==='wrong'||r.short)return 'var(--ruby)';
+  if(r.pitch!=='ok'||r.timing!=='ok')return 'var(--amber)';
+  return 'var(--green)';
+}
+function badgeOf(r){
+  if(r.miss)return '漏';
+  let s='';
+  if(r.pitch==='high')s+='↑';else if(r.pitch==='low')s+='↓';else if(r.pitch==='wrong')s+='✗';
+  if(r.timing==='early')s+='早';else if(r.timing==='late')s+='晚';else if(r.timing===null&&r.pitch!=='wrong')s+='?';
+  if(r.short)s+='短';
+  return s;
+}
+
+/* ========== 收音與節拍（與每週練習相同） ========== */
+/* ========== 收音與節拍 ========== */
+const ua=navigator.userAgent||'';
+if(/Line\/|FBAN|FBAV|Instagram|MicroMessenger|Messenger|Threads/i.test(ua))$('inapp').hidden=false;
+let ctx=null,stream=null,an=null,buf=null,raf=0;
+let run=null; // 目前的一次練習
+function showErr(t){const e=$('errMsg');e.textContent=t||'';e.hidden=!t;}
+function micError(e){
+  const name=e&&e.name;
+  const mp={NotAllowedError:'麥克風被拒絕或封鎖。請到瀏覽器或手機設定允許此網站使用麥克風，然後重新整理再試。',
+    SecurityError:'瀏覽器基於安全限制擋住麥克風。請用 https 獨立網址，並在 Safari 或 Chrome 開啟。',
+    NotFoundError:'找不到麥克風裝置。',NotReadableError:'麥克風可能被別的 App 佔用，請關掉其他錄音或通話 App 後再試。',
+    OverconstrainedError:'麥克風不支援要求的設定。'};
+  return (mp[name]||'無法開啟麥克風')+'［錯誤：'+(name||'未知')+(e&&e.message?'／'+e.message:'')+'］';
+}
+async function openMic(){
+  if(ctx&&ctx.state!=='closed'&&stream&&stream.active){if(ctx.state==='suspended')await ctx.resume();return;}
+  closeMic();
+  if(!window.isSecureContext||!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia))throw {name:'SecurityError',message:'需要 https 與支援收音的瀏覽器'};
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended')await ctx.resume();
+  stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  if(ctx.state==='suspended')await ctx.resume();
+  const src=ctx.createMediaStreamSource(stream);
+  an=ctx.createAnalyser();an.fftSize=2048;src.connect(an);buf=new Float32Array(an.fftSize);
+}
+function closeMic(){
+  window.Sfx&&Sfx.mic(false);
+  cancelAnimationFrame(raf);
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  if(ctx){try{ctx.close();}catch(e){}ctx=null;}
+  an=null;
+}
+function click(t,accent){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type='square';o.frequency.value=accent?1500:1000;
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.18,t+0.002);g.gain.exponentialRampToValueAtTime(0.0001,t+0.04);
+  o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+0.06);
+  return {o,g};
+}
+/* 即時音準提示：指針＝你吹的音比「現在這一拍該吹的音」高或低多少；綠區＝目前的音準容許範圍 */
+let gScale=60,gTol=10;
+function r0Gauge(tol){
+  gTol=tol;gScale=Math.max(60,tol*1.6);
+  const z=$('gZone');z.style.left=(50-tol/gScale*50)+'%';z.style.width=(tol/gScale*100)+'%';
+  $('gNeedle').style.opacity=.15;$('gNeedle').style.left='50%';$('gText').textContent=' ';
+}
+function showGauge(diff,nr){
+  const nd=$('gNeedle'),tx=$('gText'),ac=Math.abs(diff);
+  nd.style.opacity=1;nd.style.left=(50+Math.max(-1,Math.min(1,diff/gScale))*50)+'%';
+  if(ac<=gTol){tx.textContent='✓ 很準';tx.style.color='var(--green)';}
+  else if(ac<=100){tx.textContent=(diff>0?'偏高了 ':'偏低了 ')+Math.round(ac)+' 音分，'+(diff>0?'低一點':'高一點');tx.style.color=ac<=gTol+20?'var(--ink)':'var(--ruby)';}
+  else{tx.textContent='吹到「'+jpName(nr)+'」了，'+(diff>0?'太高':'太低');tx.style.color='var(--ruby)';}
+}
+function setLive(c,l){$('count').textContent=c;$('live').textContent=l||' ';}
+
+/* ========== 曲目、範圍與進度（原型：只存手機，不計星星糖與水晶碎片） ========== */
+let cfg=TASK?{song:TASK.song,from:TASK.from,to:TASK.to}:{song:'star',from:1,to:8};
+function taskKey(){return cfg.song+':'+cfg.from+'-'+cfg.to;}
+function loadP(){let o=OLMSave.read(STORE);o.tasks=o.tasks||{};o.played=o.played||{};return o;}
+let P=loadP();
+function saveP(){OLMSave.patch(STORE,function(d){Object.assign(d,P);});}
+function renderP(){
+  const k=taskKey();
+  if(TASK){
+    const W=Core.P,n=W.tasks[TASK.id]|0,d=Math.min(n,GOAL);
+    $('taskName').textContent='本週任務：'+TASK.name+'　第 '+cfg.from+'–'+cfg.to+' 小節';
+    $('barFill').style.width=(d/GOAL*100)+'%';
+    $('doneTxt').textContent='正確 '+d+'／'+GOAL+' 次'+(n>GOAL?'（共 '+n+'）':'');
+    $('perfTxt').textContent='總共吹了 '+W.played+' 次　第 '+(W.week+1)+' 週星星糖 '+W.given+'／'+Core.BUDGET;
+    $('doneMsg').hidden=n<GOAL;$('doneMsg').textContent='🎉 本週任務完成！（本週正確 '+n+' 次）';
+  }else{
+    const n=P.tasks[k]|0,d=Math.min(n,GOAL);
+    $('taskName').textContent=R.song.title+'　第 '+cfg.from+'–'+cfg.to+' 小節';
+    $('barFill').style.width=(d/GOAL*100)+'%';
+    $('doneTxt').textContent='正確 '+d+'／'+GOAL+' 次'+(n>GOAL?'（共 '+n+'）':'');
+    $('perfTxt').textContent='這段總共吹了 '+(P.played[k]|0)+' 次';
+  }
+  $('scoreTitle').firstChild.textContent=R.song.title+'　';
+  $('scoreSub').textContent=R.song.ts[0]+'/'+R.song.ts[1]+' 拍・1=C・第 '+cfg.from+'–'+cfg.to+' 小節';
+}
+function applyRange(){
+  const sg=SONGS[cfg.song],max=sg.bars.length;
+  cfg.from=Math.max(1,Math.min(cfg.from|0||1,max));
+  cfg.to=Math.max(cfg.from,Math.min(cfg.to|0||cfg.from,max));
+  if(cfg.to-cfg.from+1>MAX_BARS)cfg.to=cfg.from+MAX_BARS-1;
+  R=build(cfg.song,cfg.from,cfg.to);
+  $('from').value=cfg.from;$('to').value=cfg.to;$('rangeMax').textContent='（共 '+max+' 小節）';
+  drawScore();renderP();
+  $('resCard').hidden=true;lastRes=null;
+}
+function fillSongUi(){
+  const ss=$('song');ss.innerHTML='';Object.values(SONGS).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.title;ss.appendChild(o);});
+  ss.value=cfg.song;
+  const ps=$('preset');ps.innerHTML='';
+  const c=document.createElement('option');c.value='';c.textContent='自訂';ps.appendChild(c);
+  SONGS[cfg.song].presets.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p[0];ps.appendChild(o);});
+  const idx=SONGS[cfg.song].presets.findIndex(p=>p[1]===cfg.from&&p[2]===cfg.to);ps.value=idx>=0?String(idx):'';
+}
+let lastRes=null;
+
+
+async function startRun(){
+  if(demo)return;
+  showErr('');
+  $('goBtn').disabled=true;
+  try{await openMic();}catch(e){showErr(micError(e));$('goBtn').disabled=false;return;}
+  window.Sfx&&Sfx.mic(true);
+  const bpm=parseInt($('bpm').value,10),beat=60/bpm,tol=parseFloat($('tol').value);
+  const T0=ctx.currentTime+0.7;
+  const S=T0+COUNT_IN*beat,TB=R.totalBeats,bpb=R.song.ts[0];
+  const clicks=[],nodes=[];
+  for(let k=0;k<COUNT_IN+Math.ceil(TB);k++){const t=T0+k*beat;clicks.push(t);nodes.push(click(t,k%bpb===0));}
+  run={bpm,beat,tol,T0,S,TB,clicks,nodes,frames:[],amps:[],hist:[],lastBeat:-1,lastHl:-2,outLat:(ctx.outputLatency||0)+(ctx.baseLatency||0),done:false,R};
+  resetPaint();
+  r0Gauge(tol);
+  $('resCard').hidden=true;$('liveBox').hidden=false;
+  $('goBtn').hidden=true;$('demoBtn').hidden=true;$('stopBtn').hidden=false;$('goBtn').disabled=false;
+  ['bpm','tol','song','preset','from','to'].forEach(id=>$(id).disabled=true);
+  setLive('預備','聽 4 拍，第 5 拍開始吹');
+  notifyParent(true);
+  loop();
+}
+function unlockCtl(){['bpm','tol','song','preset','from','to'].forEach(id=>$(id).disabled=false);}
+function killClicks(r){if(!r||!r.nodes)return;r.nodes.forEach(x=>{try{x.o.onended=null;x.o.stop();}catch(e){}try{x.o.disconnect();x.g.disconnect();}catch(e){}});r.nodes=[];}
+function stopRun(){
+  window.Sfx&&Sfx.mic(false);
+  if(run){run.done=true;killClicks(run);run=null;}
+  cancelAnimationFrame(raf);
+  $('liveBox').hidden=true;$('stopBtn').hidden=true;$('goBtn').hidden=false;$('demoBtn').hidden=false;unlockCtl();
+  resetPaint();
+}
+function noteAt(r,pos){return r.R.notes.find(n=>pos>=n.beat-1e-9&&pos<n.beat+n.dur-1e-9);}
+function loop(){
+  if(!run||run.done)return;
+  raf=requestAnimationFrame(loop);
+  const now=ctx.currentTime,r=run;
+  an.getFloatTimeDomainData(buf);
+  let sum=0;for(let i=0;i<buf.length;i++)sum+=buf[i]*buf[i];
+  const rms=Math.sqrt(sum/buf.length);
+  $('volBar').style.width=Math.min(100,rms*400)+'%';
+  const bi=Math.floor((now-r.T0)/r.beat);
+  if(bi!==r.lastBeat&&bi>=0){
+    r.lastBeat=bi;
+    if(bi<COUNT_IN)setLive(String(COUNT_IN-bi),'預備拍');
+    else if(bi-COUNT_IN>=r.TB)setLive('✓','吹完了，分析中…');
+  }
+  /* 目前該吹的音（每個畫格更新，8 分音符也跟得上） */
+  const pos=(now-r.S)/r.beat;
+  if(bi>=COUNT_IN&&pos<r.TB){
+    const cur=noteAt(r,pos);const id=cur?cur.i:-1;
+    if(id!==r.lastHl){r.lastHl=id;r.R.notes.forEach(n=>n.hl.setAttribute('opacity',cur&&n===cur?.55:0));
+      if(cur)setLive(cur.rest?'·':jpNum(cur),'第 '+cur.bar+' 小節'+(cur.rest?'（休止）':''));}
+  }
+  const ft=now-1024/ctx.sampleRate-(ctx.baseLatency||0);
+  const nearClick=r.clicks.some(c=>ft>=c&&ft<=c+0.07);
+  if(!nearClick)r.amps.push({t:ft,rms});
+  let voiced=false,detected=false;
+  if(rms>=0.012&&!nearClick){
+    const p=detectPitch(buf,ctx.sampleRate);
+    if(p&&p.clarity>=0.85){
+      detected=true;
+      const m=69+12*Math.log2(p.freq/440);
+      r.hist.push(m);if(r.hist.length>3)r.hist.shift();
+      if(r.hist.length>=3){r.frames.push({t:ft,m:median(r.hist)});voiced=true;}
+    }
+  }
+  if(!detected&&!nearClick)r.hist=[];
+  if(voiced&&bi>=COUNT_IN&&pos<r.TB){
+    const m=median(r.hist),nr=Math.round(m);
+    const tb=(now-r.outLat-0.1-r.S)/r.beat,tn=r.R.events.find(e=>tb>=e.beat&&tb<e.beat+e.dur);
+    if(tn){showGauge((m-tn.midi)*100,nr);r.gT=now;}
+  }
+  if(r.gT&&now-r.gT>0.35){$('gNeedle').style.opacity=.15;$('gText').textContent=' ';r.gT=0;}
+  if(now>=r.S+(r.TB+0.6)*r.beat){finish();}
+}
+function finish(){
+  const r=run;if(!r)return;
+  window.Sfx&&Sfx.mic(false);
+  r.done=true;killClicks(r);cancelAnimationFrame(raf);run=null;
+  const res=judge(r.frames,r.amps,r.S,r.beat,r.outLat,r.tol,r.R.events);
+  showResult(res);
+  $('liveBox').hidden=true;$('stopBtn').hidden=true;$('goBtn').hidden=false;$('demoBtn').hidden=false;unlockCtl();
+  notifyParent(false);
+}
+
+
+/* ========== 聽示範（程式合成音；範圍與速度同目前設定） ========== */
+const SYNTH_GAIN=0.22;
+let demo=null;
+function synthNote(t,dur,midi){
+  const f=440*Math.pow(2,(midi-69)/12);
+  const rel=Math.min(0.07,0.2*dur),end=t+dur;
+  const g=ctx.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.linearRampToValueAtTime(SYNTH_GAIN,t+Math.min(0.04,0.3*dur));
+  g.gain.setValueAtTime(SYNTH_GAIN,Math.max(t+0.05,end-rel));
+  g.gain.linearRampToValueAtTime(0.0001,end);
+  g.connect(ctx.destination);
+  const o1=ctx.createOscillator(),o2=ctx.createOscillator(),g2=ctx.createGain();
+  o1.type='sine';o1.frequency.value=f;
+  o2.type='sine';o2.frequency.value=f*2;g2.gain.value=0.12;   /* 一點點二倍音，音色較像笛子 */
+  o1.connect(g);o2.connect(g2);g2.connect(g);
+  o1.start(t);o2.start(t);o1.stop(end+0.02);o2.stop(end+0.02);
+  return [o1,o2,g,g2];
+}
+function killDemoNodes(d){if(!d)return;d.nodes.forEach(x=>{try{x.stop&&x.stop();}catch(e){}try{x.disconnect();}catch(e){}});d.nodes=[];}
+function demoUi(on){
+  const b=$('demoBtn');b.classList.toggle('on',on);b.textContent=on?'⏹ 停止示範':'🔊 聽示範';
+  $('goBtn').disabled=on;
+  ['bpm','tol','song','preset','from','to'].forEach(id=>$(id).disabled=on);
+  ['gauge','gText'].forEach(id=>$(id).hidden=on);$('volBar').parentNode.hidden=on;
+  $('liveBox').hidden=!on;
+}
+async function startDemo(){
+  if(run||demo)return;
+  showErr('');
+  closeMic();   /* 示範時麥克風關閉；iPhone 需在點擊內建立 AudioContext */
+  try{
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    if(ctx.state==='suspended')await ctx.resume();
+  }catch(e){showErr('無法播放聲音。請確認手機沒有開靜音，並用 Safari 或 Chrome 開啟。');closeMic();return;}
+  const bpm=parseInt($('bpm').value,10),beat=60/bpm,bpb=R.song.ts[0];
+  const T0=ctx.currentTime+0.4,S=T0+COUNT_IN*beat,TB=R.totalBeats;
+  const nodes=[];
+  for(let k=0;k<COUNT_IN;k++){const c=click(T0+k*beat,k%bpb===0);nodes.push(c.o,c.g);}
+  R.events.forEach(e=>{
+    const len=e.dur*beat,gap=Math.min(0.06,0.15*len);   /* 每個音尾端留一點空隙，同音連吹才分得開 */
+    synthNote(S+e.beat*beat,len-gap,e.midi).forEach(x=>nodes.push(x));
+  });
+  demo={beat,T0,S,TB,nodes,lastBeat:-1,lastHl:-2,done:false,R};
+  resetPaint();$('resCard').hidden=true;lastRes=null;
+  demoUi(true);
+  setLive('預備','聽 4 拍，第 5 拍開始播');
+  notifyParent(true);
+  demoLoop();
+}
+function demoLoop(){
+  if(!demo||demo.done)return;
+  raf=requestAnimationFrame(demoLoop);
+  const d=demo,now=ctx.currentTime;
+  const bi=Math.floor((now-d.T0)/d.beat);
+  if(bi!==d.lastBeat&&bi>=0){
+    d.lastBeat=bi;
+    if(bi<COUNT_IN)setLive(String(COUNT_IN-bi),'預備拍');
+  }
+  const pos=(now-d.S)/d.beat;
+  if(bi>=COUNT_IN&&pos<d.TB){
+    const cur=noteAt({R:d.R},pos),id=cur?cur.i:-1;
+    if(id!==d.lastHl){d.lastHl=id;d.R.notes.forEach(n=>n.hl.setAttribute('opacity',cur&&n===cur?.55:0));
+      if(cur)setLive(cur.rest?'·':jpNum(cur),'第 '+cur.bar+' 小節'+(cur.rest?'（休止）':''));}
+  }
+  if(pos>=d.TB+0.3)stopDemo();
+}
+function stopDemo(){
+  if(!demo)return;
+  demo.done=true;killDemoNodes(demo);demo=null;
+  cancelAnimationFrame(raf);closeMic();
+  demoUi(false);resetPaint();
+}
+
+/* ========== 結果顯示 ========== */
+function showResult(res){
+  lastRes=res;
+  const s=summarize(res);
+  res.forEach(r=>{const c=colorOf(r),b=badgeOf(r);r.e.notes.forEach((n,k)=>paintNote(n,c,k===0?b:''));});
+  R.notes.forEach(n=>n.hl.setAttribute('opacity',0));
+  $('legend').hidden=false;
+  $('resCard').hidden=false;
+  const N=res.length,k=taskKey();
+  $('sPitch').textContent=s.pitchOk+'／'+N;
+  $('sBeat').textContent=s.beatOk+'／'+N;
+  $('sErr').textContent=s.bad.length;
+  const v=$('verdict');
+  if(!s.counted){
+    v.textContent='好像沒吹完，這次不算次數。請確認有收到聲音再試一次。';v.style.color='var(--ruby)';
+  }else{
+    try{window.Sfx&&(s.perfect?Sfx.ok():Sfx.bad());}catch(e){}
+    if(TASK){
+      Core.recordPlayed();
+      if(s.perfect){
+        const msg=Core.recordPerfect(TASK.id),n=Core.P.tasks[TASK.id];
+        v.textContent=(n===GOAL?'🎉 恭喜完成本週任務！正確 '+GOAL+' 次達成':'全部都對！本週這個任務正確 '+n+' 次 🌟')+msg;v.style.color='var(--green)';
+      }else{v.textContent='這次還沒全對，不計入正確次數。看看下面哪裡要改';v.style.color='var(--ink)';}
+      renderP();
+    }else{
+    P.played[k]=(P.played[k]|0)+1;
+    if(s.perfect){P.tasks[k]=(P.tasks[k]|0)+1;v.textContent='全部都對！這段正確 '+P.tasks[k]+' 次 🌟';v.style.color='var(--green)';}
+    else{v.textContent='這次還沒全對，不計入正確次數。看看下面哪裡要改';v.style.color='var(--ink)';}
+    saveP();renderP();
+    }
+  }
+  const off=$('offTxt');
+  if(s.counted&&Math.abs(s.offset)>=0.12)off.textContent='整體來看，你的拍子平均'+(s.offset>0?'偏晚':'偏早')+'約 '+Math.abs(s.offset).toFixed(2)+' 拍。';
+  else off.textContent='';
+  const hs=res.filter(r=>r.sameHint&&!r.miss);
+  if(s.counted&&hs.length)off.textContent=(off.textContent?off.textContent+' ':'')+'小提醒（不扣分）：'+hs.map(r=>'第 '+r.e.bar+' 小節 '+beatLabel(r.e.beatInBar)).join('、')+' 是同音連吹，沒聽出斷開，可以用舌頭輕輕「tu」一下。';
+  const ul=$('errList');ul.innerHTML='';
+  if(!s.bad.length){const li=document.createElement('li');li.textContent='沒有要改的地方，繼續保持！';ul.appendChild(li);}
+  s.bad.forEach(r=>{
+    const e=r.e,li=document.createElement('li');li.dataset.i=e.i;
+    const head=document.createElement('b');
+    head.textContent='第 '+e.bar+' 小節 '+beatLabel(e.beatInBar)+'（'+jpName(e.midi)+'）';
+    li.appendChild(head);li.appendChild(document.createElement('br'));
+    describe(r).forEach(t=>{const sp=document.createElement('span');sp.className='tag '+t.c;sp.textContent=t.t;li.appendChild(sp);});
+    li.addEventListener('click',()=>selectEvent(e.i));
+    ul.appendChild(li);
+  });
+  $('resCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function selectEvent(i){
+  if(!lastRes||run)return;
+  const e=R.events[i];R.notes.forEach(n=>n.hl.setAttribute('opacity',e&&e.notes.includes(n)?.55:0));
+  document.querySelectorAll('#errList li').forEach(li=>li.classList.toggle('sel',li.dataset.i==String(i)));
+  const li=document.querySelector('#errList li[data-i="'+i+'"]');
+  if(li)li.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function selectNote(i){
+  if(!lastRes||run)return;
+  const e=R.events.find(ev=>ev.notes.some(n=>n.i===i));if(e)selectEvent(e.i);
+}
+
+/* ========== 外殼溝通與雜項 ========== */
+function notifyParent(on){try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'practice',on:!!on},'*');}catch(e){}}
+notifyParent(true);
+function leave(){
+  notifyParent(false);
+  stopRun();stopDemo();closeMic();
+  if(history.length>1)history.back();else location.href='game-test.html';
+}
+$('back').addEventListener('click',leave);
+$('goBtn').addEventListener('click',startRun);
+$('stopBtn').addEventListener('click',()=>{stopRun();notifyParent(true);});
+$('demoBtn').addEventListener('click',()=>{if(demo)stopDemo();else startDemo();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&run){stopRun();}if(document.hidden&&demo){stopDemo();}});
+window.addEventListener('pagehide',()=>{notifyParent(false);closeMic();});
+$('song').addEventListener('change',()=>{cfg.song=$('song').value;const p=SONGS[cfg.song].presets[0];cfg.from=p[1];cfg.to=p[2];fillSongUi();applyRange();});
+$('preset').addEventListener('change',()=>{const v=$('preset').value;if(v==='')return;const p=SONGS[cfg.song].presets[+v];cfg.from=p[1];cfg.to=p[2];applyRange();});
+function onRangeInput(){cfg.from=parseInt($('from').value,10)||1;cfg.to=parseInt($('to').value,10)||cfg.from;applyRange();fillSongUi();}
+$('from').addEventListener('change',onRangeInput);$('to').addEventListener('change',onRangeInput);
+
+/* 網址參數：?song=star&from=1&to=8 */
+(function(){if(TASK)return;const q=new URLSearchParams(location.search);const s=q.get('song');if(s&&SONGS[s]){cfg.song=s;const p=SONGS[s].presets[0];cfg.from=p[1];cfg.to=p[2];}
+  if(q.get('from'))cfg.from=parseInt(q.get('from'),10)||cfg.from;if(q.get('to'))cfg.to=parseInt(q.get('to'),10)||cfg.to;})();
+fillSongUi();applyRange();fillSongUi();
+if(TASK){   /* 任務模式：曲子與範圍由任務指定，不給改；標示模擬資料 */
+  ['rowSong','rowPreset','rowRange'].forEach(id=>$(id).hidden=true);
+  $('protoNote').hidden=true;$('mockNote').hidden=!TASK.mock;
+  $('pageTitle').textContent='本週任務';
+  document.title='陶笛失落地圖｜本週任務：'+TASK.name;
+}
+
+/* 測試掛鉤（僅供除錯，不影響使用） */
+window.__sp={TASK,Core,showResult,judge,summarize,describe,detectPitch,ampOnsets,get R(){return R;},get cfg(){return cfg;},applyRange,build,SONGS,drawScore,startDemo,stopDemo,get demo(){return demo;}};
+})();
+</script>
+</body>
+</html>

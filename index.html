@@ -572,7 +572,11 @@ addEventListener('message',e=>{
   const f=$('#gamefr');
   if(!f||e.source!==f.contentWindow)return;
   const d=e.data||{};
-  if(d.type==='practice'){practiceHold=!!d.on;bgm();}
+  if(d.type==='practice'){
+    /* 進練習頁一律不放背景音樂：每週練習／分段練習頁（遊戲框目前載入的頁面）在頁面存在期間一律維持暫停，
+       即使它回報「on:false」（停止收音、結束一輪）也不恢復；離開該頁後由下一頁（遊戲頁）自己回報 */
+    let inSub=false;try{inSub=/(weekly-practice|song-practice)\.html/.test(f.contentWindow.location.pathname);}catch(_){}
+    practiceHold=!!d.on||inSub;bgm();}
   else if(d.type==='replay-story'){storyFromGame=true;setGameVisible(false);show('story');}
 });
 function fromHash(){const h=(location.hash||'').slice(1);show(h==='home'?'login':(T[h]?h:'splash'))}   /* 重新整理時不能直接跳到「登入成功」畫面（會繞過登入），改回登入頁；已登入的會看到「繼續冒險」 */

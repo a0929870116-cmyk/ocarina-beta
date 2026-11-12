@@ -299,6 +299,9 @@ a.btn{text-decoration:none}
 .vol i{display:block;height:100%;width:0;background:var(--green)}
 .gamebox{display:flex;flex-direction:column;gap:10px}
 .gameframe{width:100%;height:760px;border:3px solid var(--ink);border-radius:8px;display:block;background:var(--vellum)}
+/* 開啟小遊戲時整頁全螢幕（手機高度不夠 760px、框內手勢又會被遊戲吃掉，外層無法捲動） */
+.gamebox:not([hidden]){position:fixed;inset:0;z-index:60;background:var(--vellum);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));gap:8px}
+.gamebox:not([hidden]) .gameframe{flex:1;min-height:0;height:auto}
 .tuner .zone{left:25%;width:50%}
 .tuner i{transition:left .08s linear}
 .tuner .nd{opacity:.3}
@@ -1124,7 +1127,6 @@ $('game-open').addEventListener('click',()=>{
   stopBlow();
   $('game-frame').setAttribute('src','ocarina-playground.html');
   $('game-box').hidden=false;$('game-open').hidden=true;
-  $('game-box').scrollIntoView({behavior:'smooth',block:'start'});
 });
 $('game-close').addEventListener('click',closeGame);
 try{const q=new URLSearchParams(location.search).get('n');if(q)$('uname').textContent=q}catch(e){}

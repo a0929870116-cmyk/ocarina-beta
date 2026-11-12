@@ -156,12 +156,18 @@ form{display:flex;flex-direction:column;gap:10px}
 .todo{align-self:flex-start;font-size:12.5px;font-weight:700;border:1.5px dashed var(--ink-2);color:var(--ink-2);border-radius:999px;padding:0 10px;line-height:1.7}
 .steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px;font-size:15.5px}
 .note{font-size:13px;color:var(--ink-2);line-height:1.6;border-top:1.5px dashed var(--line);padding-top:10px}
-.notice{font-size:12.5px;line-height:1.55;color:var(--ink);border:2px solid var(--gold);border-radius:8px;background:color-mix(in srgb,var(--vellum) 70%,transparent);padding:8px 12px}
-.notice b{display:block;font-size:14px;margin-bottom:2px}
+.notice{font-size:12.5px;line-height:1.55;color:var(--ink);border:2px solid var(--gold);border-radius:10px;background:color-mix(in srgb,var(--vellum) 70%,transparent);padding:10px 12px;box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--vellum-2) 80%,transparent),inset 0 0 0 4.5px color-mix(in srgb,var(--gold) 55%,transparent)}
+.notice .nt{display:flex;align-items:center;gap:8px;justify-content:center;font-family:var(--font-head);font-size:16px;letter-spacing:.14em;margin-bottom:6px;color:var(--ink)}
+.notice .nt::before,.notice .nt::after{content:"";flex:1;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold))}
+.notice .nt::after{transform:scaleX(-1)}
 .notice p{margin:0 0 6px}.notice p:last-child{margin:0}
+.notice .nl{display:flex;gap:7px;align-items:flex-start;margin-top:2px}
+.notice .nl svg{width:12px;height:12px;margin-top:4px;flex:none;color:var(--gold);fill:currentColor}
+.notice .nl.no{color:var(--ruby)}.notice .nl.no i{font-style:normal;font-weight:700;width:12px;text-align:center;flex:none}
+.ackrow{display:flex;gap:12px;align-items:center;font-family:var(--font-head);font-size:16px;letter-spacing:.04em;line-height:1.4}
+.ackrow input{appearance:none;-webkit-appearance:none;width:30px;height:30px;flex:none;margin:0;border:2.5px solid var(--ink);border-radius:6px;background:var(--vellum-2);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--gold) 70%,transparent),0 2px 0 var(--shadow);cursor:pointer}
+.ackrow input:checked{background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -10 20 20'%3E%3Cpath fill='%23F2CF7A' d='M0,-9 L2.2,-2.2 L9,0 L2.2,2.2 L0,9 L-2.2,2.2 L-9,0 L-2.2,-2.2Z'/%3E%3C/svg%3E") center/18px no-repeat}
 #resume:not(:empty){margin-top:30px}
-.ackrow{display:flex;gap:10px;align-items:center;font-weight:700;font-size:15px;line-height:1.4}
-.ackrow input{width:26px;height:26px;flex:none;accent-color:var(--green)}
 .sp{display:block;flex:none;height:auto}
 .say{display:flex;align-items:flex-end;gap:8px}
 .say .sp{width:60px}
@@ -348,10 +354,10 @@ login:{sub:'輸入名字和密碼，回到你的島',html:`<div id="resume"></di
 register:{sub:'建立你的帳號，只要名字和密碼',html:`<form data-act="register"><div class="field"><label for="n2"><svg><use href="#i-user"/></svg>我的名字</label><div class="inp"><input id="n2" autocomplete="username" maxlength="12" value=""></div><p class="hint">請寫真實姓名，老師才找得到你。如果有同名同姓，請在名字後面加學校的第一個字，例如「王小明北」。</p></div>
 <div class="field"><label for="p2"><svg><use href="#i-key"/></svg>設定密碼（至少 4 個字）</label><div class="inp"><input id="p2" type="password" autocomplete="new-password" value="">${eye('p2')}</div></div>
 ${fPw('p3','再輸入一次密碼','',false,'new-password')}
-<div class="notice"><b>給家長的隱私與使用說明</b>
-<p>大家好！這款小遊戲是專為正在學習陶笛的孩子設計的練習工具，希望能讓孩子在家練習更有樂趣 😊</p>
-<p>為了保護孩子的隱私，我們僅記錄：<br>🔹 孩子的姓名（若同名，會多加學校的第一個字）<br>🔹 遊戲進度（練習次數、星星、道具等）</p>
-<p>家長請放心，我們絕對不會：<br>❌ 蒐集 Email、電話、住址等個資<br>❌ 錄製或保存聲音（僅透過手機即時偵測音準，不會儲存或上傳）</p>
+<div class="notice"><div class="nt">給家長的隱私與使用說明</div>
+<p>大家好！這款小遊戲是專為正在學習陶笛的孩子設計的練習工具，希望能讓孩子在家練習更有樂趣。</p>
+<p>為了保護孩子的隱私，我們僅記錄：<span class="nl"><svg viewBox="-10 -10 20 20"><path d="M0,-9 L2.2,-2.2 L9,0 L2.2,2.2 L0,9 L-2.2,2.2 L-9,0 L-2.2,-2.2Z"/></svg><span>孩子的姓名（若同名，會多加學校的第一個字）</span></span><span class="nl"><svg viewBox="-10 -10 20 20"><path d="M0,-9 L2.2,-2.2 L9,0 L2.2,2.2 L0,9 L-2.2,2.2 L-9,0 L-2.2,-2.2Z"/></svg><span>遊戲進度（練習次數、星星、道具等）</span></span></p>
+<p>家長請放心，我們絕對不會：<span class="nl no"><i>✕</i><span>蒐集 Email、電話、住址等個資</span></span><span class="nl no"><i>✕</i><span>錄製或保存聲音（僅透過手機即時偵測音準，不會儲存或上傳）</span></span></p>
 <p>紀錄僅供孩子延續關卡，以及讓家長或老師了解練習狀況。上述紀錄會存放在雲端服務，以便孩子換裝置也能繼續玩。若需刪除資料，隨時歡迎聯繫：<br>蘇鈺洺老師（玉米老師）｜聯絡信箱：a0929870116@gmail.com</p></div>
 <label class="ackrow" for="ack"><input type="checkbox" id="ack">家長已閱讀說明並同意使用。</label>
 <div id="fmsg"></div>

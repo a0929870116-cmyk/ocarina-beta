@@ -257,6 +257,7 @@ form{display:flex;flex-direction:column;gap:10px}
 <script src="sfx.js"></script>
 <script src="firebase-config.js"></script>
 <script src="student-auth.js"></script>
+<script src="cloud-sync.js"></script>
 <script>if(window.Sfx){Sfx.auto('.bk-next,.storybtn','nav');Sfx.auto('.enter,.btn','tap');}</script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -525,6 +526,7 @@ async function authSubmit(f,act){
     if(act==='register'&&v('p2')!==v('p3'))throw {code:'mm'};
     const svc=await OLMStudent.service();
     const u=act==='login'?await svc.login(v('n'),v('p')):await svc.register(v('n2'),v('p2'),f.querySelector('#ack').checked);
+    await OLMSync.attach(svc,u);   /* 進度：決定用雲端或這支手機的存檔（失敗只有 net／denied） */
     USER=u.name;SESSION=u;show('home');
   }catch(e){showErr(f,(e&&e.code)||'other');btn.disabled=false;btn.textContent=label}
 }
@@ -534,8 +536,16 @@ function renderResume(){
 }
 document.addEventListener('click',e=>{
   const d=e.target.closest('[data-do]');if(!d)return;
-  if(d.dataset.do==='resume'&&SESSION){USER=SESSION.name;show('home')}
-  else if(d.dataset.do==='logout'){OLMStudent.service().then(s=>s.logout()).catch(()=>{}).then(()=>{SESSION=null;renderResume()})}
+  if(d.dataset.do==='resume'&&SESSION){
+    d.disabled=true;const t=d.textContent;d.textContent='請稍等…';
+    OLMStudent.service().then(s=>OLMSync.attach(s,SESSION)).then(()=>{USER=SESSION.name;show('home')},e=>{d.disabled=false;d.textContent=t;const a=ERR[(e&&e.code)||'other']||ERR.other;$('#resume').insertAdjacentHTML('afterbegin',err(a[0],a[1],a[2]))});
+  }
+  else if(d.dataset.do==='logout'){
+    OLMSync.detach(true).then(ok=>{
+      if(!ok){$('#resume').insertAdjacentHTML('afterbegin',err('sad','進度還沒存到雲端','請連上網路，等一下再按「換人登入」，不然你的進度可能會不見。'));return}
+      return OLMStudent.service().then(s=>s.logout()).catch(()=>{}).then(()=>{SESSION=null;renderResume()});
+    });
+  }
 });
 /* 背景檢查這個瀏覽器是不是已經登入過（失敗就當沒有，不打擾） */
 OLMStudent.service().then(s=>s.current()).then(u=>{SESSION=u;if(curV==='login')renderResume()}).catch(()=>{});

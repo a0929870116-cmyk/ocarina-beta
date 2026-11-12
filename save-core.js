@@ -3,7 +3,7 @@
    1. 各頁一律用 OLMSave.patch(鍵, 函式或物件) 寫入：每次都「讀最新 → 修改 → 寫回」，不會蓋掉別頁寫的欄位。
    2. 讀到壞資料（不是物件、JSON 壞掉）一律當成空物件，不拋錯。
    3. 第一次載入時自動搬移舊存檔（v0.18 → v0.19）：先備份到 olm_backup_v018，每一步獨立 try，全部成功才蓋版本章。
-   4. 上雲（Firebase）之後只需改這個檔的 raw 讀寫。 */
+   4. 上雲（Firebase）：由 index.html 載入的 cloud-sync.js（OLMSync）負責；本檔只在每次寫入時記 olm_sync_ts（最後修改時間）。 */
 (function(g){
   if(g.OLMSave)return;
   var VER=19, VERKEY='olm_save_ver', BACKUP='olm_backup_v018';
@@ -11,8 +11,11 @@
          SFX:'olm_sfx_off',SONG:'olm_song_proto_v1',PG:'ocarina_playground_v1',OLDWK:'olm_weekly_v1'};
 
   function rawGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-  function rawSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){return false;}}
-  function rawDel(k){try{localStorage.removeItem(k);return true;}catch(e){return false;}}
+  /* 每次寫入（非內部鍵）都記下「最後修改時間」olm_sync_ts，給 cloud-sync.js 判斷要不要上傳、哪邊比較新 */
+  var META=/^(olm_save_ver|olm_backup|olm_sync|olm_owner)/;
+  function stamp(k){if(!META.test(k)){try{var p=parseInt(localStorage.getItem('olm_sync_ts'),10)||0;localStorage.setItem('olm_sync_ts',String(Math.max(Date.now(),p+1)));}catch(e){}}}   /* 單調遞增：同一毫秒內連寫也會變 */
+  function rawSet(k,v){try{localStorage.setItem(k,v);stamp(k);return true;}catch(e){return false;}}
+  function rawDel(k){try{localStorage.removeItem(k);stamp(k);return true;}catch(e){return false;}}
 
   /* 讀物件：壞掉或不是物件 → {} */
   function read(k){

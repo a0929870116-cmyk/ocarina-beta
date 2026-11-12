@@ -1,11 +1,12 @@
 rules_version = '2';
-// 陶笛失落地圖｜Firestore 安全規則（第二版：管理者＋學生端）
+// 陶笛失落地圖｜Firestore 安全規則（第三版：管理者＋學生端＋遊戲存檔）
 // 貼到 Firebase 控制台 → Firestore → 規則 → 發佈。
 //
 // 資料：
 //   students/{key}  學生資料。key＝名字的 SHA-256 前 24 碼（見 student-auth.js）；欄位 name、school1、note、start、ack、created、uid
 //   tasks/{key}     老師指派的每週任務（只有管理者能寫）
 //   logs/{id}       每次練習的彙總（學生只能新增自己的；只有管理者能讀）
+//   saves/{key}     遊戲存檔 { data:{存檔鍵:字串}, ts }（學生只能讀寫自己的；cloud-sync.js）
 //   gens/{key}      密碼重設的世代數字 { g: 數字 }；任何人能讀單一文件（登入前要查），只有管理者能寫
 //
 // 學生帳號的 email 是「<key>[-世代]@olm-students.example.com」，所以 key 可以從 email 取出，用來擋「替別人的名字建文件」。
@@ -77,6 +78,15 @@ service cloud.firestore {
         && request.resource.data.perfect is bool
         && request.resource.data.errs is list
         && request.resource.data.errs.size() <= 100;
+    }
+
+    // ---- 遊戲存檔（第三版新增）：只能讀寫自己的；整包 { data:{鍵:字串}, ts:毫秒 }；不能刪 ----
+    match /saves/{sid} {
+      allow get: if ownsStudent(sid);
+      allow create, update: if ownsStudent(sid)
+        && request.resource.data.keys().hasOnly(['data', 'ts'])
+        && request.resource.data.data is map
+        && request.resource.data.ts is number;
     }
 
     // ---- 管理者：全部可讀寫（含刪除）；其餘一律拒絕 ----

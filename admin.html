@@ -114,7 +114,7 @@ tr.sel td{background:var(--green2)}
         <button class="b ghost" id="as-clear" style="color:var(--red);border-color:var(--red)">清除所選學生的任務</button>
       </div>
       <p class="msg" id="as-msg"></p>
-      <p class="muted">星星糖份額依遊戲規則自動計算：每週預算 20 顆，三個任務以內權重相同，超過三個依序 1／0.8／0.6／0.4／0.2。「速度」欄位遊戲端尚未讀取（聽示範用，之後接）。同一首歌一週只能指派一次（遊戲目前以歌名當任務編號）。</p>
+      <p class="muted">星星糖份額依遊戲規則自動計算：每週預算 20 顆，三個任務以內權重相同，超過三個依序 1／0.8／0.6／0.4／0.2。「速度」欄位遊戲端尚未讀取（聽示範用，之後接）。同一首歌可以指派多個不同的小節範圍（第 2 個起任務編號加 -2、-3）；相同歌曲與範圍不能重複。</p>
     </div>
   </div>
 </section>
@@ -290,9 +290,14 @@ function delStudent(s){
 function songOptions(sel){return Object.keys(SONGS).map(function(k){return '<option value="'+k+'"'+(k===sel?' selected':'')+'>'+esc(SONGS[k].title)+'（共 '+SONGS[k].bars.length+' 小節）</option>';}).join('');}
 function newRow(){return {type:'drill',song:'pig',from:1,to:4,T:20,speed:''};}
 function rowFromTask(t){return t.type==='song'?{type:'song',song:t.song,from:t.from,to:t.to,T:t.T,speed:t.speed||''}:{type:'drill',song:'pig',from:1,to:4,T:t.T,speed:t.speed||''};}
-function rowToTask(r){
-  if(r.type==='drill')return {id:'basic-1-1',type:'drill',name:'基本指法 1-1',T:r.T,speed:r.speed||undefined};
-  var sg=SONGS[r.song];return {id:'song-'+r.song,type:'song',name:sg.title,song:r.song,from:r.from,to:r.to,T:r.T,speed:r.speed||undefined};
+/* 任務編號：基本指法 basic-1-1；歌曲第一次出現 song-歌名（與遊戲現有編號相容），同一首歌第 2、3… 個任務加 -2、-3 */
+function rowsToTasks(){
+  var cnt={};
+  return rows.map(function(r){
+    if(r.type==='drill')return {id:'basic-1-1',type:'drill',name:'基本指法 1-1',T:r.T,speed:r.speed||undefined};
+    var sg=SONGS[r.song];cnt[r.song]=(cnt[r.song]||0)+1;
+    return {id:'song-'+r.song+(cnt[r.song]>1?'-'+cnt[r.song]:''),type:'song',name:sg.title,song:r.song,from:r.from,to:r.to,T:r.T,speed:r.speed||undefined};
+  });
 }
 function renderAssignList(){
   var q=$('as-q').value.trim();
@@ -338,8 +343,8 @@ function validateRows(){
   for(var i=0;i<rows.length;i++){
     var r=rows[i],lab='任務 '+(i+1)+'：';
     if(!(r.T>=1&&r.T<=99))return lab+'目標次數要 1～99';
-    var key=r.type==='drill'?'drill':'song-'+r.song;
-    if(seen[key])return lab+(r.type==='drill'?'基本指法 1-1 只能指派一次':'「'+SONGS[r.song].title+'」一週只能指派一次');
+    var key=r.type==='drill'?'drill':'song-'+r.song+'-'+r.from+'-'+r.to;
+    if(seen[key])return lab+(r.type==='drill'?'基本指法 1-1 只能指派一次':'「'+SONGS[r.song].title+'」第 '+r.from+'–'+r.to+' 小節已經有一個任務了');
     seen[key]=1;
     if(r.type==='song'){
       var n=SONGS[r.song].bars.length;
@@ -353,7 +358,7 @@ function validateRows(){
 $('as-save').onclick=function(){
   var ids=selIds();if(!ids.length)return msg('as-msg','請先在左邊選學生','err');
   var er=validateRows();if(er)return msg('as-msg',er,'err');
-  var tasks=rows.map(rowToTask);
+  var tasks=rowsToTasks();
   A.setTasks(ids,tasks).then(function(n){msg('as-msg','已套用到 '+n+' 位學生（'+tasks.map(function(t){return t.type==='song'?t.name+' 第'+t.from+'–'+t.to+'小節':t.name;}).join('、')+'）','ok');return reload();}).catch(function(e){msg('as-msg',e.message,'err');});
 };
 $('as-clear').onclick=function(){
@@ -405,7 +410,8 @@ function taskLabelOf(sid,taskId){
   var tk=studentTasks(sid).filter(function(t){return t.id===taskId;})[0];
   if(tk)return tk.name;
   if(taskId==='basic-1-1')return '基本指法 1-1';
-  if(taskId.indexOf('song-')===0&&SONGS[taskId.slice(5)])return SONGS[taskId.slice(5)].title;
+  var m=/^song-([a-z]+)(?:-(\d+))?$/.exec(taskId);
+  if(m&&SONGS[m[1]])return SONGS[m[1]].title+(m[2]?'（'+m[2]+'）':'');
   return taskId;
 }
 $('hs-scope').onchange=renderHot;$('hs-range').onchange=renderHot;

@@ -1,7 +1,14 @@
 rules_version = '2';
-// 陶笛失落地圖｜Firestore 安全規則（第一版：只有管理者能讀寫）
+// 陶笛失落地圖｜Firestore 安全規則（第二版：管理者＋學生端）
 // 貼到 Firebase 控制台 → Firestore → 規則 → 發佈。
-// 學生端（讀自己的任務、寫自己的練習彙總）等學生登入做好後，再加規則。
+//
+// 資料：
+//   students/{key}  學生資料。key＝名字的 SHA-256 前 24 碼（見 student-auth.js）；欄位 name、school1、note、start、ack、created、uid
+//   tasks/{key}     老師指派的每週任務（只有管理者能寫）
+//   logs/{id}       每次練習的彙總（學生只能新增自己的；只有管理者能讀）
+//   gens/{key}      密碼重設的世代數字 { g: 數字 }；任何人能讀單一文件（登入前要查），只有管理者能寫
+//
+// 學生帳號的 email 是「<key>[-世代]@olm-students.example.com」，所以 key 可以從 email 取出，用來擋「替別人的名字建文件」。
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -9,8 +16,70 @@ service cloud.firestore {
       return request.auth != null
         && request.auth.token.email == 'a0929870116@gmail.com';
     }
+    function signedIn() {
+      return request.auth != null;
+    }
+    // 目前登入帳號的 key（email @ 前面、「-」前面那段）
+    function myKey() {
+      return request.auth.token.email.split('@')[0].split('-')[0];
+    }
+    // students/{sid} 這份文件的 uid 是不是目前登入的人
+    function ownsStudent(sid) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/students/$(sid))
+        && get(/databases/$(database)/documents/students/$(sid)).data.get('uid', null) == request.auth.uid;
+    }
 
-    // 其餘一律拒絕；管理者可讀寫全部
+    // ---- 密碼重設世代：登入前要查，所以允許任何人讀單一文件（不能列出）----
+    match /gens/{key} {
+      allow get: if true;
+    }
+
+    // ---- 學生 ----
+    match /students/{sid} {
+      // 只能讀自己的
+      allow get: if signedIn() && resource.data.get('uid', null) == request.auth.uid;
+
+      // 建立自己的：文件 id 必須等於自己帳號的 key；一定要勾家長知悉；欄位固定
+      allow create: if signedIn()
+        && sid == myKey()
+        && request.resource.data.keys().hasOnly(['name', 'school1', 'note', 'start', 'ack', 'created', 'uid'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.ack == true
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1
+        && request.resource.data.name.size() <= 12
+        && request.resource.data.school1 is string && request.resource.data.school1.size() <= 1
+        && request.resource.data.note is string && request.resource.data.note.size() <= 40
+        && request.resource.data.start is string && request.resource.data.start.size() == 10
+        && request.resource.data.created is string && request.resource.data.created.size() <= 40;
+
+      // 認領：名單上已有這位、而且 uid 是空的（老師先建的，或老師剛重設），只能把 uid 改成自己、ack 設為 true
+      allow update: if signedIn()
+        && sid == myKey()
+        && resource.data.get('uid', null) == null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.ack == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid', 'ack']);
+    }
+
+    // ---- 每週任務：只能讀自己的 ----
+    match /tasks/{sid} {
+      allow get: if ownsStudent(sid);
+    }
+
+    // ---- 練習彙總：只能新增自己的（sid 必須是自己），欄位固定 ----
+    match /logs/{id} {
+      allow create: if ownsStudent(request.resource.data.sid)
+        && request.resource.data.keys().hasOnly(['sid', 'ts', 'task', 'perfect', 'errs'])
+        && request.resource.data.ts is string
+        && request.resource.data.task is string
+        && request.resource.data.perfect is bool
+        && request.resource.data.errs is list
+        && request.resource.data.errs.size() <= 100;
+    }
+
+    // ---- 管理者：全部可讀寫（含刪除）；其餘一律拒絕 ----
     match /{document=**} {
       allow read, write: if isAdmin();
     }

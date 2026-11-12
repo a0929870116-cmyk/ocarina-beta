@@ -111,7 +111,7 @@ header .hbtn button{font:inherit;font-size:13px;border:1px solid rgba(255,255,25
   <div class="card">
     <h2>名單 <span class="muted" id="st-count"></span></h2>
     <div class="row" style="margin-bottom:8px"><label>搜尋<input id="st-q" placeholder="姓名或備註"></label></div>
-    <div class="tw"><table><thead><tr><th>名稱</th><th>備註</th><th>開始日</th><th>家長知悉</th><th>本週任務</th><th></th></tr></thead><tbody id="st-body"></tbody></table></div>
+    <div class="tw"><table><thead><tr><th>名稱</th><th>備註</th><th>開始日</th><th>家長知悉</th><th>帳號</th><th>本週任務</th><th></th></tr></thead><tbody id="st-body"></tbody></table></div>
     <p class="muted" id="st-empty" style="display:none">還沒有學生。在上面新增第一位學生。</p>
   </div>
 </section>
@@ -202,6 +202,7 @@ header .hbtn button{font:inherit;font-size:13px;border:1px solid rgba(255,255,25
 
 <script src="songs.js"></script>
 <script src="firebase-config.js"></script>
+<script src="student-auth.js"></script>
 <script src="admin-data.js"></script>
 <script>
 (function(){
@@ -280,6 +281,10 @@ $('ns-add').onclick=function(){
   }).catch(function(e){msg('ns-msg',e.message,'err');});
 };
 $('st-q').oninput=renderStudents;
+function acctChip(s){
+  if(!CLOUD)return '<span class="chip n">—</span>';
+  return s.uid?'<span class="chip g">已註冊</span>':'<span class="chip a">未註冊</span>';
+}
 function renderStudents(){
   var q=$('st-q').value.trim(),list=D.students.filter(function(s){return !q||(nm(s)+s.note).indexOf(q)>=0;});
   $('st-count').textContent='（'+list.length+' 位）';
@@ -287,21 +292,24 @@ function renderStudents(){
   var dupN={};D.students.forEach(function(s){dupN[s.name]=(dupN[s.name]||0)+1;});
   $('st-body').innerHTML=list.map(function(s){
     var n=studentTasks(s.id).length;
-    return '<tr><td><b>'+esc(nm(s))+'</b>'+(dupN[s.name]>1?' <span class="chip a">同名</span>':'')+'</td><td>'+esc(s.note)+'</td><td>'+esc(s.start)+'</td><td>'+(s.ack?'<span class="chip g">已知悉</span>':'<span class="chip r">未勾選</span>')+'</td><td>'+(n?n+' 個':'<span class="chip n">未指派</span>')+'</td><td><button class="b ghost sm" data-e="'+esc(s.id)+'">編輯</button> <button class="b ghost sm" style="color:var(--red);border-color:var(--red)" data-d="'+esc(s.id)+'">刪除資料</button></td></tr>';
+    return '<tr><td><b>'+esc(nm(s))+'</b>'+(dupN[s.name]>1?' <span class="chip a">同名</span>':'')+'</td><td>'+esc(s.note)+'</td><td>'+esc(s.start)+'</td><td>'+(s.ack?'<span class="chip g">已知悉</span>':'<span class="chip r">未勾選</span>')+'</td><td>'+acctChip(s)+'</td><td>'+(n?n+' 個':'<span class="chip n">未指派</span>')+'</td><td><button class="b ghost sm" data-e="'+esc(s.id)+'">編輯</button> '+(CLOUD&&s.uid?'<button class="b ghost sm" data-r="'+esc(s.id)+'">重設密碼</button> ':'')+'<button class="b ghost sm" style="color:var(--red);border-color:var(--red)" data-d="'+esc(s.id)+'">刪除資料</button></td></tr>';
   }).join('');
 }
 $('st-body').addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;
-  var s=D.students.filter(function(x){return x.id===(b.dataset.e||b.dataset.d);})[0];if(!s)return;
-  if(b.dataset.e)editStudent(s);else delStudent(s);
+  var s=D.students.filter(function(x){return x.id===(b.dataset.e||b.dataset.d||b.dataset.r);})[0];if(!s)return;
+  if(b.dataset.e)editStudent(s);else if(b.dataset.r)resetPw(s);else delStudent(s);
 });
 function editStudent(s){
-  openModal('<h3>編輯學生</h3><div class="row" style="flex-direction:column;align-items:stretch"><label>真實姓名<input id="e-name" value="'+esc(s.name)+'" maxlength="12"></label><label>學校第一個字<input id="e-sc" value="'+esc(s.school1)+'" maxlength="1"></label><label>開始日<input id="e-start" type="date" value="'+esc(s.start)+'"></label><label>備註<input id="e-note" value="'+esc(s.note)+'" maxlength="40"></label></div><p class="msg err" id="e-msg"></p><div class="acts"><button class="b ghost" id="m-no">取消</button><button class="b" id="m-ok">儲存</button></div>',function(b){
+  openModal('<h3>編輯學生</h3><div class="row" style="flex-direction:column;align-items:stretch"><p class="muted" style="margin:0 0 6px">學生登入時，名字要和他<b>註冊（或你建名單）時的名字＋學校字</b>一樣；在這裡改名只會改名單上的顯示，不會改他的登入名字。</p><label>真實姓名<input id="e-name" value="'+esc(s.name)+'" maxlength="12"></label><label>學校第一個字<input id="e-sc" value="'+esc(s.school1)+'" maxlength="1"></label><label>開始日<input id="e-start" type="date" value="'+esc(s.start)+'"></label><label>備註<input id="e-note" value="'+esc(s.note)+'" maxlength="40"></label></div><p class="msg err" id="e-msg"></p><div class="acts"><button class="b ghost" id="m-no">取消</button><button class="b" id="m-ok">儲存</button></div>',function(b){
     b.querySelector('#m-no').onclick=closeModal;
     b.querySelector('#m-ok').onclick=function(){
       A.updateStudent(s.id,{name:b.querySelector('#e-name').value,school1:b.querySelector('#e-sc').value,start:b.querySelector('#e-start').value,note:b.querySelector('#e-note').value}).then(function(){closeModal();return reload();}).catch(function(er){b.querySelector('#e-msg').textContent=er.message;});
     };
   });
+}
+function resetPw(s){
+  confirmBox('重設「'+nm(s)+'」的密碼','<p>按下去之後，這位學生<b>目前的密碼就不能用了</b>。請告訴他：回登入頁按「建立帳號」，<b>用同樣的名字</b>（「'+esc(s.name+(s.school1||''))+'」）設定新密碼；星星、進度、每週任務都會保留。</p><p class="muted">重設後到他重新設定之前，名單上顯示「未註冊」；請盡快讓他設定。</p>','確定重設',function(){A.resetPassword(s.id).then(reload).then(function(){msg('ns-msg','已重設「'+nm(s)+'」。請告訴學生：回登入頁按「建立帳號」，用同樣的名字設定新密碼。','ok');window.scrollTo(0,0);}).catch(function(e){msg('ns-msg','重設失敗：'+e.message,'err');window.scrollTo(0,0);});},true);
 }
 function delStudent(s){
   var n=logsOf(s.id).length;

@@ -156,6 +156,12 @@ form{display:flex;flex-direction:column;gap:10px}
 .todo{align-self:flex-start;font-size:12.5px;font-weight:700;border:1.5px dashed var(--ink-2);color:var(--ink-2);border-radius:999px;padding:0 10px;line-height:1.7}
 .steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px;font-size:15.5px}
 .note{font-size:13px;color:var(--ink-2);line-height:1.6;border-top:1.5px dashed var(--line);padding-top:10px}
+.notice{font-size:12.5px;line-height:1.55;color:var(--ink);border:2px solid var(--gold);border-radius:8px;background:color-mix(in srgb,var(--vellum) 70%,transparent);padding:8px 12px}
+.notice b{display:block;font-size:14px;margin-bottom:2px}
+.notice p{margin:0 0 6px}.notice p:last-child{margin:0}
+#resume:not(:empty){margin-top:30px}
+.ackrow{display:flex;gap:10px;align-items:center;font-weight:700;font-size:15px;line-height:1.4}
+.ackrow input{width:26px;height:26px;flex:none;accent-color:var(--green)}
 .sp{display:block;flex:none;height:auto}
 .say{display:flex;align-items:flex-end;gap:8px}
 .say .sp{width:60px}
@@ -243,6 +249,8 @@ form{display:flex;flex-direction:column;gap:10px}
 </style>
 <script src="save-core.js"></script>
 <script src="sfx.js"></script>
+<script src="firebase-config.js"></script>
+<script src="student-auth.js"></script>
 <script>if(window.Sfx){Sfx.auto('.bk-next,.storybtn','nav');Sfx.auto('.enter,.btn','tap');}</script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -332,21 +340,28 @@ const eye=id=>`<button type="button" class="eye" data-eye="${id}">顯示</button
 const fName=(id,v,bad)=>`<div class="field${bad?' bad':''}"><label for="${id}"><svg><use href="#i-user"/></svg>我的名字</label><div class="inp"><input id="${id}" autocomplete="username" value="${v}"${bad?' aria-invalid="true"':''}></div></div>`;
 const fPw=(id,label,v,bad,ac)=>`<div class="field${bad?' bad':''}"><label for="${id}"><svg><use href="#i-key"/></svg>${label}</label><div class="inp"><input id="${id}" type="password" autocomplete="${ac||'current-password'}" value="${v}"${bad?' aria-invalid="true"':''}>${eye(id)}</div></div>`;
 const T={
-login:{sub:'輸入名字和密碼，回到你的島',html:`${say('wave','嗨！今天也一起吹陶笛吧！')}
-<form data-go="home">${fName('n','')}${fPw('p','我的密碼','')}
+login:{sub:'輸入名字和密碼，回到你的島',html:`<div id="resume"></div>${say('wave','嗨！今天也一起吹陶笛吧！')}
+<form data-act="login">${fName('n','')}${fPw('p','我的密碼','')}
+<div id="fmsg"></div>
 <button class="btn" type="submit">開始冒險</button>
-<div class="links"><button type="button" class="link" data-v="register">建立帳號</button><button type="button" class="link" data-v="forgot">忘記密碼</button><button type="button" class="link" data-v="guest">訪客模式</button></div><p class="note">測試版：不驗證帳號，名字和密碼隨便填就能進入。</p></form>`},
-register:{sub:'建立你的帳號，只要名字和密碼',html:`<form data-go="home"><div class="field"><label for="n2"><svg><use href="#i-user"/></svg>我的名字</label><div class="inp"><input id="n2" autocomplete="name" value=""></div><p class="hint">請寫真實姓名，老師才找得到你。</p></div>
+<div class="links"><button type="button" class="link" data-v="register">建立帳號</button><button type="button" class="link" data-v="forgot">忘記密碼</button><button type="button" class="link" data-v="guest">訪客模式</button></div><p class="note">名字要和建立帳號時寫的一樣。</p></form>`},
+register:{sub:'建立你的帳號，只要名字和密碼',html:`<form data-act="register"><div class="field"><label for="n2"><svg><use href="#i-user"/></svg>我的名字</label><div class="inp"><input id="n2" autocomplete="username" maxlength="12" value=""></div><p class="hint">請寫真實姓名，老師才找得到你。如果有同名同姓，請在名字後面加學校的第一個字，例如「王小明北」。</p></div>
 <div class="field"><label for="p2"><svg><use href="#i-key"/></svg>設定密碼（至少 4 個字）</label><div class="inp"><input id="p2" type="password" autocomplete="new-password" value="">${eye('p2')}</div></div>
 ${fPw('p3','再輸入一次密碼','',false,'new-password')}
-<span class="todo">待決定：同名同姓怎麼區分</span>
+<div class="notice"><b>給家長的隱私與使用說明</b>
+<p>大家好！這款小遊戲是專為正在學習陶笛的孩子設計的練習工具，希望能讓孩子在家練習更有樂趣 😊</p>
+<p>為了保護孩子的隱私，我們僅記錄：<br>🔹 孩子的姓名（若同名，會多加學校的第一個字）<br>🔹 遊戲進度（練習次數、星星、道具等）</p>
+<p>家長請放心，我們絕對不會：<br>❌ 蒐集 Email、電話、住址等個資<br>❌ 錄製或保存聲音（僅透過手機即時偵測音準，不會儲存或上傳）</p>
+<p>紀錄僅供孩子延續關卡，以及讓家長或老師了解練習狀況。上述紀錄會存放在雲端服務，以便孩子換裝置也能繼續玩。若需刪除資料，隨時歡迎聯繫：<br>蘇鈺洺老師（玉米老師）｜聯絡信箱：a0929870116@gmail.com</p></div>
+<label class="ackrow" for="ack"><input type="checkbox" id="ack">家長已閱讀說明並同意使用。</label>
+<div id="fmsg"></div>
 <button class="btn" type="submit">建立帳號</button>
-<div class="links"><button type="button" class="link" data-v="login">已經有帳號？回登入</button></div>
-<p class="note">不需要填 email、電話或學校。</p><span class="todo">待決定：家長告知與刪除資料說明文字（建立帳號底部）</span></form>`},
+<div class="links"><button type="button" class="link" data-v="login">已經有帳號？回登入</button></div></form>`},
 forgot:{sub:'忘記密碼了也沒關係',html:`${say('point','找老師幫忙就好，別擔心！')}
 <div class="msg info"><div><b>請告訴你的陶笛老師</b>老師會幫你重設密碼，你的星星和島都還在。</div></div>
-<ol class="steps"><li>跟老師說你的名字</li><li>老師幫你重設</li><li>回到這裡，用新密碼登入</li></ol>
-<button class="btn" data-v="login" type="button">回登入畫面</button>`},
+<ol class="steps"><li>跟老師說你的名字</li><li>老師幫你重設</li><li>回到這裡按「建立帳號」，用<b>同樣的名字</b>設定新密碼</li></ol>
+<button class="btn" data-v="register" type="button">去設定新密碼</button>
+<div class="links"><button type="button" class="link" data-v="login">回登入畫面</button></div>`},
 'e-pw':{sub:'輸入名字和密碼，回到你的島',html:`<form data-go="home">${fName('n','王小明')}${fPw('p','我的密碼','mypasswor',true)}
 ${err('sad','密碼不對喔','再試一次，或按「顯示」檢查有沒有打錯。')}
 <button class="btn" type="submit">開始冒險</button>
@@ -365,8 +380,7 @@ guest:{sub:'不用帳號，先來玩玩看',html:`${say('stand','先逛逛也可
 <button class="btn" type="button" data-v="home" data-guest="1">以訪客進入</button>
 <div class="links"><button type="button" class="link" data-v="login">回登入</button></div>`},
 'e-dup':{sub:'建立你的帳號，只要名字和密碼',html:`<form>${fName('n2','王小明',true)}${fPw('p2','設定密碼','mypassword',false,'new-password')}${fPw('p3','再輸入一次密碼','mypassword',false,'new-password')}
-${err('wow','這個名字已經有人用了','如果是你本人，請回登入。如果是同名同姓，請在名字後面加上學校名，例如「王小明-陽光國小」。')}
-<span class="todo">待確認：同名處理＝姓名-學校名（與「不收學校」規格衝突，需確認）</span>
+${err('wow','這個名字已經有人用了','如果是你本人，請回登入。如果是同名同姓，請在名字後面加上學校的第一個字，例如「王小明北」。')}
 <button class="btn" type="submit">建立帳號</button>
 <div class="links"><button type="button" class="link" data-v="login">這是我，回登入</button></div></form>`},
 'e-app':{sub:'先換一個瀏覽器',html:`${say('sit','換個瀏覽器，我才聽得到你的陶笛。')}
@@ -472,7 +486,7 @@ function show(v){
   $('#app').classList.toggle('sheet-open',!!open);$('#app').classList.toggle('story-mode',v==='story');$('#art').classList.toggle('on',v==='story');
   $('#sheet').hidden=!open;
   if(open){let html=T[v].html,todos=[];if(v==='home')html=html.replace(/王小明/g,USER.replace(/[<>&]/g,''));html=html.replace(/<span class="todo">(.*?)<\/span>/g,(m,t)=>{todos.push(t);return''});
-    $('#body').innerHTML=html;$('#sheet').scrollTop=0;pvtodo(todos);if(v==='story')initBook();if(v==='home')homeT=setTimeout(()=>{if(curV==='home')enterGame()},2200)}else pvtodo([])
+    $('#body').innerHTML=html;$('#sheet').scrollTop=0;pvtodo(todos);if(v==='story')initBook();if(v==='login')renderResume();if(v==='home')homeT=setTimeout(()=>{if(curV==='home')enterGame()},2200)}else pvtodo([])
   document.querySelectorAll('.pv [data-v]').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===(open?v:'splash')));
   try{history.replaceState(null,'','#'+(open?v:'splash'))}catch(e){}
 }
@@ -481,7 +495,47 @@ document.addEventListener('click',e=>{
   const ey=e.target.closest('[data-eye]');
   if(ey){const i=document.getElementById(ey.dataset.eye);const h=i.type==='password';i.type=h?'text':'password';ey.textContent=h?'隱藏':'顯示'}
 });
-document.addEventListener('submit',e=>{e.preventDefault();const g=e.target.dataset.go;if(g){const inp=e.target.querySelector('input');USER=(inp&&inp.value.trim())||'同學';show(g)}});
+/* ===== 學生登入（Firebase；細節見 student-auth.js、firestore.rules） ===== */
+let SESSION=null;
+const ERR={
+ wrong:['sad','名字或密碼不對喔','請檢查名字有沒有寫對（要和建立帳號時一樣），或按「顯示」看看密碼。第一次來？請先按「建立帳號」。忘記密碼請找老師重設。'],
+ many:['sad','試太多次了','請等幾分鐘再試一次，或找老師幫忙。'],
+ net:['wow','連不上網路','請檢查網路，稍後再試。'],
+ config:['wow','登入功能還沒準備好','請告訴老師。'],
+ dup:['wow','這個名字已經有人用了','如果是你本人，請回登入。如果是同名同姓，請在名字後面加上學校的第一個字，例如「王小明北」。'],
+ badname:['wow','名字不能用','請輸入 1～12 個字的名字，不要有空格或特殊符號。'],
+ weak:['wow','密碼太短了','密碼至少要 4 個字。'],
+ mm:['sad','兩次密碼不一樣','請再輸入一次，或按「顯示」確認。'],
+ noack:['wow','還沒勾家長同意','請家長讀完說明，並勾選「家長已閱讀說明並同意使用」。'],
+ denied:['wow','建立不了帳號','可能這個名字已經有人用了，請在名字後面加學校的第一個字再試一次；還是不行就找老師。'],
+ nodoc:['wow','找不到你的資料','請找老師幫忙。'],
+ other:['wow','出了一點問題','請再試一次；如果一直這樣，請告訴老師。']
+};
+function showErr(f,code){const a=ERR[code]||ERR.other;f.querySelector('#fmsg').innerHTML=err(a[0],a[1],a[2]);}
+async function authSubmit(f,act){
+  const btn=f.querySelector('.btn'),label=btn.textContent,v=id=>{const e=f.querySelector('#'+id);return e?e.value:''};
+  f.querySelector('#fmsg').innerHTML='';btn.disabled=true;btn.textContent='請稍等…';
+  try{
+    if(act==='register'&&v('p2')!==v('p3'))throw {code:'mm'};
+    const svc=await OLMStudent.service();
+    const u=act==='login'?await svc.login(v('n'),v('p')):await svc.register(v('n2'),v('p2'),f.querySelector('#ack').checked);
+    USER=u.name;SESSION=u;show('home');
+  }catch(e){showErr(f,(e&&e.code)||'other');btn.disabled=false;btn.textContent=label}
+}
+function renderResume(){
+  const box=$('#resume');if(!box)return;
+  box.innerHTML=SESSION?`<div class="msg info"><div><b>你是「${SESSION.name.replace(/[<>&]/g,'')}」嗎？</b>這個瀏覽器已經登入了。</div></div><button class="btn" type="button" data-do="resume">繼續冒險</button><div class="links"><button type="button" class="link" data-do="logout">換人登入</button></div>`:'';
+}
+document.addEventListener('click',e=>{
+  const d=e.target.closest('[data-do]');if(!d)return;
+  if(d.dataset.do==='resume'&&SESSION){USER=SESSION.name;show('home')}
+  else if(d.dataset.do==='logout'){OLMStudent.service().then(s=>s.logout()).catch(()=>{}).then(()=>{SESSION=null;renderResume()})}
+});
+/* 背景檢查這個瀏覽器是不是已經登入過（失敗就當沒有，不打擾） */
+OLMStudent.service().then(s=>s.current()).then(u=>{SESSION=u;if(curV==='login')renderResume()}).catch(()=>{});
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,act=f.dataset.act;
+  if(act){authSubmit(f,act);return}
+  const g=f.dataset.go;if(g){const inp=f.querySelector('input');USER=(inp&&inp.value.trim())||'同學';show(g)}});
 
 /* ===== 遊戲頁（game-test.html）：登入後載入；音樂與故事序章由這一層負責 ===== */
 let storyFromGame=false;
@@ -502,7 +556,7 @@ addEventListener('message',e=>{
   if(d.type==='practice'){practiceHold=!!d.on;bgm();}
   else if(d.type==='replay-story'){storyFromGame=true;setGameVisible(false);show('story');}
 });
-function fromHash(){const h=(location.hash||'').slice(1);show(T[h]?h:'splash')}
+function fromHash(){const h=(location.hash||'').slice(1);show(h==='home'?'login':(T[h]?h:'splash'))}   /* 重新整理時不能直接跳到「登入成功」畫面（會繞過登入），改回登入頁；已登入的會看到「繼續冒險」 */
 addEventListener('hashchange',fromHash);fromHash();
 </script>
 

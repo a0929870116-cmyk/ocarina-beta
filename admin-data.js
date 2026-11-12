@@ -9,6 +9,7 @@
    students: [{id, name, school1, note, start, ack, created}]    → Firestore：students/{id}（文件內容不含 id）
      name   真實姓名；school1 學校第一個字（只有同名時才需要）；start 該生開始日 YYYY-MM-DD（週界起算，與 wk-core.js 同規則）
      ack    註冊時「家長知悉」已勾選；created 建立時間
+     uid    （雲端）學生登入帳號的 uid；null＝還沒註冊（或剛重設），學生用同樣名字註冊會認領。學生自己註冊的 id ＝ 名字的鑰匙，見 student-auth.js
    tasks: { 學生id: {tasks:[{id,type,name,song,from,to,T,speed}], updated} }   → Firestore：tasks/{學生id}
      type 'drill'（教材，weekly-practice.html）或 'song'（歌曲＋小節範圍，song-practice.html）；欄位同 wk-core.js 的 TASKS
      speed 為選填（BPM），遊戲端尚未讀取
@@ -65,6 +66,10 @@ function makeCloud(sdk,db){
   var COLS=['students','tasks','logs'];
   function loadCol(c){return sdk.getDocs(sdk.collection(db,c));}
   return {
+    /* 密碼重設世代（gens/<key>.g）；沒有就是 0 */
+    getGen:function(key){
+      return sdk.getDoc(sdk.doc(db,'gens',key)).then(function(s){var d=s.exists()?s.data():null;return d&&d.g>0?(d.g|0):0;});
+    },
     load:function(){
       return Promise.all(COLS.map(loadCol)).then(function(r){
         var o={students:[],tasks:{},logs:[],mock:false};
@@ -158,9 +163,21 @@ var Store={
       if(noSc.length)return fail('已有同名學生「'+name+'」但沒填學校第一個字，請先到名單補上，再新增這位');
       if(same.some(function(s){return s.school1===sc;}))return fail('「'+name+sc+'」已存在');
     }
-    var s={id:uid('s-'),name:name,school1:sc,note:(d.note||'').trim(),start:d.start||todayKey(),ack:!!d.ack,created:new Date().toISOString()};
-    o.students.push(s);save(o);
-    return commit([{t:'set',c:'students',id:s.id,d:strip(s)}]).then(function(){return s;});
+    /* 雲端模式：學生 id ＝ 名字（含學校字）的鑰匙，學生之後用同樣名字註冊就會認領這一筆；本機模式用隨機 id */
+    var S=g.OLMStudent,idP;
+    if(mode==='cloud'){
+      if(!S)return fail('缺少 student-auth.js');
+      var full=S.cleanName(name+sc);
+      if(full.length>12)return fail('名字加學校字最多 12 個字');
+      idP=S.keyOf(full);
+    }else idP=ok(uid('s-'));
+    return idP.then(function(id){
+      if(o.students.some(function(x){return x.id===id;}))throw new Error('「'+name+sc+'」這個登入名字已經有人了（可能學生已自己註冊）');
+      var s={id:id,name:name,school1:sc,note:(d.note||'').trim(),start:d.start||todayKey(),ack:!!d.ack,created:new Date().toISOString()};
+      if(mode==='cloud')s.uid=null;   /* uid 空 ＝ 等學生用這個名字註冊來認領 */
+      o.students.push(s);save(o);
+      return commit([{t:'set',c:'students',id:s.id,d:strip(s)}]).then(function(){return s;});
+    });
   },
   updateStudent:function(id,d){
     var o=load(),s=o.students.filter(function(x){return x.id===id;})[0];
@@ -178,12 +195,28 @@ var Store={
   },
   /* 刪除學生：連同任務與練習紀錄一併刪（家長要求刪除資料時用） */
   removeStudent:function(id){
-    var o=load();
+    var o=load(),st=o.students.filter(function(s){return s.id===id;})[0];
     o.students=o.students.filter(function(s){return s.id!==id;});
     delete o.tasks[id];
     o.logs=o.logs.filter(function(l){return l.sid!==id;});
     save(o);
-    return commit([{t:'del',c:'students',id:id},{t:'del',c:'tasks',id:id},{t:'delLogsOf',sid:id}]).then(function(){return true;});
+    var ops=[{t:'del',c:'students',id:id},{t:'del',c:'tasks',id:id},{t:'delLogsOf',sid:id}];
+    /* 已註冊的學生：順便把世代 +1。雲端的登入帳號刪不掉（只能在 Firebase 控制台刪），世代 +1 之後同名的人才能重新註冊 */
+    if(mode==='cloud'&&st&&st.uid){
+      return cloud.getGen(id).then(function(gn){ops.push({t:'set',c:'gens',id:id,d:{g:gn+1}});return commit(ops);}).then(function(){return true;});
+    }
+    return commit(ops).then(function(){return true;});
+  },
+  /* 重設密碼：世代 +1、清掉 uid。學生用「同樣的名字」重新按「建立帳號」設新密碼，進度與任務都保留 */
+  resetPassword:function(id){
+    if(mode!=='cloud')return fail('本機模式沒有學生帳號，不需要重設');
+    var o=load(),s=o.students.filter(function(x){return x.id===id;})[0];
+    if(!s)return fail('找不到學生');
+    if(!s.uid)return fail('這位學生還沒有註冊帳號，不需要重設');
+    return cloud.getGen(id).then(function(gn){
+      s.uid=null;save(o);
+      return commit([{t:'set',c:'gens',id:id,d:{g:gn+1}},{t:'set',c:'students',id:id,d:strip(s)}]);
+    }).then(function(){return true;});
   },
   /* ---- 每週任務 ---- */
   setTasks:function(ids,tasks){

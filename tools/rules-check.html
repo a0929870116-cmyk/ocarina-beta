@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>學生端安全規則檢查</title>
+<style>
+body{font:15px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;max-width:760px;margin:0 auto;padding:16px;color:#2b2418;background:#faf5e8}
+h1{font-size:20px;margin:0 0 6px}
+button{font:inherit;padding:8px 18px;border-radius:8px;border:1px solid #2f5d3a;background:#2f5d3a;color:#fff;cursor:pointer}
+button:disabled{opacity:.5}
+table{border-collapse:collapse;width:100%;margin-top:12px;background:#fff}
+td,th{border:1px solid #d9ccae;padding:6px 8px;text-align:left;font-size:14px;vertical-align:top}
+th{background:#f3ead7}
+.ok{color:#1f6b36;font-weight:700}.bad{color:#b3261e;font-weight:700}.unk{color:#8a5f0c;font-weight:700}
+#sum{margin-top:12px;font-weight:700;font-size:16px}
+.muted{color:#6b5f48;font-size:13px}
+</style></head><body>
+<h1>學生端安全規則檢查（測試站）</h1>
+<p class="muted">按「開始檢查」會建立兩位測試學生（名字「規則測甲＋四位數」「規則測乙＋四位數」），用兩個獨立連線互相試著讀寫：該擋的有沒有擋住、該過的有沒有過。<b>做完請到後台把這兩位測試學生「刪除資料」。</b>只在測試站用，不要在正式站按。</p>
+<button id="go">開始檢查</button>
+<div id="sum"></div>
+<table id="t" hidden><thead><tr><th>#</th><th>檢查項目</th><th>應該</th><th>結果</th></tr></thead><tbody id="tb"></tbody></table>
+<script src="../firebase-config.js"></script>
+<script src="../student-auth.js"></script>
+<script>
+(function(){
+'use strict';
+var S=window.OLMStudent,rows=[],nPass=0,nFail=0;
+function $(i){return document.getElementById(i);}
+function add(label,should,res,cls){
+  var n=rows.length+1;rows.push(1);
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td>'+n+'</td><td></td><td>'+should+'</td><td class="'+cls+'"></td>';
+  tr.children[1].textContent=label;tr.children[3].textContent=res;
+  $('tb').appendChild(tr);
+}
+/* shouldPass：true＝應該成功；false＝應該被規則擋下（permission-denied） */
+function check(label,shouldPass,fn){
+  return Promise.resolve().then(fn).then(function(){
+    if(shouldPass){nPass++;add(label,'通過','✓ 通過','ok');}
+    else{nFail++;add(label,'擋下','✗ 沒被擋住（規則有洞）','bad');}
+  },function(e){
+    var c=(e&&e.code)||'';
+    if(!shouldPass&&(c==='permission-denied'||c==='firestore/permission-denied')){nPass++;add(label,'擋下','✓ 被擋下','ok');}
+    else if(shouldPass){nFail++;add(label,'通過','✗ 被擋下或出錯：'+(c||e.message),'bad');}
+    else{nFail++;add(label,'擋下','? 出錯但不是規則擋下：'+(c||e.message),'unk');}
+  });
+}
+$('go').onclick=function(){
+  $('go').disabled=true;$('t').hidden=false;$('tb').innerHTML='';rows=[];nPass=nFail=0;$('sum').textContent='檢查中…';
+  var r=String(Math.floor(1000+Math.random()*9000)),nA='規則測甲'+r,nB='規則測乙'+r,nC='規則測丙'+r;
+  var a,b,anon,ua,ub,kA,kB,kC,X;
+  Promise.all([S.connect('rulesA'),S.connect('rulesB'),S.connect('rulesC')]).then(function(v){
+    a=v[0];b=v[1];anon=v[2];X=a.sdk;
+    return a.logout().catch(function(){}).then(function(){return b.logout().catch(function(){});});
+  }).then(function(){return a.register(nA,'test1234',true);}).then(function(u){ua=u;return b.register(nB,'test1234',true);}).then(function(u){
+    ub=u;kA=ua.sid;kB=ub.sid;return S.keyOf(nC);
+  }).then(function(k){
+    kC=k;
+    var logA='x'+Date.now().toString(36)+'a',logB='x'+Date.now().toString(36)+'b',logC='x'+Date.now().toString(36)+'c';
+    var okLog={sid:kA,ts:new Date().toISOString(),task:'basic-1-1',perfect:true,errs:[]};
+    var seq=[
+      ['甲 讀自己的學生資料',true,function(){return X.getDoc(X.doc(a.db,'students',kA)).then(function(s){if(!s.exists())throw new Error('讀不到');});}],
+      ['甲 讀乙的學生資料',false,function(){return X.getDoc(X.doc(a.db,'students',kB));}],
+      ['甲 列出所有學生',false,function(){return X.getDocs(X.collection(a.db,'students'));}],
+      ['甲 列出所有練習紀錄',false,function(){return X.getDocs(X.collection(a.db,'logs'));}],
+      ['甲 讀乙的每週任務',false,function(){return X.getDoc(X.doc(a.db,'tasks',kB));}],
+      ['甲 讀自己的每週任務（可能還沒指派，讀得到「沒有」也算通過）',true,function(){return X.getDoc(X.doc(a.db,'tasks',kA));}],
+      ['甲 寫自己的每週任務',false,function(){return X.setDoc(X.doc(a.db,'tasks',kA),{tasks:[]});}],
+      ['甲 新增自己的練習彙總',true,function(){return X.setDoc(X.doc(a.db,'logs',logA),okLog);}],
+      ['甲 新增「乙」的練習彙總',false,function(){return X.setDoc(X.doc(a.db,'logs',logB),{sid:kB,ts:okLog.ts,task:'basic-1-1',perfect:true,errs:[]});}],
+      ['甲 新增多了不該有的欄位的練習彙總',false,function(){return X.setDoc(X.doc(a.db,'logs',logC),{sid:kA,ts:okLog.ts,task:'basic-1-1',perfect:true,errs:[],extra:1});}],
+      ['甲 改自己的學生資料（例如開始日）',false,function(){return X.updateDoc(X.doc(a.db,'students',kA),{start:'2000-01-01'});}],
+      ['甲 把乙的帳號認領成自己',false,function(){return X.updateDoc(X.doc(a.db,'students',kB),{uid:ua.sid,ack:true});}],
+      ['甲 替「別人的名字」（丙）建學生文件',false,function(){return X.setDoc(X.doc(a.db,'students',kC),{name:nC,school1:'',note:'',start:'2026-01-01',ack:true,created:okLog.ts,uid:(a.auth.currentUser||{}).uid});}],
+      ['甲 寫密碼世代文件',false,function(){return X.setDoc(X.doc(a.db,'gens',kA),{g:5});}],
+      ['甲 讀自己的密碼世代文件（登入前要能讀）',true,function(){return X.getDoc(X.doc(a.db,'gens',kA));}],
+      ['甲 刪除自己的學生文件',false,function(){return X.deleteDoc(X.doc(a.db,'students',kA));}],
+      ['沒登入 讀甲的學生資料',false,function(){return X.getDoc(X.doc(anon.db,'students',kA));}],
+      ['沒登入 讀密碼世代文件（登入前要能讀）',true,function(){return X.getDoc(X.doc(anon.db,'gens',kA));}],
+      ['沒登入 新增練習彙總',false,function(){return X.setDoc(X.doc(anon.db,'logs','x'+Date.now().toString(36)+'z'),okLog);}]
+    ];
+    var p=Promise.resolve();
+    seq.forEach(function(c){p=p.then(function(){return check(c[0],c[1],c[2]);});});
+    return p;
+  }).then(function(){
+    $('sum').innerHTML=nFail?'<span class="bad">有 '+nFail+' 項不對，共 '+(nPass+nFail)+' 項。請把這頁截圖給 Claude。</span>':'<span class="ok">全部通過（'+nPass+' 項）。</span>';
+    $('sum').innerHTML+='<div class="muted" style="font-weight:400">測試學生：'+nA+'、'+nB+'。請到後台把它們「刪除資料」。</div>';
+  }).catch(function(e){
+    $('sum').innerHTML='<span class="bad">檢查中斷：'+((e&&e.code)||'')+' '+((e&&e.message)||'')+'</span><div class="muted" style="font-weight:400">若是「denied」或「permission」，多半是新規則還沒貼到 Firebase 控制台並發佈。</div>';
+  }).then(function(){$('go').disabled=false;});
+};
+})();
+</script>
+</body></html>

@@ -313,7 +313,7 @@ function renderTop(){
   document.getElementById('tabs').innerHTML=TABS.map(([k,n])=>`<button role="tab" data-tab="${k}" aria-selected="${tab===k}">${icon(k,24)}<span>${n}</span></button>`).join('');
 }
 function giftCard(){
-  return `<div class="card gift"><div class="row"><span class="sname">水晶碎片取得方式</span></div><p class="need">解星空試煉場－陶笛遊樂場<br>隨機掉落！</p></div>`;
+  return `<div class="card gift"><div class="row"><span class="sname">水晶碎片取得方式</span></div><p class="need">每週任務多練、星空試煉場<br>都會掉落！</p></div>`;
 }
 function avail(id){return S.el[id]-pick.filter(p=>p===id).length;}
 /* 魔法陣 */
@@ -383,7 +383,7 @@ function bagPanel(){
 <h2>這版的暫定假設</h2><ul class="notes">
 <li>水晶碎片名稱第 5～12 島是暫擬。每次升級放入任意 3 顆水晶碎片（Lv1→2、Lv2→3 各一次）。</li>
 <li>放入的位置決定該部位的顏色：上方＝主色、右下＝紋飾、左下＝光暈。滿級後仍可重新提煉換色。</li>
-<li>水晶碎片只靠「星空試煉場－陶笛遊樂場」隨機掉落；每週任務不再另外給。</li>
+<li>水晶碎片來源：每週任務超過目標的全對（每 2 次掉 1 顆、每週上限 10）、「星空試煉場－陶笛遊樂場」依答錯次數掉落。</li>
 <li>重設飛船只清飛船資料，不動星星罐與練習進度。</li></ul>`;
 }
 document.getElementById('labic').innerHTML=icon('lab',26,'inl')+' ';

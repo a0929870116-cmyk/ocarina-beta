@@ -1164,17 +1164,28 @@ function elfOnShow(v){
 $('elf-i').addEventListener('click',()=>elfSay(false));
 $('elf-b').addEventListener('click',()=>{$('elf-b').hidden=true;});
 
-/* ===== 開島畫面（3 頁，可略過；獎勵已在載入時結算，略過也不會少）===== */
+/* ===== 開島畫面（3 頁，可略過；獎勵已在載入時結算，略過也不會少）。視覺 11/12 重做：夜空＋金邊 ===== */
 (function(){
   const css=document.createElement('style');
-  css.textContent='.open-ov{position:fixed;inset:0;z-index:1000;background:var(--vellum);display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto}.open-ov[hidden]{display:none}'
-  +'.open-ov .oc{width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px;text-align:center;color:var(--ink)}'
-  +'.open-ov small{color:var(--ink-2)}.open-ov h2{font-size:26px;margin:0}.open-ov p{margin:0;min-height:1.5em;line-height:1.7}'
-  +'.open-ov .glow{font-size:54px;color:var(--gold-hi);text-shadow:0 0 18px var(--gold),0 0 40px var(--gold-hi);animation:opglow 2.4s ease-in-out infinite}@keyframes opglow{50%{opacity:.55}}'
-  +'.open-ov .loot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.open-ov .loot>div{flex:1;min-width:96px;border:3px solid var(--ink);border-radius:8px;padding:8px 6px;background:var(--vellum-2);font-size:14px}.open-ov .loot b{display:block;font-size:22px;color:var(--gold)}'
-  +'.open-ov .crits{display:flex;gap:10px;justify-content:center}.open-ov .crits>div{flex:1;border:2px solid var(--line);border-radius:8px;padding:8px;background:var(--vellum-2)}.open-ov .crits .ph{display:flex;justify-content:center}'
-  +'.open-ov .orow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.open-ov .orow .btn{flex:1;min-width:140px}'
-  +'.open-ov .trace{border:2px dashed var(--line);border-radius:8px;padding:12px;background:var(--vellum-2);text-align:left}';
+  css.textContent='.open-ov{position:fixed;inset:0;z-index:1000;background:linear-gradient(180deg,#070b2e 0%,#141a5c 55%,#2a2470 100%);color:#f6ecd0;display:flex;justify-content:center;overflow-y:auto}.open-ov[hidden]{display:none}'
+  +'.open-ov .ow{position:relative;width:100%;max-width:440px;min-height:100%;box-sizing:border-box;padding:64px 20px 28px;display:flex;flex-direction:column;gap:14px}'
+  +'.open-ov .ow>svg.bg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}'
+  +'.open-ov .top{position:absolute;left:0;right:0;top:0;height:56px;padding:10px 18px 0;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;z-index:2}'
+  +'.open-ov .top span{font-size:13px;letter-spacing:2px;color:#e8c36a}'
+  +'.open-ov .sk{min-height:44px;min-width:64px;border-radius:22px;border:1.5px solid rgba(232,195,106,.7);background:rgba(7,11,46,.55);color:#f6ecd0;font:inherit;font-size:14px}'
+  +'.open-ov .sp{flex:1}.open-ov .z{position:relative;z-index:1}'
+  +'.open-ov .oc2{border:2px solid #e8c36a;border-radius:16px;background:rgba(12,14,52,.8);padding:14px 16px;box-shadow:inset 0 0 0 4px rgba(232,195,106,.14);text-align:left}'
+  +'.open-ov .oc2.pu{border-color:#b980ff;background:rgba(18,14,60,.84);box-shadow:inset 0 0 0 5px rgba(185,128,255,.16)}'
+  +'.open-ov small{color:#cfc6ee;font-size:13px}.open-ov h2{margin:0;font-family:var(--font-head);font-weight:700;font-size:26px;line-height:1.4;text-align:center}'
+  +'.open-ov .cap{font-family:var(--font-head);font-size:22px;line-height:1.6;font-weight:700;min-height:3.2em}.open-ov .cap2{font-size:15px;line-height:1.7;margin-top:8px;color:#e6dcf6;min-height:1.7em}'
+  +'.open-ov .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'
+  +'.open-ov .loot{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}.open-ov .loot b{font-family:var(--font-head);font-size:26px;color:#ffe08a}'
+  +'.open-ov .dots{display:flex;gap:8px;justify-content:center}.open-ov .dots i{width:8px;height:8px;border-radius:4px;background:rgba(246,236,208,.4)}.open-ov .dots i.on{width:22px;background:#e8c36a}'
+  +'.open-ov .orow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.open-ov .orow.one{grid-template-columns:1fr}'
+  +'.open-ov .ob{min-height:52px;border-radius:26px;border:2px solid #e8c36a;background:rgba(7,11,46,.6);color:#f6ecd0;font-family:var(--font-head);font-weight:700;font-size:17px}'
+  +'.open-ov .ob.go{border:0;background:linear-gradient(180deg,#f4d77f,#d8a93e);color:#2a1f52}.open-ov .ob[hidden]{display:none}'
+  +'.open-ov .ring{width:92px;height:92px;border-radius:50%;border:3px solid #e8c36a;box-shadow:0 0 0 4px rgba(232,195,106,.2);background:radial-gradient(circle at 50% 40%,#3d3585,#1a1f5e);display:flex;align-items:center;justify-content:center;overflow:hidden}'
+  +'.open-ov .tw{animation:optw 2.4s ease-in-out infinite}@keyframes optw{50%{opacity:.45}}';
   document.head.appendChild(css);
   const titleOf=c=>c>=9?'銀河小樂手':c>=6?'星空探險家':c>=3?'小小星探':'星星見習生';
   function type(el,text,ms,done){
@@ -1182,33 +1193,55 @@ $('elf-b').addEventListener('click',()=>{$('elf-b').hidden=true;});
     const t=setInterval(()=>{if(!el.isConnected){clearInterval(t);return;}el.textContent+=a[i++]||'';if(i>=a.length){clearInterval(t);done&&done();}},ms);
     return ()=>{clearInterval(t);el.textContent=text;};
   }
+  const STARS='<g fill="#fff6d6"><circle cx="40" cy="120" r="1.6"/><circle cx="96" cy="64" r="1.2"/><circle cx="170" cy="150" r="1.4"/><circle cx="320" cy="96" r="1.8"/><circle cx="352" cy="210" r="1.2"/><circle cx="60" cy="260" r="1.3"/><circle cx="300" cy="300" r="1.1"/><circle cx="250" cy="60" r="1.2"/></g>';
+  const SCENE1='<svg class="bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="opg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe9a3" stop-opacity=".95"/><stop offset=".45" stop-color="#e8c36a" stop-opacity=".35"/><stop offset="1" stop-color="#e8c36a" stop-opacity="0"/></radialGradient></defs>'+STARS
+    +'<g transform="translate(0 -100)"><circle cx="195" cy="310" r="170" fill="url(#opg)"/><g stroke="#e8c36a" fill="none" stroke-width="1.5" opacity=".6"><circle cx="195" cy="310" r="64"/><circle cx="195" cy="310" r="96" stroke-dasharray="4 8"/><circle cx="195" cy="310" r="130" opacity=".5"/></g>'
+    +'<path d="M195 238 L207 292 L262 298 L220 332 L234 386 L195 356 L156 386 L170 332 L128 298 L183 292 Z" fill="#ffe08a" stroke="#fff6d6" stroke-width="2" stroke-linejoin="round"/><circle cx="183" cy="318" r="4" fill="#3a2d6e"/><circle cx="207" cy="318" r="4" fill="#3a2d6e"/><path d="M186 332 Q195 340 204 332" stroke="#3a2d6e" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    +'<g fill="#e8c36a" class="tw"><text x="86" y="236" font-size="26">♪</text><text x="290" y="262" font-size="22">♫</text><text x="268" y="372" font-size="20">♪</text><text x="104" y="392" font-size="22">♫</text></g></g>'
+    +'<g transform="translate(0 -100)"><ellipse cx="195" cy="520" rx="150" ry="22" fill="#d9d3f3"/><path d="M60 520 Q195 600 330 520 Q300 585 195 640 Q90 585 60 520Z" fill="#8f86d4"/><g fill="#fff"><circle cx="110" cy="504" r="26"/><circle cx="148" cy="496" r="32"/><circle cx="190" cy="500" r="28"/><circle cx="236" cy="498" r="34"/><circle cx="280" cy="506" r="26"/></g></g>'
+    +'<g transform="translate(195 410)"><path d="M-58 22 Q0 60 58 22 L40 -2 L-40 -2 Z" fill="#8a5a34" stroke="#e8c36a" stroke-width="2"/><path d="M0 -2 L0 -96" stroke="#e8c36a" stroke-width="3"/><path d="M4 -92 Q54 -60 36 -8 L4 -8Z" fill="#fff6d6" stroke="#e8c36a" stroke-width="2"/><path d="M-4 -80 Q-40 -50 -30 -8 L-4 -8Z" fill="#d9ceff" stroke="#e8c36a" stroke-width="2"/><g class="tw"><circle cx="-34" cy="10" r="16" fill="url(#opg)"/><circle cx="0" cy="14" r="16" fill="url(#opg)"/><circle cx="34" cy="10" r="16" fill="url(#opg)"/></g><circle cx="-34" cy="10" r="6" fill="#ffe9a3"/><circle cx="0" cy="14" r="6" fill="#ffe9a3"/><circle cx="34" cy="10" r="6" fill="#ffe9a3"/></g></svg>';
+  const SCENE2='<svg class="bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+STARS+'</svg>';
+  const SCENE3='<svg class="bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="opp" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d9a8ff" stop-opacity=".9"/><stop offset="1" stop-color="#d9a8ff" stop-opacity="0"/></radialGradient></defs>'+STARS
+    +'<path d="M-10 330 C80 250 140 380 220 290 S340 200 410 250" fill="none" stroke="#d9a8ff" stroke-width="3" stroke-dasharray="1 9" stroke-linecap="round"/><path d="M-10 336 C80 256 140 386 220 296 S340 206 410 256" fill="none" stroke="#b980ff" stroke-width="10" opacity=".18" stroke-linecap="round"/><circle cx="300" cy="236" r="26" fill="url(#opp)" class="tw"/><g fill="#e6c8ff"><circle cx="120" cy="300" r="3"/><circle cx="188" cy="318" r="2.5"/><circle cx="262" cy="262" r="3.2"/><circle cx="60" cy="318" r="2"/><circle cx="340" cy="238" r="2.4"/></g></svg>';
+  const dots=k=>'<div class="dots z" aria-label="第 '+k+' 頁，共 3 頁"><i'+(k===1?' class="on"':'')+'></i><i'+(k===2?' class="on"':'')+'></i><i'+(k===3?' class="on"':'')+'></i></div>';
   function playOpen(n){
     const I=ISLES.find(x=>x.n===n),S=STORY[n],F=FRAG[n],C=CRIT[n];
     let ov=$('open-ov');if(!ov){ov=document.createElement('div');ov.id='open-ov';ov.className='open-ov';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','開啟第 '+n+' 島');document.body.appendChild(ov);}
-    ov.hidden=false;
+    ov.hidden=false;ov.scrollTop=0;
     const done=()=>{ov.hidden=true;ov.innerHTML='';if(PEND.length)playOpen(PEND.shift());};
-    const skip='<button class="btn alt" data-o="skip">略過</button>';
+    const top='<div class="top"><span>第 '+n+' 島・'+I.name+'</span><button class="sk" data-o="skip" aria-label="略過開島畫面">略過</button></div>';
     const bind=()=>{const k=ov.querySelector('[data-o="skip"]');if(k)k.onclick=done;};
     const p1=()=>{
-      ov.innerHTML='<div class="oc"><small>第 '+n+' 島・'+I.name+'</small><div class="glow" aria-hidden="true">✦</div><h2>開啟了！</h2><p id="o1"></p><p id="o2"></p><p id="o3" style="color:var(--ink-2);font-size:15px"></p><div class="orow">'+skip+'<button class="btn" id="o-go" hidden>繼續 ▶</button></div></div>';
+      ov.innerHTML='<div class="ow">'+SCENE1+top+'<div class="sp"></div>'
+        +'<div class="oc2 z"><small>'+I.name+'</small><div class="cap" id="o1"></div><div class="cap2" id="o2"></div></div>'+dots(1)
+        +'<button class="ob go z" id="o-go" hidden>繼續　›</button></div>';
       bind();const go=$('o-go');let ok=false;const show=()=>{ok=true;go.hidden=false;};
-      type($('o1'),'星星想起了自己的歌聲！',70,()=>type($('o2'),'能量水晶又運作起來了，飛行船也亮了起來。',60,()=>type($('o3'),S[0],40,show)));
-      setTimeout(()=>{if(!ok&&go.isConnected)show();},9000);
+      type($('o1'),'星星想起了歌聲，水晶重新亮了起來。',70,()=>type($('o2'),S[0],40,show));
+      setTimeout(()=>{if(!ok&&go.isConnected)show();},12000);
       go.onclick=p2;
     };
     const p2=()=>{
       const ttl=titleOf(n),old=titleOf(n-1);
-      ov.innerHTML='<div class="oc"><h2>居民的謝禮</h2><p>「'+I.name+'」的居民很感謝你，送來了謝禮！</p>'
-        +'<div class="loot"><div><b>+'+OPEN_COIN+'</b>金幣</div><div><b>'+n+'／9</b>地圖碎片</div><div><b style="font-size:16px">'+ttl+'</b>'+(ttl!==old||n===1?'新稱號！':'稱號')+'</div></div>'
-        +'<div><small>圖鑑新增</small></div><div class="crits"><div><div class="ph">'+ISLE_ART.plant(n,64)+'</div><small>植物</small><br><b>'+C[0]+'</b></div><div><div class="ph">'+ISLE_ART.animal(n,64)+'</div><small>動物</small><br><b>'+C[1]+'</b></div></div>'
-        +'<div class="orow"><button class="btn alt" id="o-shop">用金幣去商店</button><button class="btn" id="o-go">繼續 ▶</button></div></div>';
-      $('o-shop').onclick=()=>{done();go('shop');};$('o-go').onclick=p3;
+      ov.innerHTML='<div class="ow">'+SCENE2+top
+        +'<div class="z" style="text-align:center"><h2>島民的謝禮</h2><small>謝謝你，「'+I.name+'」的居民都好開心！</small></div>'
+        +'<div class="g2 z"><div class="oc2 loot"><svg width="60" height="60" viewBox="0 0 64 64" role="img" aria-label="金幣"><circle cx="32" cy="32" r="28" fill="#e9b93f" stroke="#fff0b3" stroke-width="3"/><circle cx="32" cy="32" r="20" fill="none" stroke="#a9781a" stroke-width="2" stroke-dasharray="3 3"/><path d="M32 18 L36 28 L47 29 L39 36 L41 47 L32 41 L23 47 L25 36 L17 29 L28 28Z" fill="#fff3c2" stroke="#a9781a" stroke-width="1.5" stroke-linejoin="round"/></svg><small>金幣</small><b>+'+OPEN_COIN+'</b></div>'
+        +'<div class="oc2 loot"><svg width="60" height="60" viewBox="0 0 64 64" role="img" aria-label="地圖碎片"><path d="M8 14 L28 10 L30 18 Q38 14 38 22 L30 26 L34 34 L24 36 L26 54 L10 52Z" fill="#cfc6ee" stroke="#e8c36a" stroke-width="2.5" stroke-linejoin="round"/><path d="M38 22 L56 20 L54 48 L40 50 L36 40 Q44 38 40 32Z" fill="#8f86d4" stroke="#e8c36a" stroke-width="2.5" stroke-linejoin="round" opacity=".55"/></svg><small>地圖碎片</small><b style="font-size:22px">'+n+'／9</b></div></div>'
+        +'<div class="oc2 z" style="display:flex;align-items:center;gap:14px"><svg width="46" height="46" viewBox="0 0 48 48" role="img" aria-label="稱號徽章"><path d="M24 3 L42 12 V26 Q42 38 24 45 Q6 38 6 26 V12Z" fill="#3a2d6e" stroke="#e8c36a" stroke-width="2.5"/><path d="M24 13 L27 21 L35 22 L29 27 L31 35 L24 31 L17 35 L19 27 L13 22 L21 21Z" fill="#ffe08a"/></svg><div><small>'+(ttl!==old||n===1?'獲得新稱號':'目前稱號')+'</small><div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:#ffe08a">'+ttl+'</div></div></div>'
+        +'<div class="oc2 z"><small>新加入圖鑑的朋友</small><div class="g2" style="margin-top:10px"><div class="loot"><div class="ring">'+ISLE_ART.plant(n,76)+'</div><small>植物</small><b style="font-size:16px;color:#f6ecd0">'+C[0]+'</b></div><div class="loot"><div class="ring">'+ISLE_ART.animal(n,76)+'</div><small>動物</small><b style="font-size:16px;color:#f6ecd0">'+C[1]+'</b></div></div></div>'
+        +'<div class="sp"></div>'+dots(2)
+        +'<div class="orow z"><button class="ob" id="o-shop">用金幣去商店</button><button class="ob go" id="o-go">繼續　›</button></div></div>';
+      bind();$('o-shop').onclick=()=>{done();go('shop');};$('o-go').onclick=p3;
     };
     const p3=()=>{
-      ov.innerHTML='<div class="oc"><small>第 '+n+' 島・'+I.name+'</small><h2>星星足跡</h2><div class="trace"><small>星星說出了一個痕跡：</small><p id="o1"></p></div><p id="o2" style="color:var(--ink-2);font-size:15px;opacity:0;transition:opacity .6s">痕跡收進「日記」了。<br>鑰匙碎片 '+n+'／9「'+F[0]+'」入手！</p><div class="orow"><button class="btn alt" id="o-map">回地圖</button><button class="btn" id="o-diary" hidden>翻閱日記</button></div></div>';
-      $('o-map').onclick=done;$('o-diary').onclick=()=>{done();openIsle(n);};
+      ov.innerHTML='<div class="ow">'+SCENE3+top
+        +'<div class="z" style="text-align:center"><h2 style="color:#e6c8ff">星星留下的足跡</h2><small>紫色星塵，是星星走過的路</small></div><div style="height:130px"></div>'
+        +'<div class="oc2 pu z"><small>星星說出了一個痕跡：</small><div class="cap" style="font-size:20px;font-weight:500;line-height:1.9;min-height:5em" id="o1"></div></div>'
+        +'<div class="oc2 z" id="o2" style="display:flex;gap:14px;align-items:center;opacity:0;transition:opacity .6s"><svg width="46" height="58" viewBox="0 0 52 64" role="img" aria-label="鑰匙碎片"><circle cx="26" cy="14" r="11" fill="none" stroke="#e8c36a" stroke-width="4"/><circle cx="26" cy="14" r="3" fill="#ffe08a"/><rect x="23" y="25" width="6" height="34" fill="#e8c36a"/><rect x="29" y="44" width="9" height="5" fill="#e8c36a"/><rect x="29" y="53" width="7" height="5" fill="#e8c36a"/></svg><div style="flex:1;min-width:0"><small>鑰匙碎片入手！</small><div style="font-family:var(--font-head);font-size:19px;font-weight:700;color:#ffe08a">第 '+n+' 片　'+n+'／9</div><small>「'+F[0]+'」，全文收在日記裡</small></div></div>'
+        +'<div class="sp"></div>'+dots(3)
+        +'<div class="orow z"><button class="ob" id="o-map">回地圖</button><button class="ob go" id="o-diary" hidden>翻閱日記</button></div></div>';
+      bind();$('o-map').onclick=done;$('o-diary').onclick=()=>{done();openIsle(n);};
       type($('o1'),S[1],70,()=>{$('o2').style.opacity=1;$('o-diary').hidden=false;});
-      setTimeout(()=>{const d=$('o-diary');if(d&&d.isConnected){d.hidden=false;$('o2').style.opacity=1;}},9000);
+      setTimeout(()=>{const d=$('o-diary');if(d&&d.isConnected){d.hidden=false;$('o2').style.opacity=1;}},12000);
     };
     p1();
   }

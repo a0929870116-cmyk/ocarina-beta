@@ -95,7 +95,9 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 .solo{margin-top:10px;text-align:center;font-family:Iansui,'Noto Sans TC',sans-serif;font-size:28px;font-weight:900;min-height:40px}
 .solo small{display:block;font-family:'Noto Sans TC',sans-serif;font-size:13px;color:var(--sub);font-weight:700}
 .hide{display:none!important}
-.cardface{aspect-ratio:480/300;max-width:520px;margin:6px auto 0;border-radius:18px;border:3px solid var(--ink);background:linear-gradient(#fff8e4,#f3e3b6);box-shadow:inset 0 0 0 4px #fff8e4,inset 0 0 0 7px var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;gap:8px}
+.cardface{position:relative;aspect-ratio:480/300;max-width:520px;margin:6px auto 0;border-radius:18px;border:3px solid var(--ink);background:linear-gradient(#fff8e4,#f3e3b6);box-shadow:inset 0 0 0 4px #fff8e4,inset 0 0 0 7px var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;gap:8px}
+.cardface .frm{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.cardface .cin{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 26px}
 .cardface .ic{font-size:54px;line-height:1}
 .cardface .tt{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:32px;font-weight:900;line-height:1.2}
 .cardface .ds{font-size:18px;font-weight:700;color:var(--sub);line-height:1.5}
@@ -138,9 +140,6 @@ details.test summary{cursor:pointer;font-weight:700}
    <div id="deck">
      <div class="lab"><span>🎴 課堂任務卡</span><span id="deckN"></span></div>
      <div class="cardface" id="cardface"></div>
-     <div class="row2" style="margin-top:12px">
-      <button class="btn sm" id="drawCard" style="min-height:68px;font-size:24px;background:linear-gradient(#ffe48a,var(--gold))">🎴 抽一張卡</button>
-     </div>
      <p class="hint" style="margin-top:8px" id="deckHint"></p>
     </div>
    <div id="rescue" class="hide">
@@ -152,20 +151,17 @@ details.test summary{cursor:pointer;font-weight:700}
    </div>
    <div class="msg" id="msg" aria-live="polite"></div>
    </div>
+   <div class="row2" style="margin-top:12px"><button class="btn sm" id="drawCard" style="min-height:68px;font-size:24px;background:linear-gradient(#ffe48a,var(--gold))">🎴 抽一張卡</button></div>
   </div>
 
   <div class="side">
    <div class="frame" style="padding:18px 16px">
     <i class="stud a"></i><i class="stud b"></i><i class="stud c"></i><i class="stud d"></i>
     <div id="rescueCtl">
-    <div class="pips" id="pips"></div>
-    <p class="cnt" id="cnt"></p>
     <div class="steps" id="steps">
-     <div class="stp" data-s="1"><b>1</b>全班一起合奏一遍</div>
-     <div class="stp" data-s="2"><b>2</b>抽 1 位獨奏</div>
-     <div class="stp" data-s="3"><b>3</b>按「通過」（獨奏沒過？全班一起吹支援，吹完同樣按通過）</div>
+     <div class="stp cur" data-s="1"><b>1</b>老師播放配樂，全班一起合奏一遍</div>
+     <div class="stp" data-s="2"><b>2</b>吹完，按「通過」，五條藤蔓一起鬆開</div>
     </div>
-    <button class="btn sm" id="draw" style="width:100%;margin-top:12px;min-height:54px;font-size:20px">🎲 抽 1 位獨奏</button>
     </div>
     <div class="solo" id="solo"></div>
     <div style="height:10px"></div>
@@ -189,7 +185,7 @@ details.test summary{cursor:pointer;font-weight:700}
     </div>
     <div class="cap" id="cap"></div>
     <div class="row2" style="margin-top:10px"><button class="btn sm" id="ship" style="background:linear-gradient(#ffe48a,var(--gold))">🚀 進入提煉工坊，升級飛行船 →</button></div>
-    <div class="row2" style="margin-top:10px"><button class="btn sm" id="next"></button></div>
+    <div class="row2" style="margin-top:10px"><button class="btn sm" id="jarGo" style="background:#fff8e4">⭐ 查看星星罐・解鎖地圖進度 →</button></div>
    </div>
   </div>
  </div>
@@ -201,7 +197,7 @@ details.test summary{cursor:pointer;font-weight:700}
   <hr style="border:0;border-top:1px dashed var(--ink);margin:10px 0">
   <div><b>測試用（正式站不放）</b></div>
   <div class="chips" id="chips" role="group" aria-label="指定動物救援"></div>
-  <label>下一次抽到：<select id="force"><option value="">隨機</option><option value="wind">風</option><option value="c0">卡1</option><option value="c1">卡2</option><option value="c2">卡3</option><option value="c3">卡4</option><option value="c4">卡5</option><option value="c5">卡6</option></select></label>
+  <label>下一次抽到：<select id="force"><option value="">隨機</option><option value="wind">風</option><option value="c0">卡1</option><option value="c1">卡2</option><option value="c2">卡3</option><option value="c3">卡4</option><option value="c4">卡5</option><option value="c5">卡6</option><option value="c6">卡7（打節奏）</option></select></label>
   <label>救援掉落：<select id="mode"><option value="rand">隨機（各 25% 加碼）</option><option value="base">只出保底</option><option value="bonus">兩種都加碼</option></select></label>
   <div class="row2" style="margin-top:8px"><button class="btn sm" id="resetDay" type="button">重設「今天」（張數、本班今日星星糖）</button></div>
  </details>
@@ -219,16 +215,38 @@ const KEY='olm_class_v1', ARC='olm_arcade_v1', SHIP='olm_ship_v1', TEST='olm_tes
 const HP = 5;
 const CARD_CANDY=4, CARD_CRY=1, WIND_LOSS=5;
 const P_ANIMAL=.15, P_WIND=.10;   /* 命運事件機率（Claude 暫定，未確認）：動物 15%、風 10%、其餘是普通任務卡 */
-/* 普通任務卡（可再增加；每張一次「通過」＝老師按鈕） */
+/* 普通任務卡（新增請加在最後面，存檔用順序編號記錄） */
 const CARDS=[
  {ic:'🎺',t:'全班合奏',d:'全班一起，把整首歌吹一遍'},
  {ic:'🦸',t:'英雄獨奏',d:'被抽到的號碼，獨自吹這首歌（沒吹過？全班一起吹支援）',solo:true},
  {ic:'🔗',t:'接龍吹奏',d:'一個接一個，每人吹一小句，把整首歌接完'},
  {ic:'🎶',t:'配音樂',d:'跟著伴奏音樂，全班一起吹一遍'},
  {ic:'🙈',t:'譜蓋起來吹',d:'把譜蓋起來，全班憑記憶吹一遍'},
- {ic:'🔁',t:'重複第一段',d:'回到第一段，全班再吹一次'}
+ {ic:'🔁',t:'重複第一段',d:'回到第一段，全班再吹一次'},
+ {ic:'🥁',t:'打出節奏',d:'選歌曲任一段落，全班拍手（或敲桌）打出它的節奏'}
 ];
 const $ = id => document.getElementById(id);
+/* 凱爾特風卡框：雙線金框＋上下編繩＋四角三圓結（凱爾特風只放 UI 框） */
+function braid(x1,x2,y){
+  let a='',b='';
+  for(let x=x1;x<=x2;x+=2){ const t=(x-x1)/14*Math.PI; const yy1=y+Math.sin(t)*4.5, yy2=y-Math.sin(t)*4.5; a+=(x===x1?'M':'L')+x+' '+yy1.toFixed(1); b+=(x===x1?'M':'L')+x+' '+yy2.toFixed(1); }
+  return '<path d="'+a+'" fill="none" stroke="#4a2f1a" stroke-width="4.2" stroke-linecap="round"/><path d="'+a+'" fill="none" stroke="#d4a63a" stroke-width="2.4" stroke-linecap="round"/><path d="'+b+'" fill="none" stroke="#4a2f1a" stroke-width="4.2" stroke-linecap="round"/><path d="'+b+'" fill="none" stroke="#f2cf6a" stroke-width="2.4" stroke-linecap="round"/>';
+}
+function knot(cx,cy){
+  const r=8.5, pts=[[0,-5],[-4.6,3],[4.6,3]];
+  return pts.map(p=>'<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="'+r+'" fill="none" stroke="#4a2f1a" stroke-width="4.4"/>').join('')
+        +pts.map((p,i)=>'<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="'+r+'" fill="none" stroke="'+['#d4a63a','#f2cf6a','#b98a22'][i]+'" stroke-width="2.4"/>').join('')
+        +'<circle cx="'+cx+'" cy="'+(cy+0.5)+'" r="2.6" fill="#a8447f" stroke="#4a2f1a" stroke-width="1.4"/>';
+}
+const FRAME='<svg class="frm" viewBox="0 0 480 300" aria-hidden="true">'
+ +'<rect x="8" y="8" width="464" height="284" rx="20" fill="none" stroke="#4a2f1a" stroke-width="3.5"/>'
+ +'<rect x="16" y="16" width="448" height="268" rx="14" fill="none" stroke="#d4a63a" stroke-width="3"/>'
+ +braid(78,402,25)+braid(78,402,275)
+ +knot(40,40)+knot(440,40)+knot(40,260)+knot(440,260)+'</svg>';
+function face(cls,ic,t,d,tag){
+  const f=$('cardface'); f.className='cardface'+(cls?' '+cls:'');
+  f.innerHTML=FRAME+'<div class="cin"><div class="ic">'+ic+'</div><div class="tt">'+t+'</div>'+(d?'<div class="ds">'+d+'</div>':'')+(tag?'<span class="tag2">'+tag+'</span>':'')+'</div>';
+}
 function dayStr(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 /* 班級存檔 olm_class_v1：{size,day,n(今天抽了幾張),used(星星糖今日),phase:idle|card|wind|rescue|drop,card,solo,i,pass,drop,wind,last} 每天自動換新 */
 let C=OLMSave.read(KEY);
@@ -236,57 +254,57 @@ function fresh(size){return {size:size||20,day:dayStr(),n:0,used:0,phase:'idle',
 if(C.day!==dayStr()||typeof C.n!=='number')C=fresh(C.size);
 if(!(C.size>=1&&C.size<=60))C.size=20;
 function save(){OLMSave.write(KEY,C);}
-const S = {busy:false, drawn:false, mode:'rand', force:''};
+const S = {busy:false, mode:'rand', force:'', forceAnimal:-1};
 function arcN(){const a=OLMSave.read(ARC);return a.day===dayStr()?(a.n|0):0;}
 function vines5(a){
   const v=a.vines;
   return [v[2], v[0], '<g transform="translate(480,46) scale(-1,1)">'+v[0]+'</g>', v[1], '<g transform="translate(480,40) scale(-1,1)">'+v[1]+'</g>'];
 }
+function drawLabel(){ return C.n>0 ? '🎴 再抽一張卡' : '🎴 抽一張卡'; }
+function setDraw(on){ const b=$('drawCard'); b.disabled=!on; b.textContent=drawLabel(); }
 /* ---- 畫面切換 ---- */
 function view(ph){
   const rescue = ph==='rescue' || ph==='drop';
   $('deck').classList.toggle('hide', rescue);
   $('rescue').classList.toggle('hide', !rescue);
   $('rescueCtl').classList.toggle('hide', ph!=='rescue');
-  $('draw').classList.toggle('hide', ph!=='rescue');
   $('sess').innerHTML='今日已抽 <b>'+C.n+'</b> 張';
 }
+function setPass(txt,off,hint){ $('pass').textContent=txt; $('pass').disabled=!!off; $('passHint').textContent=hint||''; }
 function idle(){
-  C.phase='idle'; C.drop=null; C.wind=null; C.card=-1; save(); S.busy=false; S.drawn=false;
+  C.phase='idle'; C.drop=null; C.wind=null; C.card=-1; save(); S.busy=false;
   view('idle'); $('drop').classList.remove('show');
-  $('cardface').className='cardface';
-  $('cardface').innerHTML='<div class="ic">🎴</div><div class="tt">準備好了嗎？</div><div class="ds">按「抽一張卡」，看看這一次是什麼任務</div>';
-  $('drawCard').disabled=false; $('drawCard').textContent='🎴 抽一張卡';
-  $('deckN').textContent='今日已抽 '+C.n+' 張'; $('deckHint').textContent='完成任務、老師按「通過」就會掉落星星糖和水晶碎片';
+  face('','🎴','準備好了嗎？','按「'+(C.n>0?'再抽一張卡':'抽一張卡')+'」，看看這一次是什麼任務');
+  setDraw(true); $('deckHint').textContent='完成任務、老師按「通過」就會掉落星星糖和水晶碎片';
   $('solo').innerHTML=''; setPass('通過',true);
 }
-function setPass(txt,off){ $('pass').textContent=txt; $('pass').disabled=!!off; $('passHint').textContent=''; }
 /* ---- 抽卡 ---- */
 function drawCard(){
   if(S.busy) return;
+  if(C.phase!=='idle'&&C.phase!=='drop') return;
+  if(C.phase==='drop'){ idle(); }   /* 掉落畫面按「再抽一張卡」：先收掉掉落畫面 */
   const f=S.force;
   let kind;
   if(f==='animal') kind='animal'; else if(f==='wind') kind='wind'; else if(/^c\d$/.test(f)) kind=f;
   else { const r=Math.random(); kind = r<P_ANIMAL?'animal' : r<P_ANIMAL+P_WIND?'wind' : 'card'; }
-  S.force='';
-  const fs=$('force'); if(fs) fs.value='';
+  S.force=''; const fs=$('force'); if(fs) fs.value='';
   C.n++;
   if(kind==='animal'){ startRescue(); return; }
   if(kind==='wind'){ showWind(); return; }
   let ix;
-  if(/^c\d$/.test(kind)) ix=+kind.slice(1);
+  if(/^c\d$/.test(kind)&&CARDS[+kind.slice(1)]) ix=+kind.slice(1);
   else { const pool=CARDS.map((x,k)=>k).filter(k=>k!==C.last); ix=pool[Math.floor(Math.random()*pool.length)]; }
   showCard(ix);
 }
 function showCard(ix){
   const c=CARDS[ix]; C.phase='card'; C.card=ix; C.last=ix; C.solo=c.solo?1+Math.floor(Math.random()*C.size):0; save();
-  view('card');
-  $('cardface').className='cardface';
-  $('cardface').innerHTML='<div class="ic">'+c.ic+'</div><div class="tt">'+c.t+'</div><div class="ds">'+c.d+'</div>';
-  $('drawCard').disabled=true; $('deckN').textContent='今日已抽 '+C.n+' 張';
-  $('deckHint').textContent='';
-  $('solo').innerHTML = c.solo ? '請 <span style="color:var(--pink)">'+C.solo+' 號</span> 獨奏<small>沒吹過？全班一起吹支援</small>' : '';
-  setPass('通過',false); $('passHint').textContent='完成後按這一顆（獨奏沒過、全班一起吹支援，也是按這一顆）';
+  paintCard();
+}
+function paintCard(){
+  const c=CARDS[C.card]; view('card'); face('',c.ic,c.t,c.d);
+  setDraw(false); $('deckHint').textContent='';
+  $('solo').innerHTML = c.solo&&C.solo ? '請 <span style="color:var(--pink)">'+C.solo+' 號</span> 獨奏<small>沒吹過？全班一起吹支援</small>' : '';
+  setPass('通過',false,'完成後按這一顆（獨奏沒過、全班一起吹支援，也是按這一顆）');
 }
 function passCard(){
   if(S.busy) return; S.busy=true; $('pass').disabled=true;
@@ -295,13 +313,14 @@ function passCard(){
 }
 /* ---- 命運：風 ---- */
 function showWind(){
-  C.phase='wind'; save(); view('wind');
   const t=OLMSave.read(TEST); const have=(t.jar==null?9:(t.jar|0)); const lose=Math.min(WIND_LOSS,have);
-  C.wind={lose:lose,from:have,to:have-lose}; save();
-  $('cardface').className='cardface fate wind';
-  $('cardface').innerHTML='<div class="ic">🌬️</div><div class="tt">一陣大風！</div><div class="ds">'+(lose>0?'風把 '+lose+' 顆星星糖刮走了…':'風呼呼地吹過，但星星罐是空的，什麼也沒被刮走')+'</div><span class="tag2">命運事件</span>';
-  $('drawCard').disabled=true; $('deckN').textContent='今日已抽 '+C.n+' 張'; $('deckHint').textContent='';
-  $('solo').innerHTML=''; setPass('好吧…，再抽一張',false);
+  C.phase='wind'; C.wind={lose:lose,from:have,to:have-lose}; save(); paintWind();
+}
+function paintWind(){
+  const w=C.wind; view('wind');
+  face('fate wind','🌬️','一陣大風！',w.lose>0?'風把 '+w.lose+' 顆星星糖刮走了…':'風呼呼地吹過，但星星罐是空的，什麼也沒被刮走','命運事件');
+  setDraw(false); $('deckHint').textContent='';
+  $('solo').innerHTML=''; setPass('好吧…',false);
 }
 function windOk(){
   if(S.busy) return; S.busy=true;
@@ -309,13 +328,12 @@ function windOk(){
   if(w.lose>0) OLMSave.patch(TEST,function(t){t.jar=Math.max(0,(t.jar==null?9:(t.jar|0))-w.lose);});
   S.busy=false; idle();
 }
-/* ---- 命運：動物救援（5 次通過） ---- */
+/* ---- 命運：動物救援（全班配音樂合奏一次，五條藤蔓一起鬆開；音樂由老師播放） ---- */
 function startRescue(){
   const pool=A.map((x,k)=>k).filter(k=>k!==C.i);
-  C.i=pool[Math.floor(Math.random()*pool.length)]; if(S.forceAnimal>=0&&S.forceAnimal!=null){C.i=S.forceAnimal;} S.forceAnimal=-1;
-  C.phase='rescue'; C.pass=0; C.drop=null; save(); S.busy=false; S.drawn=false;
-  view('rescue'); $('drop').classList.remove('show'); mount();
-  $('cardface').innerHTML='';
+  C.i = S.forceAnimal>=0 ? S.forceAnimal : pool[Math.floor(Math.random()*pool.length)]; S.forceAnimal=-1;
+  C.phase='rescue'; C.pass=0; C.drop=null; save(); S.busy=false;
+  view('rescue'); $('drop').classList.remove('show'); $('drawCard').classList.add('hide'); mount();
 }
 function mount(){
   const a = A[C.i];
@@ -325,28 +343,18 @@ function mount(){
     + '<g class="tail" id="tA">'+a.tA+'</g><g class="tail off" id="tB">'+a.tB+'</g></g></svg>';
   $('calmWrap').innerHTML = a.calm.replace(/^/,'<svg viewBox="0 0 480 400" role="img" aria-label="'+a.name+'恢復了">')+'</svg>';
   $('stage').classList.remove('calm');
-  S.drawn=false; $('solo').innerHTML='';
-  $('drop').classList.remove('show');
-  render();
+  $('solo').innerHTML=''; $('drop').classList.remove('show');
+  renderRescue();
 }
-function render(){
-  if(C.phase!=='rescue'&&C.phase!=='drop') return;
-  const p = C.pass;
-  [0,1,2,3,4].forEach(k=>{ const v=$('vine'+k); if(v) v.classList.toggle('cut', k<p); });
-  if($('tA')){ $('tA').classList.toggle('off', p>=1); $('tB').classList.toggle('off', p<1); }
-  $('pips').innerHTML = [0,1,2,3,4].map(k=>{
-    const c = k<p?'done':(k===p?'cur':'');
-    return '<div class="pip '+c+'"><small>第 '+(k+1)+' 次</small><span class="big">'+(k<p?'✓':(k+1))+'</span></div>';
-  }).join('');
-  const left = HP-p;
-  $('cnt').textContent = p<HP ? '通過 '+p+'／'+HP+'　（還剩 '+left+' 條藤蔓）' : '通過 '+HP+'／'+HP;
-  $('pass').textContent='通過';
-  $('pass').disabled = S.busy || p>=HP || !S.drawn;
-  $('draw').disabled = S.busy || p>=HP || S.drawn;
-  stepUI();
+function renderRescue(){
+  const p=C.pass;
+  [0,1,2,3,4].forEach(k=>{ const v=$('vine'+k); if(v) v.classList.toggle('cut', p>=HP); });
+  if($('tA')){ $('tA').classList.toggle('off', p>=HP); $('tB').classList.toggle('off', p<HP); }
   $('sess').innerHTML='今日已抽 <b>'+C.n+'</b> 張';
-  $('msg').textContent = p===0 ? '求救訊號！被走音音浪纏住了！先全班合奏，再抽人獨奏' :
-    p<HP-1 ? '鬆開了 '+p+' 條，還有 '+(HP-p)+' 條' : p===HP-1 ? '只剩最後一條了！' : '';
+  if(C.phase==='rescue'){
+    $('msg').textContent='求救訊號！'+A[C.i].name+'被走音音浪纏住了！老師播放配樂，全班一起合奏一遍';
+    setPass('通過',S.busy,'全班合奏完，按這一顆');
+  }
 }
 function burst(){
   const b = $('burst'); const w = $('stage').clientWidth, h=$('stage').clientHeight;
@@ -361,17 +369,13 @@ function burst(){
 function doPass(){
   if(C.phase==='wind'){ windOk(); return; }
   if(C.phase==='card'){ passCard(); return; }
-  if(S.busy||C.pass>=HP||!S.drawn) return;
-  S.busy=true;
-  const k=C.pass; const v=$('vine'+k);
-  v.classList.add('shake'); burst();
-  setTimeout(()=>{
-    C.pass++; save(); S.drawn=false; $('solo').innerHTML=''; render(); S.busy=true; $('pass').disabled=true;
-    if(C.pass>=HP){ setTimeout(finishRescue, 650); } else { setTimeout(()=>{S.busy=false;render();}, 450); }
-  }, 380);
+  if(C.phase!=='rescue'||S.busy) return;
+  S.busy=true; $('pass').disabled=true;
+  [0,1,2,3,4].forEach(k=>setTimeout(()=>{ const v=$('vine'+k); if(v){v.classList.add('shake');burst();setTimeout(()=>v.classList.add('cut'),120);} },k*170));
+  setTimeout(()=>{ C.pass=HP; save(); finishRescue(); },5*170+600);
 }
 function finishRescue(){
-  const a=A[C.i], m=S.mode;
+  const m=S.mode;
   const cb = m==='bonus' || (m==='rand' && Math.random()<.25);
   const xb = m==='bonus' || (m==='rand' && Math.random()<.25);
   $('stage').classList.add('calm'); burst();
@@ -398,7 +402,6 @@ function giveDrop(o){
 }
 function showDrop(){
   const d=C.drop; if(!d) return;
-  if(d.kind==='card'){ view('card'); $('drawCard').disabled=true; }
   $('dropTitle').textContent = d.title;
   $('dCandy').textContent = '+'+d.candyOk; $('dCry').textContent = '+'+d.cryOk;
   $('tCandy').textContent = d.cb ? '✨ 加碼 +4' : (d.kind==='rescue'?'保底':'任務獎勵'); $('tCandy').className='tag'+(d.cb?'':' base');
@@ -410,36 +413,19 @@ function showDrop(){
     '本班今日　星星糖 '+C.used+'／'+CAP.candy+'<div class="bar"><i style="width:'+(C.used/CAP.candy*100)+'%"></i></div>'
    +'水晶碎片 '+arcN()+'／'+CAP.cry+'（含星空試煉）<div class="bar"><i style="width:'+(arcN()/CAP.cry*100)+'%"></i></div>'
    +((cn||yn)?'<span class="capnote">已達今日上限，這次只發到上限。</span>':'');
-  $('next').textContent = '再抽一張卡 →'; $('next').disabled=false;
   $('drop').classList.add('show');
   S.busy=false;
-  if(d.kind==='rescue'){ render(); $('msg').textContent='藤蔓枯萎了，'+A[C.i].name+'變回原本的樣子！'; }
-  else { $('pass').disabled=true; }
+  $('drawCard').classList.remove('hide'); setDraw(true);   /* 通過後，「抽一張卡」自動變成「再抽一張卡」 */
+  $('sess').innerHTML='今日已抽 <b>'+C.n+'</b> 張';
+  if(d.kind==='rescue'){ renderRescue(); $('msg').textContent='藤蔓枯萎了，'+A[C.i].name+'變回原本的樣子！'; }
+  else { setPass('通過',true); $('passHint').textContent=''; }
 }
-function stepUI(){
-  const p=C.pass;
-  document.querySelectorAll('.stp').forEach(e=>{
-    const s=+e.dataset.s; e.classList.remove('cur','ok');
-    if(p>=HP) { e.classList.add('ok'); return; }
-    if(s===1) e.classList.add(S.drawn?'ok':'cur');
-    if(s===2) e.classList.add(S.drawn?'ok':'cur');
-    if(s===3 && S.drawn) e.classList.add('cur');
-  });
-  $('passHint').textContent = p>=HP ? '' : (S.drawn ? '獨奏通過或夥伴支援完成，都按這一顆' : '先抽出獨奏的人，才能按「通過」');
-}
-function draw(){
-  if(S.drawn||S.busy||C.phase!=='rescue') return;
-  const seat=1+Math.floor(Math.random()*C.size);
-  S.drawn=true;
-  $('solo').innerHTML='請 <span style="color:var(--pink)">'+seat+' 號</span> 獨奏<small>沒吹過？全班一起吹支援</small>';
-  render();
-}
-$('pass').onclick=doPass; $('draw').onclick=draw; $('drawCard').onclick=drawCard; $('next').onclick=idle;
+$('pass').onclick=doPass; $('drawCard').onclick=drawCard;
 $('ship').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'ship'},'*');}catch(e){} };
+$('jarGo').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'map'},'*');}catch(e){} };   /* 地圖頁同一頁有星空地圖與星星罐 */
 /* 老師設定／測試 */
 $('csize').value=C.size; $('csize').onchange=e=>{const n=Math.max(1,Math.min(60,parseInt(e.target.value,10)||20));C.size=n;e.target.value=n;save();};
-S.forceAnimal=-1;
-A.forEach((a,k)=>{ const b=document.createElement('button'); b.className='chip'; b.type='button'; b.textContent='救援：'+a.name; b.onclick=()=>{ if(C.phase!=='idle')return; S.forceAnimal=k; S.force='animal'; drawCard(); }; $('chips').appendChild(b); });
+A.forEach((a,k)=>{ const b=document.createElement('button'); b.className='chip'; b.type='button'; b.textContent='救援：'+a.name; b.onclick=()=>{ if(C.phase!=='idle'&&C.phase!=='drop')return; S.forceAnimal=k; S.force='animal'; drawCard(); }; $('chips').appendChild(b); });
 $('mode').onchange=e=>S.mode=e.target.value;
 $('force').onchange=e=>{S.force=e.target.value;};
 $('resetDay').onclick=()=>{ if(!confirm('重設今天？已抽張數、本班今日星星糖會歸零（已發出的獎勵不會收回）。'))return; C=fresh(C.size); save(); idle(); };
@@ -450,14 +436,16 @@ rep();
 /* 開啟：依存檔回到上次的畫面 */
 (function(){
   const ph=C.phase;
-  if(ph==='card'&&C.card>=0){ $('drawCard').disabled=true; showCardResume(); }
-  else if(ph==='wind'&&C.wind){ showWindResume(); }
-  else if(ph==='rescue'&&C.pass<HP){ view('rescue'); mount(); }
-  else if(ph==='drop'&&C.drop){ if(C.drop.kind==='rescue'){ view('rescue'); mount(); C.pass=HP; $('stage').classList.add('calm'); } else { const c=CARDS[C.card]; if(c){ view('card'); $('cardface').className='cardface'; $('cardface').innerHTML='<div class="ic">'+c.ic+'</div><div class="tt">'+c.t+'</div>'; $('deckN').textContent='今日已抽 '+C.n+' 張'; } } showDrop(); }
+  if(ph==='card'&&CARDS[C.card]){ paintCard(); }
+  else if(ph==='wind'&&C.wind){ paintWind(); }
+  else if(ph==='rescue'){ view('rescue'); $('drawCard').classList.add('hide'); mount(); }
+  else if(ph==='drop'&&C.drop){
+    if(C.drop.kind==='rescue'){ view('rescue'); mount(); C.pass=HP; $('stage').classList.add('calm'); renderRescue(); }
+    else { const c=CARDS[C.card]; view('card'); if(c) face('',c.ic,c.t,''); $('deckHint').textContent=''; }
+    showDrop();
+  }
   else idle();
 })();
-function showCardResume(){ const ix=C.card, c=CARDS[ix]; view('card'); $('cardface').className='cardface'; $('cardface').innerHTML='<div class="ic">'+c.ic+'</div><div class="tt">'+c.t+'</div><div class="ds">'+c.d+'</div>'; $('deckN').textContent='今日已抽 '+C.n+' 張'; $('deckHint').textContent=''; $('solo').innerHTML = c.solo&&C.solo ? '請 <span style="color:var(--pink)">'+C.solo+' 號</span> 獨奏<small>沒吹過？全班一起吹支援</small>' : ''; setPass('通過',false); }
-function showWindResume(){ const w=C.wind; view('wind'); $('cardface').className='cardface fate wind'; $('cardface').innerHTML='<div class="ic">🌬️</div><div class="tt">一陣大風！</div><div class="ds">'+(w.lose>0?'風把 '+w.lose+' 顆星星糖刮走了…':'風呼呼地吹過，但星星罐是空的，什麼也沒被刮走')+'</div><span class="tag2">命運事件</span>'; $('drawCard').disabled=true; $('deckN').textContent='今日已抽 '+C.n+' 張'; setPass('好吧…，再抽一張',false); }
 </script>
 </body>
 </html>

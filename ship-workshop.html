@@ -379,6 +379,8 @@ function bagPanel(){
 <div class="grid2" style="margin-top:8px">
 <button class="btn alt" data-act="all3">每種 +3</button><button class="btn alt" data-act="reset">重設飛船</button></div>
 <button class="btn alt" style="margin-top:8px" data-act="jar10">星星罐 +10（測試開島，罐滿 40 就會開島）</button>
+<div style="margin-top:8px;display:flex;gap:8px"><select id="jumpsel" style="flex:1">${[1,2,3,4,5,6,7,8,9].map(n=>`<option value="${n}">跳到第 ${n} 島前</option>`).join('')}</select><button class="btn alt" style="flex:1" data-act="jumpN">跳過去</button></div>
+<button class="btn alt" style="margin-top:8px" data-act="coin100">金幣 +100</button>
 <button class="btn alt" style="margin-top:8px" data-act="resetOpen">重設開島進度（回第 3 島、星星罐 9、金幣 86）</button></div></details>
 <h2>這版的暫定假設</h2><ul class="notes">
 <li>水晶碎片名稱第 5～12 島是暫擬。每次升級放入任意 3 顆水晶碎片（Lv1→2、Lv2→3 各一次）。</li>
@@ -426,6 +428,12 @@ document.addEventListener('click',e=>{
   else if(act==='reset'){S=Object.assign(fresh(),{isle:S.isle});pick=[null,null,null];setMsg('飛船已重設。');}
   else if(act==='fake'){const w=wk();S.fake=S.fake===w.week?-1:w.week;setMsg(S.fake===w.week?'已假裝本週任務完成，可到「提煉工坊」領水晶碎片。':'已取消。');}
   else if(act==='unclaim'){S.claimed=-1;setMsg('已重設本週領取。');}
+  else if(act==='jumpN'||act==='coin100'){
+    try{OLMSave.patch(OLMSave.K.TEST,function(T){
+      if(act==='coin100'){T.coins=(T.coins|0)+100;setMsg('金幣 +100（現在 '+T.coins+'）。');}
+      else{const n=+document.getElementById('jumpsel').value;T.open=n-1;T.jar=30;S.isle=n;setMsg('已開 '+(n-1)+' 座島、星星罐 30。按一次「星星罐 +10」就會在地圖頁開第 '+n+' 島。');}
+    });}catch(e){setMsg('寫入失敗');}
+  }
   else if(act==='jar10'||act==='resetOpen'){
     try{OLMSave.patch(OLMSave.K.TEST,function(T){
       if(act==='jar10'){T.jar=Math.min(79,(T.jar==null?9:(T.jar|0))+10);setMsg('星星罐 +10（現在 '+T.jar+'）。罐滿 40 顆，回地圖頁會開島。');}

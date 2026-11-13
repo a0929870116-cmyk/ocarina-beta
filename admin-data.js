@@ -249,6 +249,34 @@ var Store={
     save(o);return commit(ops).then(function(){return true;});
   },
   clearAll:function(){save(fix({}));return commit([{t:'wipe'}]).then(function(){return true;});},
+  /* 雲端測試學生：建 5 位（含同名案例）、不寫練習紀錄（省額度）。備註固定「測試帳號」，可一鍵刪除。
+     學生 id ＝名字鑰匙，所以你用手機以同樣名字註冊，就會認領這些名單（可快速測任務與登入） */
+  seedTestCloud:function(){
+    if(mode!=='cloud')return fail('只有雲端模式使用；本機模式請用「產生模擬學生」');
+    var S=g.OLMStudent;if(!S)return fail('缺少 student-auth.js');
+    var o=load(),names=[['測試小明',''],['測試小明','復興'],['測試小華',''],['測試小美',''],['測試小強','']];
+    var tasks=[{id:'basic-1-1',type:'drill',name:'基本指法 1-1',T:5},{id:'song-pig',type:'song',name:'豬之歌',song:'pig',from:1,to:4,T:5}];
+    var now=new Date().toISOString(),ops=[],added=0;
+    return Promise.all(names.map(function(p){return S.keyOf(S.cleanName(p[0]+p[1]));})).then(function(ids){
+      names.forEach(function(p,i){
+        var id=ids[i];
+        if(o.students.some(function(x){return x.id===id;}))return;
+        var st={id:id,name:p[0],school1:p[1],note:'測試帳號',start:todayKey(),ack:true,created:now,uid:null};
+        o.students.push(st);o.tasks[id]={tasks:JSON.parse(JSON.stringify(tasks)),updated:now};
+        ops.push({t:'set',c:'students',id:id,d:strip(st)},{t:'set',c:'tasks',id:id,d:strip(o.tasks[id])});added++;
+      });
+      save(o);return ops.length?commit(ops):0;
+    }).then(function(){return added;});
+  },
+  clearTestCloud:function(){
+    var o=load(),ids=o.students.filter(function(s){return s.note==='測試帳號';}).map(function(s){return s.id;});
+    if(!ids.length)return ok(0);
+    var ops=[];
+    o.students=o.students.filter(function(s){return ids.indexOf(s.id)<0;});
+    ids.forEach(function(id){delete o.tasks[id];ops.push({t:'del',c:'students',id:id},{t:'del',c:'tasks',id:id},{t:'delLogsOf',sid:id});});
+    o.logs=o.logs.filter(function(l){return ids.indexOf(l.sid)<0;});
+    save(o);return commit(ops).then(function(){return ids.length;});
+  },
   clearDemo:function(){
     var o=load(),ops=[];
     o.students.forEach(function(s){if(s.id.indexOf(DEMO_PREFIX)===0)ops.push({t:'del',c:'students',id:s.id});});
@@ -266,7 +294,7 @@ var Store={
     n=Math.max(1,Math.min(n||20,40));
     var o=load();
     var names=['王小明','林美玲','陳大文','張語彤','李承恩','黃詩涵','吳宥辰','劉芷瑜','蔡宗翰','楊雅婷','許家豪','鄭婉如','謝柏翰','洪佩珊','邱冠宇','曾怡君','廖偉倫','賴思妤','徐子軒','王小明','簡于晴','周品妍','葉泰安','江家瑜','蘇哲豪','潘羽彤','何俊賢','古心怡','施冠廷','方筱涵'];
-    var schools=['北','南'];
+    var schools=['復興','中山'];
     var rnd=(function(seed){return function(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};})(20261112);
     var today=Date.parse(todayKey()+'T00:00:00Z');
     var songHot=[3,4,9,10,15,16];

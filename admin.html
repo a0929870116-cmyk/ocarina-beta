@@ -186,6 +186,8 @@ header .hbtn button{font:inherit;font-size:13px;border:1px solid rgba(255,255,25
     <div class="row">
       <button class="b ghost" id="dm-seed">產生 20 位模擬學生（含 4 週練習紀錄）</button>
       <button class="b ghost" id="dm-clear">只清除模擬資料</button>
+      <button class="b ghost" id="dm-tseed" style="display:none">建立 5 位測試學生（含同名）</button>
+      <button class="b ghost" id="dm-tclear" style="display:none">刪除測試學生</button>
       <button class="b red" id="dm-all">清除全部後台資料</button>
     </div>
     <p class="muted">模擬資料的學生編號以 demo- 開頭，清除時不會動到你自己新增的學生。</p>
@@ -500,7 +502,9 @@ $('bk-file').onchange=function(e){
   rd.readAsText(f);
 };
 $('dm-seed').onclick=function(){A.seedDemo(20).then(function(){msg('dm-msg','已產生 20 位模擬學生','ok');return reload();});};
-$('dm-clear').onclick=function(){A.clearDemo().then(function(){msg('dm-msg','已清除模擬資料','ok');selAssign={};return reload();});};
+$('dm-tseed').onclick=function(){A.seedTestCloud().then(function(n){msg('dm-msg',n?'已建立 '+n+' 位測試學生（備註「測試帳號」）；手機用同樣名字註冊就會認領':'測試學生已存在','ok');return reload();}).catch(function(e){msg('dm-msg',e.message,'err');});};
+$('dm-tclear').onclick=function(){A.clearTestCloud().then(function(n){msg('dm-msg','已刪除 '+n+' 位測試學生','ok');selAssign={};return reload();}).catch(function(e){msg('dm-msg',e.message,'err');});};
+$('dm-clear').onclick=$('dm-clear').onclick=function(){A.clearDemo().then(function(){msg('dm-msg','已清除模擬資料','ok');selAssign={};return reload();});};
 $('dm-all').onclick=function(){confirmBox('清除全部後台資料','<p>會刪除<b>所有學生、任務、練習紀錄</b>，無法復原。</p><p class="muted">建議先下載備份。</p>','全部清除',function(){A.clearAll().then(function(){msg('dm-msg','已全部清除','ok');selAssign={};curDetail=null;return reload();});},true);};
 
 /* ===== 啟動：雲端模式要先登入；網址加 ?local=1 走本機模式（看畫面、模擬資料） ===== */
@@ -551,7 +555,7 @@ if(!CLOUD){
     A.refresh().then(reload).catch(loadErr);
   };
   /* 雲端模式不提供模擬資料 */
-  $('dm-seed').style.display='none';$('dm-clear').style.display='none';
+  $('dm-seed').style.display='none';$('dm-clear').style.display='none';$('dm-tseed').style.display='';$('dm-tclear').style.display='';
 }
 /* 漏接的失敗（例如雲端寫入被拒）：顯示在橫幅，並重新讀取讓畫面和雲端一致 */
 window.addEventListener('unhandledrejection',function(ev){

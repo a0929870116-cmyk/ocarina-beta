@@ -702,13 +702,19 @@ function introClose(){ $('intro').classList.add('hide'); if(!C.intro){ C.intro=1
 $('introNext').onclick=function(){ if(introI>=INTRO.length-1) introClose(); else { introI++; introPaint(); } };
 $('introSkip').onclick=introClose;
 $('introBtn').onclick=introOpen;
-function openArc(id){ $('arcFrame').src='ocarina-playground.html?class=1&game='+encodeURIComponent(id); $('arcOv').classList.remove('hide'); }
+function openArc(id){
+  try{ if(parent!==window){ parent.postMessage({type:'class-arc-open',id:id},'*'); return; } }catch(e){}   /* 嵌在遊戲頁裡：由外層開全螢幕（自己開會比螢幕高、被裁掉） */
+  $('arcFrame').src='ocarina-playground.html?class=1&game='+encodeURIComponent(id); $('arcOv').classList.remove('hide'); }
 function closeArc(){
   if($('arcOv').classList.contains('hide')) return;
   $('arcOv').classList.add('hide'); $('arcFrame').src='about:blank';
   idle('星空試煉結束，水晶碎片會依成績自動入帳');
 }
-addEventListener('message',function(e){ if(e.data&&e.data.type==='arcade-close') closeArc(); });
+addEventListener('message',function(e){
+  if(!e.data) return;
+  if(e.data.type==='arcade-close') closeArc();
+  else if(e.data.type==='class-arc-closed') idle('星空試煉結束，水晶碎片會依成績自動入帳');   /* 外層全螢幕層關閉 */
+});
 $('ship').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'ship'},'*');}catch(e){} };
 $('jarGo').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'map'},'*');}catch(e){} };   /* 地圖頁同一頁有星空地圖與星星罐 */
 /* 老師設定／測試 */

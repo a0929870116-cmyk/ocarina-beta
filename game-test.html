@@ -303,6 +303,10 @@ a.btn{text-decoration:none}
 /* 開啟小遊戲時整頁全螢幕（手機高度不夠 760px、框內手勢又會被遊戲吃掉，外層無法捲動） */
 .gamebox:not([hidden]){position:fixed;inset:0;z-index:60;background:var(--vellum);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));gap:8px}
 .gamebox:not([hidden]) .gameframe{flex:1;min-height:0;height:auto}
+/* 課堂的星空試煉：由外層開全螢幕（課堂頁在高度約 1100px 的 iframe 裡，自己開 fixed 會比螢幕高、被裁掉一半） */
+#classArc{position:fixed;inset:0;z-index:70;background:var(--vellum);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+#classArc[hidden]{display:none}
+#classArc iframe{flex:1;min-height:0;width:100%;border:0;display:block}
 .tuner .zone{left:25%;width:50%}
 .tuner i{transition:left .08s linear}
 .tuner .nd{opacity:.3}
@@ -326,8 +330,10 @@ Sfx.auto('.btn,button.back,.bk-back,#q-lock,#q-dex,#q-story,.kp-close,#elf-i','t
 /* 收音中靜音：舊長音吹奏、內嵌遊樂場的麥克風；互動觀察開啟時另外在 onOpen／onClose 切換 */
 Sfx.probe=function(){
   try{if(typeof B!=='undefined'&&B.on)return true;}catch(e){}
-  try{var w=document.getElementById('game-frame').contentWindow;return !!(w&&w.__og&&w.__og.Mic&&w.__og.Mic.on);}catch(e){return false;}
+  try{var w=document.getElementById('game-frame').contentWindow;if(w&&w.__og&&w.__og.Mic&&w.__og.Mic.on)return true;}catch(e){}
+  try{var w2=document.getElementById('classArcFrame').contentWindow;return !!(w2&&w2.__og&&w2.__og.Mic&&w2.__og.Mic.on);}catch(e){return false;}
 };}</script>
+<div id="classArc" hidden><iframe id="classArcFrame" title="星空試煉" allow="microphone; autoplay"></iframe></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -661,8 +667,11 @@ function openShip(){
   if(!f.getAttribute('src'))f.src='ship-workshop.html';
   else try{f.contentWindow.postMessage({type:'ship-refresh'},'*');}catch(e){}
 }
+function closeClassArc(){const o=$('classArc');if(o.hidden)return;o.hidden=true;$('classArcFrame').src='about:blank';try{$('class-frame').contentWindow.postMessage({type:'class-arc-closed'},'*');}catch(err){}}
 window.addEventListener('message',e=>{
   const d=e.data;
+  if(d&&d.type==='class-arc-open'&&e.source===$('class-frame').contentWindow&&/^[\w-]{1,40}$/.test(d.id||'')){$('classArcFrame').src='ocarina-playground.html?class=1&game='+encodeURIComponent(d.id);$('classArc').hidden=false;return;}
+  if(d&&d.type==='arcade-close'&&e.source===$('classArcFrame').contentWindow){closeClassArc();return;}
   if(d&&e.source===$('class-frame').contentWindow){if(d.type==='class-go'&&d.v)go(d.v);if(d.type==='class-h'&&d.h>300)$('class-frame').style.height=Math.ceil(d.h)+'px';}
   if(d&&d.type==='ship-h'&&e.source===$('ship-frame').contentWindow&&d.h>200)$('ship-frame').style.height=Math.ceil(d.h)+'px';
 });

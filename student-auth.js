@@ -61,7 +61,7 @@ function make(sdk,auth,db){
     return sdk.getDoc(stuRef(key)).then(function(s){
       if(!s.exists())return null;
       var d=s.data();if(d.uid!==uid)return null;
-      return {sid:key,name:String(d.name||'')+String(d.school1||'')};
+      return {sid:key,name:String(d.name||'')+String(d.school1||''),note:String(d.note||'')};
     },function(e){if(isDenied(e))return null;throw E('net',null,e);});
   }
 
@@ -69,7 +69,7 @@ function make(sdk,auth,db){
     sdk:sdk,auth:auth,db:db,
 
     /* 建立帳號（或老師重設後重新設定密碼：同樣的名字） */
-    register:function(rawName,pw,ack){
+    register:function(rawName,pw,ack,note){
       var name=cleanName(rawName);
       if(!name||name.length>16||/[<>&"'\/\\]/.test(name))return Promise.reject(E('badname'));
       if(String(pw||'').length<4)return Promise.reject(E('weak'));
@@ -79,7 +79,7 @@ function make(sdk,auth,db){
         return sdk.createUserWithEmailAndPassword(auth,emailOf(key,gen),pw+PAD).catch(function(e){throw mapAuthErr(e);});
       }).then(function(cred){
         user=cred.user;
-        var d={name:name,school1:'',note:'',start:todayKey(),ack:true,created:new Date().toISOString(),uid:user.uid};
+        var d={name:name,school1:'',note:String(note||'').slice(0,40),start:todayKey(),ack:true,created:new Date().toISOString(),uid:user.uid};
         return sdk.setDoc(stuRef(key),d).catch(function(){
           /* 名單上已有這位（老師先建的，或老師剛重設）→ 認領 */
           return sdk.updateDoc(stuRef(key),{uid:user.uid,ack:true});

@@ -269,6 +269,7 @@ details summary{min-height:44px;display:flex;align-items:center;font-weight:700;
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--vellum-2) 72%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:3px double var(--gold);
   padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
 .nav-in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.nav-in.cls{grid-template-columns:repeat(5,minmax(0,1fr))}
 .nav button{border:2px solid transparent;background:none;min-height:60px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:13px;font-weight:700;color:var(--ink-2);cursor:pointer}
 .nav button svg{width:32px;height:32px}
 .nav button[aria-current="page"]{color:var(--ink);background:color-mix(in srgb,var(--green) 22%,transparent);border-color:var(--green)}
@@ -535,6 +536,11 @@ Sfx.probe=function(){
     </section>
   </div>
 
+  <!-- ===== 課堂（只有班級帳號看得到；class-mode.html 用 iframe 載入，同網域共用存檔） ===== -->
+  <div class="view" id="v-class" hidden>
+    <iframe id="class-frame" title="課堂模式・老師操作" style="display:block;width:100%;height:1100px;border:0;border-radius:8px"></iframe>
+  </div>
+
   <!-- ===== 島嶼頁（點已開的島進來，沒有獨立分頁） ===== -->
   <div class="view" id="v-isle" hidden>
     <button type="button" class="back" data-go="map">← 回地圖</button>
@@ -556,7 +562,8 @@ Sfx.probe=function(){
 </main>
 
 <nav class="nav" aria-label="主選單">
-  <div class="nav-in">
+  <div class="nav-in" id="nav-in">
+    <button data-go="class" id="nav-class" hidden><svg><use href="#n-ocarina"/></svg>課堂</button>
     <button data-go="map" aria-current="page"><svg><use href="#n-map"/></svg>地圖</button>
     <button data-go="practice"><svg><use href="#n-ocarina"/></svg>練習</button>
     <button data-go="shop"><svg><use href="#n-bag"/></svg>商店</button>
@@ -656,13 +663,21 @@ function openShip(){
 }
 window.addEventListener('message',e=>{
   const d=e.data;
+  if(d&&e.source===$('class-frame').contentWindow){if(d.type==='class-go'&&d.v)go(d.v);if(d.type==='class-h'&&d.h>300)$('class-frame').style.height=Math.ceil(d.h)+'px';}
   if(d&&d.type==='ship-h'&&e.source===$('ship-frame').contentWindow&&d.h>200)$('ship-frame').style.height=Math.ceil(d.h)+'px';
 });
 
 /* 頁面切換（網址 # 後面只放 map / practice / shop / ship / isle / dex） */
-const VIEWS=['map','practice','shop','ship','isle','dex'];
+const CLASS_MODE=new URLSearchParams(location.search).get('class')==='1';   /* 班級帳號：多一個「課堂」分頁、預設開在課堂 */
+const VIEWS=['map','practice','shop','ship','isle','dex','class'];
+if(CLASS_MODE){$('nav-class').hidden=false;$('nav-in').classList.add('cls');}
+function openClass(){
+  const f=$('class-frame');
+  if(!f.getAttribute('src'))f.src='class-mode.html?n='+encodeURIComponent(new URLSearchParams(location.search).get('n')||'');
+}
 function show(v){
-  if(!VIEWS.includes(v))v='map';
+  if(!VIEWS.includes(v)||(v==='class'&&!CLASS_MODE))v='map';
+  if(v==='class')openClass();
   if(v!=='practice'){try{stopBlow();closeGame();}catch(e){}}
   VIEWS.forEach(x=>{$('v-'+x).hidden=x!==v;});
   const hi=(v==='isle'||v==='dex')?'map':v;
@@ -1256,7 +1271,7 @@ window.addEventListener('storage',e=>{
   if(!OPEN_Q&&(((v.jar|0)>=NEED&&OPEN<MAXOPEN)||(v.open!=null&&(v.open|0)!==OPEN)))location.reload();
   else drawShop(shopG);
 });
-show(location.hash.slice(1));
+show(location.hash.slice(1)||(CLASS_MODE?'class':''));
 </script>
 
 </body></html>

@@ -12,7 +12,7 @@
 'use strict';
 /* 要上雲的鍵。新增存檔鍵時要記得加在這裡。
    不上雲：olm_save_ver／olm_backup*／olm_sync*／olm_owner（內部記號）、olm_admin_v1（後台）、ocarina_pin／ocarina_mic_off（這支手機的設定） */
-var KEYS=['olm_test_v1','olm_ship_v1','olm_wk_v2','olm_arcade_v1','olm_sfx_off','olm_elf_v1','ocarina_playground_v1'];
+var KEYS=['olm_test_v1','olm_ship_v1','olm_wk_v2','olm_arcade_v1','olm_sfx_off','olm_elf_v1','ocarina_playground_v1','olm_class_v1'];
 var TS='olm_sync_ts',OWNER='olm_owner',BACKUP='olm_backup_sync';
 var MAX=900000;          /* Firestore 單一文件上限約 1MB，超過就不上傳 */
 var TICK=6000;           /* 每 6 秒檢查一次有沒有要上傳 */

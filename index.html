@@ -352,7 +352,15 @@ login:{sub:'輸入名字和密碼，回到你的島',html:`<div id="resume"></di
 <form data-act="login">${fName('n','')}${fPw('p','我的密碼','')}
 <div id="fmsg"></div>
 <button class="btn" type="submit">開始冒險</button>
-<div class="links"><button type="button" class="link" data-v="register">建立帳號</button><button type="button" class="link" data-v="forgot">忘記密碼</button><button type="button" class="link" data-v="guest">訪客模式</button></div><p class="note">名字要和建立帳號時寫的一樣。</p></form>`},
+<div class="links"><button type="button" class="link" data-v="register">建立帳號</button><button type="button" class="link" data-v="forgot">忘記密碼</button><button type="button" class="link" data-v="guest">訪客模式</button></div><div class="links"><button type="button" class="link" data-v="classlogin">班級登入（老師用）</button></div><p class="note">名字要和建立帳號時寫的一樣。</p></form>`},
+classlogin:{sub:'老師用：班級帳號登入',html:`<form data-act="classlogin"><div class="field"><label for="cn"><svg><use href="#i-user"/></svg>班級名稱</label><div class="inp"><input id="cn" autocomplete="username" maxlength="16" value=""></div><p class="hint">例如「復興501」。班級帳號只在學校電腦、老師電腦或平板用，同一時間只開一台，換裝置前請先登出。</p></div>${fPw('cp','班級密碼','')}
+<div id="fmsg"></div>
+<button class="btn" type="submit">進入課堂</button>
+<div class="links"><button type="button" class="link" data-v="classreg">還沒有班級帳號？建立</button><button type="button" class="link" data-v="login">回學生登入</button></div></form>`},
+classreg:{sub:'老師用：建立班級帳號',html:`<form data-act="classreg"><div class="field"><label for="cn2"><svg><use href="#i-user"/></svg>班級名稱（學校＋班級）</label><div class="inp"><input id="cn2" autocomplete="username" maxlength="16" value=""></div><p class="hint">例如「復興501」。班級帳號不收學生個資；密碼請老師自己保管，不要告訴學生。</p></div>${fPw('cp2','設定密碼（至少 4 個字）','',false,'new-password')}${fPw('cp3','再輸入一次密碼','',false,'new-password')}
+<div id="fmsg"></div>
+<button class="btn" type="submit">建立班級帳號</button>
+<div class="links"><button type="button" class="link" data-v="classlogin">已經有了？回班級登入</button></div></form>`},
 register:{sub:'建立你的帳號，只要名字和密碼',html:`<form data-act="register"><div class="field"><label for="n2"><svg><use href="#i-user"/></svg>我的名字</label><div class="inp"><input id="n2" autocomplete="username" maxlength="16" value=""></div><p class="hint">請寫真實姓名，老師才找得到你。如果系統說名稱已有人使用，請在名字後面加上校名縮寫（2～4 字），例如「王小明復興」。</p></div>
 <div class="field"><label for="p2"><svg><use href="#i-key"/></svg>設定密碼（至少 4 個字）</label><div class="inp"><input id="p2" type="password" autocomplete="new-password" value="">${eye('p2')}</div></div>
 ${fPw('p3','再輸入一次密碼','',false,'new-password')}
@@ -517,6 +525,7 @@ const ERR={
  noack:['wow','還沒勾家長同意','請家長讀完說明，並勾選「家長已閱讀說明並同意使用」。'],
  denied:['wow','建立不了帳號','可能名稱已有人使用，請在名字後面加上校名（縮寫 2～4 字）再試一次；還是不行就找老師。'],
  nodoc:['wow','找不到你的資料','請找老師幫忙。'],
+ notclass:['sad','這不是班級帳號','班級登入只給老師建立的班級帳號用。學生請回到登入畫面，用自己的名字登入。'],
  other:['wow','出了一點問題','請再試一次；如果一直這樣，請告訴老師。']
 };
 function showErr(f,code){const a=ERR[code]||ERR.other;f.querySelector('#fmsg').innerHTML=err(a[0],a[1],a[2]);}
@@ -525,8 +534,12 @@ async function authSubmit(f,act){
   f.querySelector('#fmsg').innerHTML='';btn.disabled=true;btn.textContent='請稍等…';
   try{
     if(act==='register'&&v('p2')!==v('p3'))throw {code:'mm'};
+    if(act==='classreg'&&v('cp2')!==v('cp3'))throw {code:'mm'};
     const svc=await OLMStudent.service();
-    const u=act==='login'?await svc.login(v('n'),v('p')):await svc.register(v('n2'),v('p2'),f.querySelector('#ack').checked);
+    let u;
+    if(act==='classreg')u=await svc.register(v('cn2'),v('cp2'),true,'班級');   /* 班級帳號：老師自己建、note 記「班級」 */
+    else if(act==='classlogin'){u=await svc.login(v('cn'),v('cp'));if(u.note!=='班級'){try{await svc.logout();}catch(x){}throw {code:'notclass'};}}   /* 學生帳號不能用班級登入 */
+    else u=act==='login'?await svc.login(v('n'),v('p')):await svc.register(v('n2'),v('p2'),f.querySelector('#ack').checked);
     await OLMSync.attach(svc,u);   /* 進度：決定用雲端或這支手機的存檔（失敗只有 net／denied） */
     await OLMTasks.attach(svc,u);   /* 後台任務與練習紀錄（不會失敗、最多等 4 秒） */
     USER=u.name;SESSION=u;show('home');
@@ -561,7 +574,8 @@ let storyFromGame=false;
 function setGameVisible(on){const f=$('#gamefr');f.hidden=!on;$('#app').style.visibility=on?'hidden':'visible';inGame=!!on;bgm();}
 function enterGame(){
   const f=$('#gamefr');
-  if(!f.getAttribute('src'))f.setAttribute('src','game-test.html?n='+encodeURIComponent(USER));
+  const want='game-test.html?n='+encodeURIComponent(USER)+(SESSION&&SESSION.note==='班級'?'&class=1':'');   /* 班級帳號：遊戲頁多一個「課堂」分頁 */
+  if(f.getAttribute('src')!==want)f.setAttribute('src',want);
   setGameVisible(true);
 }
 function storyEnd(finished){

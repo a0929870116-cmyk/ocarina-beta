@@ -670,7 +670,10 @@ window.addEventListener('message',e=>{
 /* 頁面切換（網址 # 後面只放 map / practice / shop / ship / isle / dex） */
 const CLASS_MODE=new URLSearchParams(location.search).get('class')==='1';   /* 班級帳號：多一個「課堂」分頁、預設開在課堂 */
 const VIEWS=['map','practice','shop','ship','isle','dex','class'];
-if(CLASS_MODE){$('nav-class').hidden=false;$('nav-in').classList.add('cls');}
+if(CLASS_MODE){$('nav-class').hidden=false;$('nav-in').classList.add('cls');
+  /* 課堂：拿掉每週練習與動態樂譜，只留星空試煉（導覽改稱「小遊戲」） */
+  ['wk-h','dy-h'].forEach(i=>{const e=$(i)&&$(i).closest('section');if(e)e.style.display='none';});
+  const pb=document.querySelector('.nav button[data-go="practice"]');if(pb)pb.lastChild.textContent='小遊戲';}
 function openClass(){
   const f=$('class-frame');
   if(!f.getAttribute('src'))f.src='class-mode.html?n='+encodeURIComponent(new URLSearchParams(location.search).get('n')||'');

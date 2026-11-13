@@ -161,7 +161,7 @@ details.test summary{cursor:pointer;font-weight:700}
  <button type="button" class="skip" id="introSkip">略過</button>
  <div class="pic" id="introPic"></div>
  <div class="tx" id="introTx"></div>
- <div class="dots" id="introDots"><i></i><i></i><i></i></div>
+ <div class="dots" id="introDots"><i></i><i></i><i></i><i></i></div>
  <button type="button" class="nx" id="introNext">下一頁</button>
 </div>
 <div id="arcOv" class="hide"><div class="bar2"><button type="button" id="arcClose">關閉星空試煉，回到課堂</button></div><iframe id="arcFrame" title="星空試煉" allow="microphone"></iframe></div>
@@ -506,15 +506,16 @@ function showDrop(){
 $('pass').onclick=doPass; $('drawCard').onclick=drawCard;
 /* ---- 前情提要：3 頁圖卡、每頁一句話；每天第一次進課堂頁自動出現，可略過；右上角「前情提要」可重看 ---- */
 const INTRO=[
- {g:'star',t:'星星島的星星，睡著了，歌聲也不見了……'},
- {g:'ens',t:'陶笛的歌聲，能把星星叫醒！'},
- {g:'deck',t:'全班一起完成任務卡，集滿星星罐，就能點亮一座新島！'}
+ {g:'star',t:'夜空有十二座小島，住著一開口就會下水晶雨的星星。'},
+ {g:'ens',t:'有座島的星星不見了，男孩喚醒陶笛精靈，跟著星辰足跡去尋找。'},
+ {g:'wind',t:'可是地圖碎了，其他星星也忘了歌聲，想不起它的蹤跡。'},
+ {g:'hero',t:'請化身精靈分身，吹奏笛音、集滿星星罐，點亮小島吧！'}
 ];
 let introI=0;
 function introPaint(){
   const it=INTRO[introI];
   let tw=''; for(let k=0;k<14;k++){ tw+='<i class="tw" style="left:'+((k*37+11)%92)+'%;top:'+((k*53+7)%88)+'%;animation-delay:'+((k%5)*.4)+'s"></i>'; }
-  $('introPic').innerHTML=tw+icon(it.g)+(introI===0?'<div style="position:absolute;right:6%;top:4%;font-size:34px;font-weight:900">z z</div>':'');
+  $('introPic').innerHTML=tw+icon(it.g)+'';
   $('introTx').textContent=it.t;
   [].forEach.call($('introDots').children,function(d,k){d.classList.toggle('on',k===introI);});
   $('introNext').textContent = introI===INTRO.length-1 ? '開始' : '下一頁';

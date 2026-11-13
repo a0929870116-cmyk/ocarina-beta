@@ -138,6 +138,7 @@ h2{font-size:16px;margin:12px 0 6px;color:var(--gold)}
 .btn{min-height:44px;border-radius:12px}
 .slotbox{background:#342a1e}
 .notes{font-size:12px}
+.tg{margin:14px 0 6px;font-weight:700;color:#D9A843;font-size:15px}.tg:first-child{margin-top:0}.tn{font-size:13px;opacity:.7;margin-top:4px}.btn.dng{border-color:#c0584a;color:#e07b6a}
 </style>
 <script src="save-core.js"></script>
 <script src="sfx.js"></script>
@@ -206,6 +207,7 @@ function load(){
 }
 /* 只寫本頁負責的欄位（el、lv、cr、isle），其餘欄位（如別頁新增的）不動 */
 function save(){OLMSave.patch(KEY,function(d){d.el=S.el;d.lv=S.lv;d.cr=S.cr;d.isle=S.isle;});}
+const DEV=(function(){const t=[window,window.parent,window.top];for(const w of t){try{if(/[?&]dev=1(&|$)/.test(w.location.search))return true;}catch(e){}}return false;})();
 let S=load(), tab='craft', pick=[null,null,null], mcPart='hull', msg='', openD={tools:false};
 
 /* ===== 繪圖輔助 ===== */
@@ -431,16 +433,21 @@ function bagPanel(){
   const w=wk();
   return `<h2>水晶碎片（每島一種）</h2><div class="grid">${els}</div>
 <p class="notes">解任務拾獲島嶼結晶，全對多掉一顆稀有水晶碎片！在「練習」頁超過任務目標後掉落，依「目前練習的島」決定是哪一種。</p>
-<details data-d="tools" ${openD.tools?'open':''}><summary>測試工具</summary><div class="card">
-<label for="isle" class="need" style="display:block">目前練習的島（練習頁掉的水晶碎片會跟著變）</label>
+${DEV?`<details data-d="tools" ${openD.tools?'open':''}><summary>測試工具（開發用）</summary><div class="card">
+<div class="tg">水晶碎片</div>
+<label for="isle" class="need" style="display:block">目前練習的島</label>
 <select id="isle" data-act="isle" style="width:100%;margin-bottom:8px">${opts}</select>
 <button class="btn" data-act="drop">模擬掉落 1 次（${EL[S.isle-1].n}）</button>
-<div class="grid2" style="margin-top:8px">
-<button class="btn alt" data-act="all3">每種 +3</button><button class="btn alt" data-act="reset">重設飛船</button></div>
-<button class="btn alt" style="margin-top:8px" data-act="jar10">星星罐 +10（測試開島，罐滿 40 就會開島）</button>
+<button class="btn alt" style="margin-top:8px" data-act="all3">每種 +3</button>
+<div class="tg">進度與金幣</div>
+<button class="btn alt" data-act="jar10">星星罐 +10</button>
+<div class="tn">罐滿 40 顆，回地圖頁會開島</div>
 <div style="margin-top:8px;display:flex;gap:8px"><select id="jumpsel" style="flex:1">${[1,2,3,4,5,6,7,8,9].map(n=>`<option value="${n}">跳到第 ${n} 島前</option>`).join('')}</select><button class="btn alt" style="flex:1" data-act="jumpN">跳過去</button></div>
 <button class="btn alt" style="margin-top:8px" data-act="coin100">金幣 +100</button>
-<button class="btn alt" style="margin-top:8px" data-act="resetOpen">重設開島進度（從頭：0 島、星星罐 0、金幣 0、無裝備）</button></div></details>
+<div class="tg" style="color:#e07b6a">⚠ 重設（會清資料）</div>
+<button class="btn alt dng" data-act="reset">重設飛船</button>
+<button class="btn alt dng" style="margin-top:8px" data-act="resetOpen">重設開島進度</button>
+<div class="tn">從頭：0 島、星星罐 0、金幣 0、無裝備</div></div></details>`:''}
 <h2>這版的暫定假設</h2><ul class="notes">
 <li>水晶碎片名稱第 5～12 島是暫擬。每次升級放入任意 3 顆水晶碎片（Lv1→2、Lv2→3 各一次）。</li>
 <li>放入的位置決定該部位的顏色：上方＝主色、右下＝紋飾、左下＝光暈。滿級後仍可重新提煉換色。</li>
@@ -544,6 +551,8 @@ document.addEventListener('click',e=>{
   if(busy) return;
   if(t.dataset.tab){tab=t.dataset.tab;pick=[null,null,null];render();return;}
   const act=t.dataset.act;
+  if(act==='isle') return;   /* 選單本身不是按鈕；否則點下去會重畫頁面、選單被換掉而選不了 */
+  if((act==='reset'||act==='resetOpen')&&!confirm(act==='reset'?'確定要重設飛船？':'確定要重設開島進度？（0 島、星星罐 0、金幣 0、無裝備）')) return;
   S=load();   /* 先讀最新存檔，避免蓋掉練習頁剛掉的水晶碎片 */
   if(act==='part'){mcPart=t.dataset.slot;pick=[null,null,null];}
   else if(act==='cycle'){const i=SLOTS.findIndex(s=>s.id===mcPart);mcPart=SLOTS[(i+1)%SLOTS.length].id;pick=[null,null,null];}

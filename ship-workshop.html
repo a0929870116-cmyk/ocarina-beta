@@ -84,6 +84,42 @@ select{min-height:44px;font:500 16px var(--font-b);border:2px solid var(--line);
 .partbtn[aria-pressed="true"]{background:var(--green);color:#fdf6dd;border-color:var(--green)}.partbtn[aria-pressed="true"] .ic{color:#f1d98a}
 .mc{display:block;width:100%;max-width:340px;margin:0 auto}
 .preview .gem{width:20px;height:20px;vertical-align:-5px}
+
+/* ===== 翻牌升級＋魔法陣動畫（11/13） ===== */
+.mc .sl{transform-box:fill-box;transform-origin:center}
+.mc .la,.mc .rl,.mc .burst{opacity:0}
+.mc .burst{transform-box:fill-box;transform-origin:center}
+.mc.cast .sl{animation:fly .8s cubic-bezier(.5,0,.8,.5) forwards;animation-delay:calc(var(--i)*.2s)}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) scale(.25);opacity:.15}}
+.mc.cast .la{animation:lita .5s ease-out forwards;animation-delay:calc(.35s + var(--i)*.22s)}
+@keyframes lita{to{opacity:.95}}
+.mc.cast .rl{animation:rl 1.2s ease-in-out .5s forwards}
+@keyframes rl{0%{opacity:0}60%{opacity:.55}100%{opacity:.3}}
+.mc.cast .burst{animation:bst .5s ease-out 1s forwards}
+@keyframes bst{0%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:scale(2.8)}}
+#spot{position:fixed;inset:0;z-index:50;background:rgba(10,8,5,.86);animation:fadein .25s}
+@keyframes fadein{from{opacity:0}}
+#spot .spotin{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:12px}
+#spot.inframe{position:absolute;left:0;top:0;width:100%}
+#spot.inframe .spotin{position:absolute;left:0;right:0;inset:auto;width:100%}
+.flip{perspective:1400px;width:min(94vw,480px)}
+.card3d{display:grid;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.45,.05,.3,1)}
+.card3d.turn{transform:rotateY(180deg)}
+.face{grid-area:1/1;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:12px;background:var(--parch);border:4px double var(--gold);box-shadow:0 8px 0 rgba(0,0,0,.4);display:flex;flex-direction:column;gap:8px;align-items:center}
+.face.b{transform:rotateY(180deg);background:#fbefc7}
+.face h3{margin:0;font:400 22px var(--font-d);display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.face h3 .ic{color:var(--gold)}
+.face .tagp{font:700 13px var(--font-b);border-radius:999px;padding:1px 10px;background:var(--parch2);border:1px solid var(--line)}
+.face.b .tagp{background:var(--green);color:#fdf6dd;border-color:var(--green)}
+.face .big{width:100%;border-radius:10px;overflow:hidden;border:2px solid var(--gold);background:var(--night)}
+.face .big svg{display:block;width:100%;height:auto;max-height:32vh}
+.face .zoom{width:74%;border-radius:12px;overflow:hidden;border:3px solid var(--gold);background:var(--night);position:relative}
+.face .zoom svg{display:block;width:100%;height:auto;max-height:25vh}
+.face .zoom span{position:absolute;left:6px;top:4px;font:700 12px var(--font-b);color:#f1d98a;background:rgba(20,33,61,.75);padding:1px 8px;border-radius:999px}
+.face .fdesc{margin:0;font-size:14px;color:#6b4c2a;text-align:center}
+#spot .btn{width:auto;min-width:170px;transition:opacity .3s}
+#spot .btn.off{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.mc.cast .sl,.mc.cast .la,.mc.cast .rl,.mc.cast .burst{animation:none}.card3d{transition:none}#spot{animation:none}}
 </style>
 <script src="save-core.js"></script>
 <script src="sfx.js"></script>
@@ -205,7 +241,8 @@ const STARS=[[-70,80],[-60,140],[430,110],[425,160],[-75,30],[-40,50],[-20,110],
 function totalLv(){return SLOTS.reduce((n,s)=>n+S.lv[s.id],0);}
 function hullTier(){return [0,2,3][(S.lv.hull||1)-1];}
 function hullScale(){return 0.72+0.28*(totalLv()-5)/10;}
-function ship(){
+function ship(vb,pfx){
+  const IDP=pfx||'';
   const L=S.lv, P=Object.fromEntries(SLOTS.map(s=>[s.id,pcol(s.id)]));
   const sc=hullScale(), tier=hullTier(), dl=[0,12,24,34][tier], dr=[0,14,28,40][tier], xl=70-dl, xr=330+dr;
   const wingShape=`<path d="M180 196 C150 168 112 158 60 158 C98 178 128 200 152 214 Z" fill="${P.wing.m}" stroke="${D}" stroke-width="2" stroke-linejoin="round"/>`
@@ -231,7 +268,7 @@ function ship(){
   for(let x=xl+95;x<=xr-95;x+=35) ports+=`<circle cx="${x}" cy="234" r="5" fill="${P.hull.g}" stroke="${D}" stroke-width="1.5"/>`;
   const hull=`<path d="M${xl} 188 L${xr} 188 Q${xr-12} 238 ${xr-68} 252 L${xl+68} 252 Q${xl+12} 238 ${xl} 188 Z" fill="${P.hull.b}" stroke="${D}" stroke-width="3" stroke-linejoin="round"/>`
     +`<path d="M${xl+26} 236 Q${(xl+xr)/2} 262 ${xr-26} 232" fill="none" stroke="${D}" stroke-opacity=".35" stroke-width="2"/>`
-    +braid(xl+26,xr-24,208,5,28,'hb')+ports;
+    +braid(xl+26,xr-24,208,5,28,IDP+'hb')+ports;
   let cabin='';
   if(tier>=3){
     const cx=xl+36;
@@ -271,9 +308,9 @@ function ship(){
   if(L.prow>=3) prow+=`<circle cx="352" cy="112" r="24" fill="${P.prow.g}" opacity=".25" class="pulse"/><circle cx="352" cy="112" r="18" fill="none" stroke="${P.prow.t}" stroke-width="2" stroke-dasharray="4 4"/><path d="M352 98 L362 112 L352 128 L342 112 Z" fill="${P.prow.g}" stroke="${D}" stroke-width="2" stroke-linejoin="round"/>`;
 
   const stars=STARS.map(s=>`<circle cx="${s[0]}" cy="${s[1]}" r="1.4" fill="#fdf6dd" opacity=".8"/>`).join('');
-  return `<svg viewBox="-80 0 520 290" role="img" aria-label="凱爾特風格飛船，總等級${totalLv()}、船體${L.hull}級、風帆${L.sail}級、機翼${L.wing}級、引擎${L.engine}級、船頭${L.prow}級">
-<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e1a38"/><stop offset="1" stop-color="#2a3b6b"/></linearGradient></defs>
-<rect x="-80" width="520" height="290" fill="url(#sky)"/>${stars}
+  return `<svg viewBox="${vb||'-80 0 520 290'}" ${pfx?'aria-hidden="true"':'role="img"'} aria-label="凱爾特風格飛船，總等級${totalLv()}、船體${L.hull}級、風帆${L.sail}級、機翼${L.wing}級、引擎${L.engine}級、船頭${L.prow}級">
+<defs><linearGradient id="${IDP}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e1a38"/><stop offset="1" stop-color="#2a3b6b"/></linearGradient></defs>
+<rect x="-80" width="520" height="290" fill="url(#${IDP}sky)"/>${stars}
 <g transform="translate(200 266) scale(${sc.toFixed(3)}) translate(-200 -266)"><g class="bob"><g transform="translate(${-dl} 0)">${glow}</g>${wings}<g transform="translate(${-dl} 0)">${flame}</g>${hull}${cabin}${rail}<g transform="translate(${-dl} 0)">${engine}</g>${sails}<g transform="translate(${dr} 0)">${prow}</g></g></g></svg>`;
 }
 
@@ -342,10 +379,14 @@ function circleSvg(){
     const id=pick[i], c=id?byId(EL,id).c:null, nm=['主色','紋飾','光暈'][i];
     const inner=id?`<circle cx="${p[0]}" cy="${p[1]}" r="38" fill="${c}" opacity=".22" class="pulse"/><g transform="translate(${p[0]-20} ${p[1]-20}) scale(1.25)">${ISLE_ART.crystalInner(EL.findIndex(e=>e.id===id)+1)}</g>`
       :`<text x="${p[0]}" y="${p[1]+5}" text-anchor="middle" font-size="13" fill="#8d7a52">${nm}</text>`;
-    return `<g ${id?`data-act="clear" data-i="${i}" role="button" tabindex="0" aria-label="取出${byId(EL,id).n}（${nm}）" style="cursor:pointer"`:`aria-label="${nm}空格"`}><circle cx="${p[0]}" cy="${p[1]}" r="31" fill="#fbf4de" stroke="${G}" stroke-width="3" ${id?'':'stroke-dasharray="6 5"'}/>${inner}</g>`;
+    return `<g class="sl" style="--dx:${(MC.cx-p[0]).toFixed(1)}px;--dy:${(MC.cy-p[1]).toFixed(1)}px;--i:${i}"><g ${id?`data-act="clear" data-i="${i}" role="button" tabindex="0" aria-label="取出${byId(EL,id).n}（${nm}）" style="cursor:pointer"`:`aria-label="${nm}空格"`}><circle cx="${p[0]}" cy="${p[1]}" r="31" fill="#fbf4de" stroke="${G}" stroke-width="3" ${id?'':'stroke-dasharray="6 5"'}/>${inner}</g></g>`;
   }).join('');
+  const full3=pick.every(Boolean), cc=full3?pick.map(x=>byId(EL,x).c):null;
+  const f1=a=>a.map(v=>v.toFixed(1)).join(' ');
+  const lit=full3?`<g aria-hidden="true">`+[[p0,p1],[p1,p2],[p2,p0]].map(([a,b],i)=>`<path class="la" style="--i:${i}" d="M${f1(a)} ${arc(a,b)}" fill="none" stroke="${cc[i]}" stroke-width="8" stroke-linecap="round"/>`).join('')+`<circle class="rl" cx="150" cy="150" r="118" fill="none" stroke="${cc[1]}" stroke-width="10"/></g>`:'';
+  const burst=full3?`<circle class="burst" cx="150" cy="150" r="50" fill="${mix(cc[0],'#ffffff',.35)}" aria-hidden="true"/>`:'';
   const center=`<g data-act="cycle" role="button" tabindex="0" aria-label="目前部位：${part.n}，點一下換下一個部位" style="cursor:pointer"><circle cx="150" cy="150" r="50" fill="#fbf4de" stroke="${D}" stroke-width="3"/><circle cx="150" cy="150" r="44" fill="none" stroke="${G}" stroke-width="2" stroke-dasharray="3 4"/><g transform="translate(112 110) scale(1.9)" color="${D}">${icon(mcPart,40).replace(/<svg[^>]*>/,'<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">').replace('</svg>','</g>')}</g><text x="150" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="${D}">${part.n}</text></g>`;
-  return `<svg class="mc" viewBox="-12 -12 324 324" role="group" aria-label="提煉陣，選 ${part.n}，三個水晶碎片格">${ringBraid(MC.cx,MC.cy,MC.R,5.5,12,'rb')}${trik}${center}${slots}</svg>`;
+  return `<svg class="mc" viewBox="-12 -12 324 324" role="group" aria-label="提煉陣，選 ${part.n}，三個水晶碎片格">${ringBraid(MC.cx,MC.cy,MC.R,5.5,12,'rb')}${trik}${lit}${center}${slots}${burst}</svg>`;
 }
 function craftPanel(){
   const part=byId(SLOTS,mcPart), lv=S.lv[mcPart], full=pick.every(Boolean);
@@ -395,9 +436,94 @@ function renderPanel(){
 function report(){try{if(parent!==window)parent.postMessage({type:'ship-h',h:document.getElementById('wrap').offsetHeight},'*');}catch(e){}}
 function render(){renderTop();renderPanel();report();}
 
+/* ===== 升級演出：魔法陣（碎片飛入、陣紋亮起）→ 翻牌（升級前 → 升級後）＋專用音效 ===== */
+const PVB={hull:'20 120 360 160',sail:'130 10 240 190',wing:'-45 50 225 180',engine:'-45 150 175 130',prow:'265 65 150 140'};
+const REDUCE=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+let busy=false, spotEl=null, spotCleanup=null;
+let AC=null;
+function ac(){try{if(window.Sfx&&Sfx.isOn&&!Sfx.isOn())return null;AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC;}catch(e){return null;}}
+function tone(c,t,f,len,vol,type,f1){const o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+len);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+len);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+len+.05);}
+function castSound(){   /* 碎片飛入：上升的嗡鳴＋三聲「叮」，最後一聲帶光爆 */
+  try{const c=ac();if(!c)return;const t=c.currentTime+.03;
+    tone(c,t,200,1.3,.05,'triangle',900);
+    [784,988,1175].forEach((f,i)=>{tone(c,t+.8+i*.2,f,.35,.11,'sine');tone(c,t+.8+i*.2,f*2,.2,.03,'sine');});
+    [523,659,784,1047].forEach(f=>tone(c,t+1.0,f,.6,.05,'sine'));
+  }catch(e){}
+}
+function flipSound(){   /* 翻牌：沙沙一掃，翻開後上行的魔法和弦 */
+  try{const c=ac();if(!c)return;const t=c.currentTime+.05,len=.6,n=Math.floor(c.sampleRate*len),buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+    const src=c.createBufferSource();src.buffer=buf;const bp=c.createBiquadFilter();bp.type='bandpass';bp.Q.value=1.1;bp.frequency.setValueAtTime(700,t);bp.frequency.exponentialRampToValueAtTime(4200,t+len);
+    const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.3,t+.2);g.gain.exponentialRampToValueAtTime(.0001,t+len);src.connect(bp);bp.connect(g);g.connect(c.destination);src.start(t);
+    [523,659,784,1047,1319].forEach((f,i)=>{tone(c,t+.85+i*.09,f,.5,.1,'sine');tone(c,t+.85+i*.09,f*2,.3,.025,'sine');});
+    tone(c,t+1.35,2093,.7,.05,'sine');
+  }catch(e){}
+}
+function zoomHTML(sid,p){   /* 依目前船體縮放與加長量，算出該部位的放大框（4:3） */
+  const r=PVB[sid].split(' ').map(Number), sc=hullScale(), tier=hullTier(), dl=[0,12,24,34][tier], dr=[0,14,28,40][tier];
+  const sh=sid==='engine'?-dl:sid==='prow'?dr:0;
+  let x=200+(r[0]+sh-200)*sc, y=266-(266-r[1])*sc, w=r[2]*sc, h=r[3]*sc;
+  const cx=x+w/2, cy=y+h/2; w*=1.12; h*=1.12;
+  if(w/h<4/3)w=h*4/3; else h=w*3/4;
+  return ship((cx-w/2).toFixed(1)+' '+(cy-h/2).toFixed(1)+' '+w.toFixed(1)+' '+h.toFixed(1),p);
+}
+function faceHTML(cls,tag,sid,lv,recolor,big,zoom){
+  const part=byId(SLOTS,sid), pips=[1,2,3].map(i=>`<span class="pip${i<=lv?' on':''}"></span>`).join('');
+  const dsc=recolor?(cls==='b'?'換上新的顏色':'舊的顏色'):`Lv${lv}：${part.d[lv-1]}`;
+  return `<div class="face ${cls}" aria-hidden="${cls==='b'?'false':'true'}"><h3>${icon(sid,28)}<span>${part.n}${recolor?'':' Lv'+lv}</span><span class="pips">${pips}</span><span class="tagp">${tag}</span></h3><div class="big">${big}</div><div class="zoom">${zoom}<span>放大：${part.n}</span></div><p class="fdesc">${dsc}</p></div>`;
+}
+function spotBox(){
+  try{if(parent===window||!window.frameElement)return null;
+    const r=window.frameElement.getBoundingClientRect(),vh=parent.innerHeight,top=Math.max(0,-r.top),bot=Math.min(r.height,vh-r.top);
+    if(bot-top<260)return null; return {top:top,h:bot-top};
+  }catch(e){return null;}
+}
+function placeSpot(){
+  if(!spotEl)return; const b=spotBox(), in_=spotEl.querySelector('.spotin');
+  if(b){spotEl.classList.add('inframe');spotEl.style.height=Math.max(document.documentElement.scrollHeight,b.top+b.h)+'px';in_.style.top=b.top+'px';in_.style.height=b.h+'px';}
+  else{spotEl.classList.remove('inframe');spotEl.style.height='';in_.style.top='';in_.style.height='';}
+}
+function closeSpot(){
+  if(!spotEl)return; if(spotCleanup)spotCleanup(); spotEl.remove(); spotEl=null; busy=false;
+}
+function showFlip(sid,lvB,lvA,recolor,B,A){
+  const el=document.createElement('div'); el.id='spot'; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label','升級結果');
+  el.innerHTML=`<div class="spotin"><div class="flip"><div class="card3d" id="c3d">${faceHTML('a',recolor?'舊顏色':'升級前',sid,lvB,recolor,B.big,B.zoom)}${faceHTML('b',recolor?'新顏色':'升級後！',sid,lvA,recolor,A.big,A.zoom)}</div></div><button class="btn off" id="spotok" data-act="spot-close">太棒了</button></div>`;
+  document.body.appendChild(el); spotEl=el; placeSpot();
+  let pw=null; try{if(parent!==window)pw=parent;}catch(e){}
+  const onMove=()=>placeSpot();
+  window.addEventListener('resize',onMove); if(pw){try{pw.addEventListener('scroll',onMove,true);pw.addEventListener('resize',onMove);}catch(e){}}
+  const onKey=e=>{if(e.key==='Escape'&&!document.getElementById('spotok').classList.contains('off'))closeSpot();};
+  document.addEventListener('keydown',onKey);
+  spotCleanup=()=>{window.removeEventListener('resize',onMove);document.removeEventListener('keydown',onKey);if(pw){try{pw.removeEventListener('scroll',onMove,true);pw.removeEventListener('resize',onMove);}catch(e){}}};
+  const T=REDUCE?150:700;
+  setTimeout(()=>{const c=document.getElementById('c3d'); if(c){c.classList.add('turn');flipSound();}},T);
+  setTimeout(()=>{const b=document.getElementById('spotok'); if(b){b.classList.remove('off');try{b.focus({preventScroll:true});}catch(e){}}},REDUCE?400:2500);
+}
+/* 放入 3 顆碎片後：先在魔法陣上演出，再套用升級、翻牌 */
+function castUpgrade(ids,sid){
+  busy=true;
+  const mc=document.querySelector('.mc'); if(mc)mc.classList.add('cast'); castSound();
+  setTimeout(()=>{
+    S=load();
+    const need={};ids.forEach(x=>{need[x]=(need[x]||0)+1;});
+    if(!Object.entries(need).every(([k,v])=>S.el[k]>=v)){busy=false;pick=[null,null,null];render();return;}
+    const lvB=S.lv[sid], recolor=lvB>=3;
+    const B={big:ship(null,'pa'),zoom:zoomHTML(sid,'pb')};
+    Object.entries(need).forEach(([k,v])=>S.el[k]-=v);
+    S.cr[sid]=ids; if(!recolor)S.lv[sid]=lvB+1;
+    const A={big:ship(null,'pc'),zoom:zoomHTML(sid,'pd')};
+    setMsg(recolor?`提煉完成！${byId(SLOTS,sid).n}換上新的顏色。`:`提煉完成！${byId(SLOTS,sid).n}升到 Lv${lvB+1}。`,true);
+    pick=[null,null,null]; save(); render();
+    showFlip(sid,lvB,recolor?lvB:lvB+1,recolor,B,A);
+  },REDUCE?250:1500);
+}
+
 /* ===== 事件 ===== */
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-tab],[data-act]'); if(!t) return;
+  if(t.dataset.act==='spot-close'){closeSpot();return;}
+  if(busy) return;
   if(t.dataset.tab){tab=t.dataset.tab;pick=[null,null,null];render();return;}
   const act=t.dataset.act;
   S=load();   /* 先讀最新存檔，避免蓋掉練習頁剛掉的水晶碎片 */
@@ -412,15 +538,8 @@ document.addEventListener('click',e=>{
   else if(act==='put'){const i=pick.indexOf(null);if(i>=0&&avail(t.dataset.id)>0)pick[i]=t.dataset.id;}
   else if(act==='clear'){pick[+t.dataset.i]=null;}
   else if(act==='inject'){
-    const ids=pick.slice(), sid=mcPart, lv=S.lv[sid];
-    const need={};ids.forEach(x=>{if(x)need[x]=(need[x]||0)+1;});
-    if(ids.every(Boolean)&&Object.entries(need).every(([k,v])=>S.el[k]>=v)){
-      Object.entries(need).forEach(([k,v])=>S.el[k]-=v);
-      S.cr[sid]=ids;
-      if(lv<3){S.lv[sid]=lv+1;setMsg(`提煉完成！${byId(SLOTS,sid).n}升到 Lv${lv+1}。`,true);}
-      else setMsg(`提煉完成！${byId(SLOTS,sid).n}換上新的顏色。`,true);
-      pick=[null,null,null];
-    }
+    const ids=pick.slice(), need={};ids.forEach(x=>{if(x)need[x]=(need[x]||0)+1;});
+    if(ids.every(Boolean)&&Object.entries(need).every(([k,v])=>S.el[k]>=v)){castUpgrade(ids,mcPart);return;}
   }
   else if(act==='reset-color'){delete S.cr[mcPart];setMsg(`${byId(SLOTS,mcPart).n}已恢復原色。`);}
   else if(act==='drop'){const el=EL[S.isle-1];S.el[el.id]++;setMsg(`掉落「${el.n}」×1（第 ${S.isle} 島）。`);}

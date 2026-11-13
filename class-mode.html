@@ -108,18 +108,27 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 /* 前情提要 */
 #intro{position:fixed;inset:0;z-index:60;background:linear-gradient(#141f48,#2d3d7a);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;color:#fff3c4}
 #intro.hide{display:none}
-#intro .skip{position:absolute;top:12px;right:12px;font-family:inherit;font-weight:900;font-size:17px;min-height:44px;padding:0 18px;border:3px solid var(--ink);border-radius:14px;background:#ffe48a;color:var(--text);cursor:pointer}
+#intro .cb{position:relative;border:0;background:none;padding:0;cursor:pointer;font-family:inherit;font-weight:900;color:var(--text);display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+#intro .cb svg{position:absolute;inset:0;width:100%;height:100%;display:block;filter:drop-shadow(0 4px 0 #4a2f1a)}
+#intro .cb span{position:relative;letter-spacing:.12em}
+#intro .cb:active{transform:translateY(3px)}
+#intro .skip{position:absolute;top:12px;right:12px;width:112px;height:48px;font-size:18px}
 #intro .pic{width:min(62vw,300px);aspect-ratio:1;position:relative}
 #intro .pic svg{width:100%;height:100%;display:block}
-#intro .tx{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:clamp(24px,5vw,38px);font-weight:900;text-align:center;line-height:1.5;max-width:640px;min-height:3em}
+#intro .tx{text-align:center;text-wrap:balance;margin:0 auto;width:100%;font-family:Iansui,'Noto Sans TC',sans-serif;font-size:clamp(24px,5vw,38px);font-weight:900;text-align:center;line-height:1.5;max-width:640px;min-height:4.5em;display:flex;align-items:center;justify-content:center}
 #intro .dots{display:flex;gap:10px}
 #intro .dots i{width:12px;height:12px;border-radius:50%;background:#fff3c4;opacity:.35}
 #intro .dots i.on{opacity:1}
-#intro .nx{font-family:inherit;font-weight:900;font-size:26px;min-height:60px;padding:0 44px;border:3px solid var(--ink);border-radius:18px;background:linear-gradient(#ffe48a,var(--gold));color:var(--text);box-shadow:0 5px 0 var(--ink);cursor:pointer}
-#intro .pic.wide{width:min(92vw,520px);aspect-ratio:480/300}
-#intro .sc{position:absolute;inset:0;border-radius:18px;overflow:hidden;background:linear-gradient(#141f48,#3b4f8f)}
-#intro .sc>img,#intro .sc>svg.jar{position:absolute;display:block}
-#intro .sc>svg.bg{position:absolute;inset:0;width:100%;height:100%}
+#intro .nx{width:220px;height:64px;font-size:26px}
+#intro .pic.wide{width:min(92vw,420px);aspect-ratio:1/1}
+#intro .sc{position:absolute;inset:0}
+#intro .sc{display:flex;align-items:flex-end;justify-content:center;gap:0}
+#intro .sc img{display:block;width:auto;flex:none}
+#intro .wrapsp{position:relative;display:inline-block;flex:none}
+#intro .wrapsp img{height:100%}
+.tear{position:absolute;width:9px;height:13px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:linear-gradient(#e8f6ff,#7cc6e8);border:1.5px solid #4a2f1a;opacity:0;animation:tearfall 1.9s ease-in infinite}
+@keyframes tearfall{0%{opacity:0;transform:translateY(0) scale(.6)}15%{opacity:1}100%{opacity:0;transform:translateY(62px) scale(1)}}
+@media (prefers-reduced-motion:reduce){.tear{animation:none;opacity:.9}}
 #intro .frm{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #intro .tw{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff3c4;animation:tw 2.4s ease-in-out infinite}
 @keyframes tw{50%{opacity:.2}}
@@ -163,11 +172,11 @@ details.test summary{cursor:pointer;font-weight:700}
 
 <script src="save-core.js"></script>
 <div id="intro" class="hide" role="dialog" aria-label="前情提要">
- <button type="button" class="skip" id="introSkip">略過</button>
+ <button type="button" class="cb skip" id="introSkip"><svg viewBox="0 0 112 48" aria-hidden="true"><defs><linearGradient id="cbg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe48a"/><stop offset="1" stop-color="#d4a63a"/></linearGradient></defs><rect x="2" y="2" width="108" height="44" rx="18" fill="url(#cbg1)" stroke="#4a2f1a" stroke-width="3.5"/><rect x="8" y="8" width="96" height="32" rx="12" fill="none" stroke="#fff3a8" stroke-width="2"/><g fill="none" stroke="#4a2f1a" stroke-width="2.2"><circle cx="10.5" cy="26" r="5"/><circle cx="17.5" cy="26" r="5"/><circle cx="14" cy="20.5" r="5"/><circle cx="94.5" cy="26" r="5"/><circle cx="101.5" cy="26" r="5"/><circle cx="98" cy="20.5" r="5"/></g><g fill="none" stroke="#a8447f" stroke-width="1.2"><circle cx="10.5" cy="26" r="5"/><circle cx="17.5" cy="26" r="5"/><circle cx="14" cy="20.5" r="5"/><circle cx="94.5" cy="26" r="5"/><circle cx="101.5" cy="26" r="5"/><circle cx="98" cy="20.5" r="5"/></g></svg><span>略過</span></button>
  <div class="pic" id="introPic"></div>
  <div class="tx" id="introTx"></div>
  <div class="dots" id="introDots"><i></i><i></i><i></i><i></i></div>
- <button type="button" class="nx" id="introNext">下一頁</button>
+ <button type="button" class="cb nx" id="introNext"><svg viewBox="0 0 220 64" aria-hidden="true"><defs><linearGradient id="cbg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe48a"/><stop offset="1" stop-color="#d4a63a"/></linearGradient></defs><rect x="2" y="2" width="216" height="60" rx="18" fill="url(#cbg2)" stroke="#4a2f1a" stroke-width="3.5"/><rect x="8" y="8" width="204" height="48" rx="12" fill="none" stroke="#fff3a8" stroke-width="2"/><g fill="none" stroke="#4a2f1a" stroke-width="2.2"><circle cx="10.5" cy="34" r="5"/><circle cx="17.5" cy="34" r="5"/><circle cx="14" cy="28.5" r="5"/><circle cx="202.5" cy="34" r="5"/><circle cx="209.5" cy="34" r="5"/><circle cx="206" cy="28.5" r="5"/></g><g fill="none" stroke="#a8447f" stroke-width="1.2"><circle cx="10.5" cy="34" r="5"/><circle cx="17.5" cy="34" r="5"/><circle cx="14" cy="28.5" r="5"/><circle cx="202.5" cy="34" r="5"/><circle cx="209.5" cy="34" r="5"/><circle cx="206" cy="28.5" r="5"/></g></svg><span id="introNextTx">下一頁</span></button>
 </div>
 <div id="arcOv" class="hide"><div class="bar2"><button type="button" id="arcClose">關閉星空試煉，回到課堂</button></div><iframe id="arcFrame" title="星空試煉" allow="microphone"></iframe></div>
 <div class="wrap">
@@ -510,60 +519,25 @@ function showDrop(){
 }
 $('pass').onclick=doPass; $('drawCard').onclick=drawCard;
 /* ---- 前情提要：3 頁圖卡、每頁一句話；每天第一次進課堂頁自動出現，可略過；右上角「前情提要」可重看 ---- */
-/* 前情提要插圖：程式繪製（雙線金褐＋編繩圓環，與卡面一致），不使用外部圖檔 */
-function stp(cx,cy,r){let d='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,R=i%2?r*0.45:r;d+=(i?'L':'M')+(cx+R*Math.cos(a)).toFixed(1)+' '+(cy+R*Math.sin(a)).toFixed(1);}return d+'Z';}
-function isl(x,y,w){return dbl('M'+(x-w)+' '+y+' a'+w+' 3.6 0 1 0 '+(2*w)+' 0 a'+w+' 3.6 0 1 0 '+(-2*w)+' 0',2.6)+dbl('M'+(x-w)+' '+y+' L'+(x-w*0.35)+' '+(y+w*1.1)+' L'+(x+w*0.35)+' '+(y+w*1.1)+' L'+(x+w)+' '+y,2.6);}
-function dim(d){return '<path d="'+d+'" fill="none" stroke="#7d86ad" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"/>';}
-function note(x,y){return dbl('M'+x+' '+y+' L'+x+' '+(y-12)+' L'+(x+7)+' '+(y-10),2.4)+'<ellipse cx="'+(x-2)+'" cy="'+y+'" rx="3.4" ry="2.6" fill="#a8447f" stroke="#4a2f1a" stroke-width="1.4"/>';}
-const SC={
- /* ① 十二座島：三座島、星星發光、水晶雨 */
- isles:isl(30,62,11)+isl(70,62,11)+isl(50,44,11)+dbl(stp(30,49,6.5),2.2)+dbl(stp(70,49,6.5),2.2)+dbl(stp(50,31,6.5),2.2)+dot(30,80,1.8)+dot(27,85,1.4)+dot(70,80,1.8)+dot(73,85,1.4)+dot(50,62,1.8)+dot(47,67,1.4),
- /* ② 陶笛精靈亮起，星辰足跡一路延伸 */
- spirit:dbl('M28 58 Q28 40 48 40 Q70 40 74 54 Q76 66 58 70 Q38 74 28 58Z',3.4)+dbl('M74 54 L84 50 L78 62',3)+dbl('M66 41 L72 31',3)+dot(40,54,2.4)+dot(50,52,2.4)+dot(60,56,2.4)+dot(48,62,2.4)+dbl('M28 58 L19 62 L26 66',3)+dbl('M50 22 L50 14 M30 28 L25 22 M70 26 L76 20',2.4)+dot(18,84,1.8)+dot(28,80,2.2)+dot(38,78,1.8)+dot(26,70,1.5)+dbl(stp(14,76,4.5),1.8),
- /* ③ 地圖碎片四散，島暗了、星星只剩虛線 */
- broken:dbl('M16 24 L28 18 L33 24 L38 22 L36 34 L26 32 L20 38Z',2.4)+dbl('M62 20 L72 24 L80 22 L78 34 L70 38 L64 32Z',2.4)+dbl('M68 58 L78 56 L84 64 L80 74 L70 72 L72 66Z',2.4)+dbl('M14 58 L24 54 L30 60 L28 70 L20 74 L16 66Z',2.4)+dbl('M20 28 L30 26 M68 28 L74 30',1.6)+dim('M36 62 L64 62 Q60 76 50 78 Q40 76 36 62Z')+dim(stp(50,50,8))+dim('M44 44 L56 44'),
- /* ④ 星星罐：吹出的音符飛進罐子，星星亮起 */
- jar:dbl('M36 40 L64 40 L64 46 Q74 52 72 66 Q70 78 50 78 Q30 78 28 66 Q26 52 36 46Z',3.4)+dbl('M34 34 L66 34',3.4)+dbl(stp(44,64,6),2.2)+dbl(stp(58,60,5),2.2)+dbl(stp(52,72,4),2)+note(28,30)+note(40,20)+note(72,26)
-};
-function spts(cx,cy,R,r){let p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,k=i%2?r:R;p.push((cx+k*Math.cos(a)).toFixed(1)+','+(cy+k*Math.sin(a)).toFixed(1));}return p.join(' ');}
-function jarSVG(n){ /* 與地圖頁星星罐同款：玻璃罐＋金蓋＋彩色星星糖 */
-  const COL=['#F28B82','#F7C948','#7CC6E8','#8FD19E','#C9A0E8','#F4A261'], xs=[36,58,80,102,124], ys=[166,142,118,94];
-  const body='M44 40C20 46 14 64 14 82V164C14 180 24 188 40 188H120C136 188 146 180 146 164V82C146 64 140 46 116 40Z';
-  let o='<path d="'+body+'" fill="rgba(165,210,222,.30)"/>';
-  for(let i=0;i<n;i++){const row=Math.floor(i/5),col=i%5,x=xs[col]+(row%2?5:0),y=ys[row]-(col%2?2:0),rot=(i*37)%50-25;
-    o+='<g transform="rotate('+rot+' '+x+' '+y+')"><polygon points="'+spts(x,y,10.5,5.1)+'" fill="'+COL[i%6]+'" stroke="#3A2A1A" stroke-width="1.6" stroke-linejoin="round"/></g>';}
-  o+='<path d="'+body+'" fill="none" stroke="#3A2A1A" stroke-width="3.2" stroke-linejoin="round"/><path d="M24 86V160" stroke="rgba(255,255,255,.75)" stroke-width="5" stroke-linecap="round" fill="none"/>';
-  o+='<rect x="46" y="28" width="68" height="14" rx="3" fill="rgba(165,210,222,.30)" stroke="#3A2A1A" stroke-width="3"/><rect x="40" y="8" width="80" height="22" rx="6" fill="#C8963A" stroke="#3A2A1A" stroke-width="3"/>';
-  return o;
-}
-function sky(){let t='';for(let k=0;k<16;k++){t+='<i class="tw" style="left:'+((k*41+9)%94)+'%;top:'+((k*29+5)%70)+'%;animation-delay:'+((k%5)*.4)+'s"></i>';}return t;}
-const SCENE={
- meet:function(){ /* ② 男孩與陶笛精靈，沿著星辰足跡尋找 */
-   let tr='';[[70,236],[118,214],[168,186],[214,156],[262,128],[316,98],[372,72],[428,46]].forEach(function(p,i){tr+='<polygon points="'+spts(p[0],p[1],i%2?9:12,i%2?4.2:5.5)+'" fill="'+(i%2?'#f2cf6a':'#d9b3ff')+'" stroke="#4a2f1a" stroke-width="1.6" stroke-linejoin="round"/>';});
-   return sky()+'<svg class="bg" viewBox="0 0 480 300" preserveAspectRatio="none" aria-hidden="true"><path d="M30 262 Q150 210 240 160 T450 40" fill="none" stroke="#a77bd6" stroke-width="16" stroke-linecap="round" opacity=".45"/><path d="M30 262 Q150 210 240 160 T450 40" fill="none" stroke="#e3ccff" stroke-width="5" stroke-linecap="round" opacity=".7"/>'+tr+'<ellipse cx="170" cy="272" rx="150" ry="20" fill="#5e7f4a" stroke="#4a2f1a" stroke-width="3"/></svg>'
-    +'<img src="assets/intro/spirit_welcome.webp" alt="" style="left:9%;bottom:13%;height:58%"><img src="assets/intro/boy_point.webp" alt="" style="left:36%;bottom:13%;height:70%">'+FRAME;
- },
- jar:function(){ /* ④ 化身精靈分身，吹奏、集滿星星罐 */
-   return sky()+'<svg class="bg" viewBox="0 0 480 300" preserveAspectRatio="none" aria-hidden="true"><ellipse cx="240" cy="270" rx="200" ry="16" fill="#5e7f4a" stroke="#4a2f1a" stroke-width="3"/></svg>'
-    +'<svg class="jar" viewBox="0 0 160 196" aria-hidden="true" style="left:50%;transform:translateX(-50%);bottom:9%;height:74%">'+jarSVG(17)+'</svg>'
-    +'<img src="assets/intro/spirit_cheer.webp" alt="" style="left:6%;bottom:13%;height:55%"><img src="assets/intro/boy_cheer.webp" alt="" style="right:5%;bottom:13%;height:64%">'+FRAME;
- }
-};
+/* 前情提要：只留小男孩（不同表情，像在說故事），最後一頁加小小的陶笛精靈；無背景、無外框 */
+function tears(){ return '<i class="tear" style="left:41%;top:50%;animation-delay:0s"></i><i class="tear" style="left:63%;top:50%;animation-delay:.9s"></i>'; }
 const INTRO=[
- {s:'isles',t:'夜空有十二座小島，住著一開口就會下水晶雨的星星。'},
- {sc:'meet',t:'有座島的星星不見了，男孩喚醒陶笛精靈，跟著星辰足跡去尋找。'},
- {s:'broken',t:'可是地圖碎了，其他星星也忘了歌聲，想不起它的蹤跡。'},
- {sc:'jar',t:'請化身精靈分身，吹奏笛音、集滿星星罐，點亮小島吧！'}
+ {h:100,imgs:[['boy_pocket',100]],t:'夜空有十二座小島，住著一開口就會下水晶雨的星星。'},
+ {h:78,imgs:[['sp_sit',100]],t:'有座島的星星不見了，男孩喚醒陶笛精靈，跟著星辰足跡去尋找。'},
+ {h:92,imgs:[['sp_sad',100]],tear:1,t:'可是地圖碎了，其他星星也忘了歌聲，想不起它的蹤跡。'},
+ {h:100,imgs:[['spirit_cheer',24],['boy_cheer',80]],t:'請化身精靈分身，吹奏笛音、集滿星星罐，點亮小島吧！'}
 ];
 let introI=0;
 function introPaint(){
   const it=INTRO[introI];
   let tw=''; for(let k=0;k<14;k++){ tw+='<i class="tw" style="left:'+((k*37+11)%92)+'%;top:'+((k*53+7)%88)+'%;animation-delay:'+((k%5)*.4)+'s"></i>'; }
-  $('introPic').classList.toggle('wide',!!it.sc);
-  $('introPic').innerHTML = it.sc ? '<div class="sc">'+SCENE[it.sc]()+'</div>' : tw+'<svg viewBox="0 0 100 100" aria-hidden="true">'+ring()+SC[it.s]+'</svg>';
+  $('introPic').classList.add('wide');
+  $('introPic').innerHTML='<div class="sc" style="height:'+it.h+'%;top:auto;bottom:0">'+it.imgs.map(function(m){
+    const im='<img src="assets/intro/'+m[0]+'.webp" alt="" style="height:'+m[1]+'%">';
+    return it.tear&&m[0]==='sp_sad' ? '<span class="wrapsp" style="height:100%">'+im+tears()+'</span>' : im;}).join('')+'</div>';
   $('introTx').textContent=it.t;
   [].forEach.call($('introDots').children,function(d,k){d.classList.toggle('on',k===introI);});
-  $('introNext').textContent = introI===INTRO.length-1 ? '開始' : '下一頁';
+  $('introNextTx').textContent = introI===INTRO.length-1 ? '開始' : '下一頁';
 }
 function introOpen(){ introI=0; introPaint(); $('intro').classList.remove('hide'); }
 function introClose(){ $('intro').classList.add('hide'); if(!C.intro){ C.intro=1; save(); } }

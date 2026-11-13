@@ -290,6 +290,7 @@ function touchDay(){
    掉落量依「答錯次數」：0 錯＝2 顆（當島水晶碎片＋其他已開島水晶碎片 1 顆）、1–2 錯＝1 顆（當島）、3 錯以上＝0 顆。
    每日小遊戲掉落上限 6 顆（與每週練習的上限各自計）；每種水晶碎片背包上限 30。
    寫入飛船存檔 olm_ship_v1.el；每日紀錄存 olm_arcade_v1。金幣商店還是示範數字，所以 +5 只先記錄。 */
+const CLASS_MODE=(function(){try{return new URLSearchParams(location.search).get('class')==='1';}catch(e){return false;}})();
 const ARC_KEY='olm_arcade_v1',SHIP_KEY='olm_ship_v1',ARC_DAY_CAP=6,ARC_KIND_CAP=30,ARC_COIN=5,ARC_COIN_SWORD=8;
 const ARC_ELEM=[['stardust','星塵'],['moonwater','月光水'],['rainbow','彩虹絲'],['cloud','雲絮'],['glowdew','螢光露'],['lantern','燈籠火'],['core','星核砂'],['seaglass','海玻璃'],['note','音符晶'],['aurora','極光冰'],['peak','星峰石'],['ruby','城堡紅玉']];
 function arcRead(k){return OLMSave.read(k);}
@@ -298,7 +299,7 @@ function arcSettle(wrong){
   const A=arcRead(ARC_KEY),S=arcRead(SHIP_KEY),today=dayStr(new Date());
   if(A.day!==today){A.day=today;A.n=0;A.coin=0;}
   const out={wrong:wrong,items:[],coin:0,capped:false,full:false,want:dropCount(wrong)};
-  if(!A.coin){A.coin=1;
+  if(!A.coin&&!CLASS_MODE){A.coin=1;
     try{OLMSave.patch(OLMSave.K.TEST,function(T){
       const sw=!!(T.worn&&T.worn.hand==='sword');          /* 穿水晶劍：每天第一次 +8 */
       out.coin=sw?ARC_COIN_SWORD:ARC_COIN;out.sword=sw;
@@ -499,11 +500,11 @@ const api={
     cur.state='end';
     releaseAll();clearGate();if(!demo)needRest=true;
     if(!demo){
-      touchDay();save.plays++;
+      if(!CLASS_MODE){touchDay();save.plays++;
       save.total+=res.stars;
       save.stars[gdef.id]=Math.max(save.stars[gdef.id]||0,res.stars);
       persist();
-      Track.add(gdef.id,gdef.name.replace(/（.*）/,''),res.stars,res.stats);
+      Track.add(gdef.id,gdef.name.replace(/（.*）/,''),res.stars,res.stats);}
       const w=(typeof res.wrong==='number')?res.wrong:({3:0,2:1})[res.stars];   /* 沒有答錯次數的遊戲（長音養龍、指法衝刺）：3★＝0 錯、2★＝1 錯、1★＝3 錯 */
       res.drop=arcSettle(w===undefined?3:Math.max(0,Math.round(w)));
     }
@@ -601,7 +602,7 @@ function showResult(res){
   ov.innerHTML=h;ov.hidden=false;
   $('#again').addEventListener('click',()=>{if(demo)setDemo(false);startRound();});
   const a2=$('#again2');if(a2)a2.addEventListener('click',()=>startRound());
-  $('#home').addEventListener('click',goHub);
+  $('#home').addEventListener('click',CLASS_MODE?function(){try{parent.postMessage({type:'arcade-close'},'*');}catch(e){}}:goHub);
   if(!demo)api.score('');
 }
 function setDemo(on){

@@ -95,16 +95,32 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 .solo{margin-top:10px;text-align:center;font-family:Iansui,'Noto Sans TC',sans-serif;font-size:28px;font-weight:900;min-height:40px}
 .solo small{display:block;font-family:'Noto Sans TC',sans-serif;font-size:13px;color:var(--sub);font-weight:700}
 .hide{display:none!important}
-.cardface{position:relative;aspect-ratio:480/300;max-width:520px;margin:6px auto 0;border-radius:18px;border:3px solid var(--ink);background:linear-gradient(#fff8e4,#f3e3b6);box-shadow:inset 0 0 0 4px #fff8e4,inset 0 0 0 7px var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;gap:8px}
+.cardface{position:relative;max-width:520px;margin:6px auto 0;border-radius:18px;border:3px solid var(--ink);background:linear-gradient(#fff8e4,#f3e3b6);box-shadow:inset 0 0 0 4px #fff8e4,inset 0 0 0 7px var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px 18px;gap:6px;min-height:240px}
 .cardface .frm{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .cardface .cin{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 26px}
-.cardface .gl{width:88px;height:88px;display:block}
+.cardface .gl{width:76px;height:76px;display:block}
 .cardface .ic{font-size:54px;line-height:1}
 .cardface .tt{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:32px;font-weight:900;line-height:1.2}
 .cardface .ds{font-size:18px;font-weight:700;color:var(--sub);line-height:1.5}
 .cardface.fate{background:linear-gradient(#dfe9ff,#b9c9ee)}
 .cardface.wind{background:linear-gradient(#e9f4ff,#c4dff3)}
 .cardface .tag2{font-size:13px;font-weight:900;background:var(--gold);border:2px solid var(--ink);border-radius:999px;padding:1px 10px}
+/* 節奏題 */
+.rh{display:flex;justify-content:center;gap:8px;margin:8px 0 2px}
+.rb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:54px;height:58px;border:3px solid var(--ink);border-radius:12px;background:#fff8e4}
+.rb small{font-size:11px;color:var(--sub);line-height:1}
+.rb>i{display:inline-block}
+.rq{width:18px;height:18px;border-radius:50%;background:var(--pink);border:2px solid var(--ink)}
+.rq.s{width:13px;height:13px;margin:0 1px}
+.rb{flex-direction:row;flex-wrap:wrap;align-content:center;padding:4px 2px}
+.rb small{flex-basis:100%;text-align:center}
+.rr{width:20px;height:5px;background:var(--ink);border-radius:3px}
+/* 星空試煉疊層 */
+#arcOv{position:fixed;inset:0;z-index:50;background:#0f1a3a;display:flex;flex-direction:column}
+#arcOv.hide{display:none}
+#arcOv .bar2{display:flex;justify-content:flex-end;padding:6px 10px;background:#0f1a3a}
+#arcOv .bar2 button{font-family:inherit;font-weight:900;font-size:18px;min-height:44px;padding:0 18px;border:3px solid var(--ink);border-radius:14px;background:#ffe48a;cursor:pointer}
+#arcOv iframe{flex:1;border:0;width:100%}
 /* 測試用 */
 details.test{margin-top:16px;background:rgba(255,255,255,.5);border:2px dashed var(--ink);border-radius:14px;padding:8px 14px;font-size:14px}
 details.test summary{cursor:pointer;font-weight:700}
@@ -128,6 +144,7 @@ details.test summary{cursor:pointer;font-weight:700}
 </defs></svg>
 
 <script src="save-core.js"></script>
+<div id="arcOv" class="hide"><div class="bar2"><button type="button" id="arcClose">關閉星空試煉，回到課堂</button></div><iframe id="arcFrame" title="星空試煉" allow="microphone"></iframe></div>
 <div class="wrap">
  <div class="top">
   <h1>課堂模式・老師操作</h1>
@@ -198,7 +215,7 @@ details.test summary{cursor:pointer;font-weight:700}
   <hr style="border:0;border-top:1px dashed var(--ink);margin:10px 0">
   <div><b>測試用（正式站不放）</b></div>
   <div class="chips" id="chips" role="group" aria-label="指定動物救援"></div>
-  <label>下一次抽到：<select id="force"><option value="">隨機</option><option value="wind">風</option><option value="c0">卡1</option><option value="c1">卡2</option><option value="c2">卡3</option><option value="c3">卡4</option><option value="c4">卡5</option><option value="c5">卡6</option><option value="c6">卡7（打節奏）</option></select></label>
+  <label>下一次抽到：<select id="force"><option value="">隨機</option><option value="wind">風</option><option value="c0">卡1</option><option value="c1">卡2</option><option value="c2">卡3</option><option value="c3">卡4</option><option value="c4">卡5</option><option value="c5">卡6</option><option value="c6">卡7（打節奏）</option><option value="c7">卡8 星空試煉</option><option value="c8">卡9 慢速／加速</option><option value="c9">卡10 背譜達人</option><option value="c10">卡11 默劇大師</option></select></label>
   <label>救援掉落：<select id="mode"><option value="rand">隨機（各 25% 加碼）</option><option value="base">只出保底</option><option value="bonus">兩種都加碼</option></select></label>
   <div class="row2" style="margin-top:8px"><button class="btn sm" id="resetDay" type="button">重設「今天」（張數、本班今日星星糖）</button></div>
  </details>
@@ -224,8 +241,19 @@ const CARDS=[
  {ic:'soft',t:'輕輕吹',d:'全班一起，輕輕地把整首歌吹一遍'},
  {ic:'book',t:'譜蓋起來吹',d:'把譜蓋起來，全班憑記憶吹一遍'},
  {ic:'loop',t:'重複第一段',d:'回到第一段，全班再吹一次'},
- {ic:'drum',t:'打出節奏',d:'選歌曲任一段落，全班拍手（或敲桌）打出它的節奏'}
+ {ic:'drum',t:'打出節奏',d:'全班跟著下面的節奏，拍手（或敲桌）打 4 遍',rh:true},
+ {ic:'star',t:'星空試煉',d:'打開星空試煉，大家一起挑戰（可以不收音玩）',arc:true},
+ {ic:'slow',t:'慢速挑戰',d:'全班一起，比平常慢很多，穩穩把整首歌吹一遍',v:[{ic:'slow',t:'慢速挑戰',d:'全班一起，比平常慢很多，穩穩把整首歌吹一遍'},{ic:'fast',t:'加速挑戰',d:'全班一起，比平常快一點，把整首歌吹一遍'}]},
+ {ic:'eye',t:'背譜達人',d:'全班閉上眼睛，把整首歌吹一遍'},
+ {ic:'mime',t:'默劇大師',d:'只按指法、不吹氣，把整首歌「演」一遍'}
 ];
+/* 節奏題庫（一小節 4 拍）：q=一拍一下、e=一拍兩下（快）、r=休息 */
+const RHYTHMS=[['q','q','q','q'],['q','q','e','q'],['e','e','q','q'],['q','r','q','q'],['q','e','q','r'],['e','q','e','q'],['q','q','q','r'],['e','e','e','q']];
+function rhHTML(k){ return '<div class="rh">'+RHYTHMS[k].map(function(b,i){return '<span class="rb">'+(b==='q'?'<i class="rq"></i>':b==='e'?'<i class="rq s"></i><i class="rq s"></i>':'<i class="rr"></i>')+'<small>'+(i+1)+'</small></span>';}).join('')+'</div><small style="font-weight:700">● 拍一下　●● 快拍兩下　－ 休息</small>'; }
+function cardView(c){ /* 依存檔的變化版／節奏題決定這張卡實際顯示的內容 */
+  if(c.v) c=c.v[C.v|0]||c.v[0];
+  return {ic:c.ic,t:c.t,d:(c.rh&&C.rh>=0)?c.d+rhHTML(C.rh):c.d};
+}
 const $ = id => document.getElementById(id);
 /* 凱爾特風卡框：雙線金框＋上下編繩＋四角三圓結（凱爾特風只放 UI 框） */
 function braid(x1,x2,y){
@@ -239,7 +267,7 @@ function knot(cx,cy){
         +pts.map((p,i)=>'<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="'+r+'" fill="none" stroke="'+['#d4a63a','#f2cf6a','#b98a22'][i]+'" stroke-width="2.4"/>').join('')
         +'<circle cx="'+cx+'" cy="'+(cy+0.5)+'" r="2.6" fill="#a8447f" stroke="#4a2f1a" stroke-width="1.4"/>';
 }
-const FRAME='<svg class="frm" viewBox="0 0 480 300" aria-hidden="true">'
+const FRAME='<svg class="frm" viewBox="0 0 480 300" preserveAspectRatio="none" aria-hidden="true">'
  +'<rect x="8" y="8" width="464" height="284" rx="20" fill="none" stroke="#4a2f1a" stroke-width="3.5"/>'
  +'<rect x="16" y="16" width="448" height="268" rx="14" fill="none" stroke="#d4a63a" stroke-width="3"/>'
  +braid(78,402,25)+braid(78,402,275)
@@ -264,6 +292,11 @@ const GLYPH={
  loop:dbl('M66 38 A19 19 0 1 0 69 52',4)+dbl('M58 36 L68 38 L66 28',3.4)+dbl('M34 62 A19 19 0 0 0 32 48',0.1),
  drum:dbl('M30 46 a20 8 0 1 0 40 0 a20 8 0 1 0 -40 0',3.6)+dbl('M30 46 L30 64 Q50 76 70 64 L70 46',3.6)+dbl('M36 30 L50 44',3.6)+dbl('M64 30 L50 44',3.6),
  deck:dbl('M32 30 L68 30 L68 70 L32 70Z',3.6)+dbl('M42 50 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0',3)+dot(50,50,3),
+ star:dbl('M50 26 L55 42 L72 42 L58 52 L63 68 L50 58 L37 68 L42 52 L28 42 L45 42Z',3.2)+dbl('M26 70 Q40 78 60 74',3.2)+dot(50,50,2.4),
+ slow:dbl('M50 50 m0 0 a4 4 0 1 1 6 3 a10 10 0 1 1 -14 -8 a17 17 0 1 1 24 14',3.4)+dbl('M28 70 L72 70',3.4)+dot(50,50,2.4),
+ fast:dbl('M30 36 L46 50 L30 64',3.8)+dbl('M48 36 L64 50 L48 64',3.8)+dbl('M66 36 L78 50 L66 64',3.8),
+ eye:dbl('M26 52 Q50 36 74 52',3.8)+dbl('M32 60 L28 68 M50 62 L50 72 M68 60 L72 68',3.2)+dot(50,46,2.4),
+ mime:dbl('M30 58 Q30 38 50 38 Q72 38 72 56 Q72 70 52 70 Q30 70 30 58Z',3.4)+dot(42,54,2.6)+dot(52,52,2.6)+dot(62,56,2.6)+dbl('M36 30 L68 76',3.6),
  wind:dbl('M32 40 Q54 30 62 40 Q70 52 58 54',4)+dbl('M30 54 Q50 48 58 54',4)+dbl('M36 66 Q56 72 68 62',4)
 };
 function icon(k){ return GLYPH[k] ? '<svg viewBox="0 0 100 100" class="gl" aria-hidden="true">'+ring()+GLYPH[k]+'</svg>' : k; }
@@ -309,30 +342,35 @@ function drawCard(){
   if(C.phase==='drop'){ idle(); }   /* 掉落畫面按「再抽一張卡」：先收掉掉落畫面 */
   const f=S.force;
   let kind;
-  if(f==='animal') kind='animal'; else if(f==='wind') kind='wind'; else if(/^c\d$/.test(f)) kind=f;
+  if(f==='animal') kind='animal'; else if(f==='wind') kind='wind'; else if(/^c\d+$/.test(f)) kind=f;
   else { const r=Math.random(); kind = r<P_ANIMAL?'animal' : r<P_ANIMAL+P_WIND?'wind' : 'card'; }
   S.force=''; const fs=$('force'); if(fs) fs.value='';
   C.n++;
   if(kind==='animal'){ startRescue(); return; }
   if(kind==='wind'){ showWind(); return; }
   let ix;
-  if(/^c\d$/.test(kind)&&CARDS[+kind.slice(1)]) ix=+kind.slice(1);
+  if(/^c\d+$/.test(kind)&&CARDS[+kind.slice(1)]) ix=+kind.slice(1);
   else { const pool=CARDS.map((x,k)=>k).filter(k=>k!==C.last); ix=pool[Math.floor(Math.random()*pool.length)]; }
   showCard(ix);
 }
 function showCard(ix){
-  const c=CARDS[ix]; C.phase='card'; C.card=ix; C.last=ix; C.solo=c.solo?1+Math.floor(Math.random()*C.size):0; save();
+  const c=CARDS[ix]; C.phase='card'; C.card=ix; C.last=ix; C.solo=c.solo?1+Math.floor(Math.random()*C.size):0;
+  C.v=c.v?Math.floor(Math.random()*c.v.length):0;
+  if(c.rh){ const pool=RHYTHMS.map(function(x,k){return k;}).filter(function(k){return k!==C.lastRh;}); C.rh=pool[Math.floor(Math.random()*pool.length)]; C.lastRh=C.rh; } else C.rh=-1;
+  save();
   paintCard();
 }
 function paintCard(){
-  const c=CARDS[C.card]; view('card'); face('',c.ic,c.t,c.d);
-  setDraw(false); $('deckHint').textContent='';
+  const c0=CARDS[C.card], c=cardView(c0); view('card'); face('',c.ic,c.t,c.d);
+  setDraw(false); $('deckHint').innerHTML='';
+  if(c0.arc){ $('deckHint').innerHTML='<button type="button" class="btn sm" id="arcGo" style="width:100%;min-height:64px;font-size:26px">開始星空試煉</button><br>星空試煉的水晶碎片會自動入帳，玩完老師再按「通過」（這張卡不另外掉星星糖）'; $('arcGo').onclick=openArc; }
   $('solo').innerHTML = c.solo&&C.solo ? '請 <span style="color:var(--pink)">'+C.solo+' 號</span> 獨奏<small>沒吹過？全班一起吹支援</small>' : '';
   setPass('通過',false,'完成後按這一顆（獨奏沒過、全班一起吹支援，也是按這一顆）');
 }
 function passCard(){
   if(S.busy) return; S.busy=true; $('pass').disabled=true;
   const c=CARDS[C.card];
+  if(c&&c.arc){ idle(); $('deckHint').textContent='星空試煉的水晶碎片已自動入帳。'; return; }   /* 機會牌：只靠試煉掉落水晶碎片 */
   giveDrop({candy:CARD_CANDY,candyBonus:0,cry:CARD_CRY,cryBonus:0,title:'任務完成！'+(c?c.t:''),cryIsle:null,kind:'card'});
 }
 /* ---- 命運：風 ---- */
@@ -445,6 +483,10 @@ function showDrop(){
   else { setPass('通過',true); $('passHint').textContent=''; }
 }
 $('pass').onclick=doPass; $('drawCard').onclick=drawCard;
+function openArc(){ $('arcFrame').src='ocarina-playground.html?class=1'; $('arcOv').classList.remove('hide'); }
+function closeArc(){ $('arcOv').classList.add('hide'); $('arcFrame').src='about:blank'; }
+$('arcClose').onclick=closeArc;
+addEventListener('message',function(e){ if(e.data&&e.data.type==='arcade-close') closeArc(); });
 $('ship').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'ship'},'*');}catch(e){} };
 $('jarGo').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'map'},'*');}catch(e){} };   /* 地圖頁同一頁有星空地圖與星星罐 */
 /* 老師設定／測試 */
@@ -465,7 +507,7 @@ rep();
   else if(ph==='rescue'){ view('rescue'); $('drawCard').classList.add('hide'); mount(); }
   else if(ph==='drop'&&C.drop){
     if(C.drop.kind==='rescue'){ view('rescue'); mount(); C.pass=HP; $('stage').classList.add('calm'); renderRescue(); }
-    else { const c=CARDS[C.card]; view('card'); if(c) face('',c.ic,c.t,''); $('deckHint').textContent=''; }
+    else { const c=CARDS[C.card]; view('card'); if(c){ const cv=cardView(c); face('',cv.ic,cv.t,''); } $('deckHint').textContent=''; }
     showDrop();
   }
   else idle();

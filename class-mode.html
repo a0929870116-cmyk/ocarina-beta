@@ -536,6 +536,7 @@ function newBag(prev){
 }
 function nextKind(){ if(!C.bag||!C.bag.length) C.bag=newBag(C.lastKind); const k=C.bag.shift(); C.lastKind=k; return k; }
 function drawCard(){
+  try{ if(parent!==window) parent.postMessage({type:'class-music',off:true},'*'); }catch(e){}   /* 抽卡就關背景音樂（老師要播自己的配樂）；離開課堂去飛船／星星罐會自動恢復 */
   if(S.busy) return;
   if(C.phase!=='idle'&&C.phase!=='drop') return;
   if(C.phase==='drop'){ idle(); }   /* 掉落畫面按「再抽一張卡」：先收掉掉落畫面 */

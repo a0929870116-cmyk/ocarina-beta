@@ -672,7 +672,7 @@ window.addEventListener('message',e=>{
   const d=e.data;
   if(d&&d.type==='class-arc-open'&&e.source===$('class-frame').contentWindow&&/^[\w-]{1,40}$/.test(d.id||'')){$('classArcFrame').src='ocarina-playground.html?class=1&game='+encodeURIComponent(d.id);$('classArc').hidden=false;return;}
   if(d&&d.type==='arcade-close'&&e.source===$('classArcFrame').contentWindow){closeClassArc();return;}
-  if(d&&e.source===$('class-frame').contentWindow){if(d.type==='class-go'&&d.v)go(d.v);if(d.type==='class-h'&&d.h>300)$('class-frame').style.height=Math.ceil(d.h)+'px';}
+  if(d&&e.source===$('class-frame').contentWindow){if(d.type==='class-go'&&d.v)go(d.v);if(d.type==='class-music')toParent({type:'practice',on:!!d.off});if(d.type==='class-h'&&d.h>300)$('class-frame').style.height=Math.ceil(d.h)+'px';}
   if(d&&d.type==='ship-h'&&e.source===$('ship-frame').contentWindow&&d.h>200)$('ship-frame').style.height=Math.ceil(d.h)+'px';
 });
 

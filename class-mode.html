@@ -7,27 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Iansui&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#4a2f1a;--text:#3a2410;--sub:#5a4630;--paper:#EFE1BF;--card:#F9F0D6;--gold:#d4a63a;--gold2:#b98a22;--green:#3f7a4a;--leaf:#6fae78;--pink:#a8447f}
+:root{--ink:#4a2f1a;--text:#3a2410;--sub:#5a4630;--paper:#EFE1BF;--card:#F9F0D6;--card2:#fff8e4;--edge:#D9C494;--gold:#d4a63a;--gold2:#b98a22;--green:#3f7a4a;--leaf:#6fae78;--pink:#a8447f;--bshadow:#4a2f1a;--finkc:#4a2f1a;--bd1:#fff8e4;--bd2:#f3e3b6;--fate1:#dfe9ff;--fate2:#b9c9ee;--wind1:#e9f4ff;--wind2:#c4dff3}
+/* 跟地圖頁同一套深色（跟隨裝置深色模式） */
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--ink:#EFE2C4;--text:#EFE2C4;--sub:#BFA987;--paper:#1E1A16;--card:#292219;--card2:#332a1f;--edge:#120F0C;--gold:#D9A843;--gold2:#F0C867;--green:#7FBF9B;--leaf:#5fa77a;--pink:#e58ab0;--bshadow:#0c0906;--finkc:#EFE2C4;--bd1:#2f261c;--bd2:#241e16;--fate1:#27315a;--fate2:#1d2548;--wind1:#24384c;--wind2:#1a2a3a}}
 *{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingFang TC',sans-serif;min-height:100vh;
- background-image:radial-gradient(circle at 20% 10%,rgba(255,255,255,.35),transparent 45%),radial-gradient(circle at 85% 90%,rgba(180,140,60,.15),transparent 50%)}
-.wrap{max-width:980px;margin:0 auto;padding:14px 14px 40px}
-.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.top h1{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:26px;margin:0;flex:1 1 auto;line-height:1.2}
-.pill{background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:4px 14px;font-weight:700;font-size:15px}
-.pill b{color:var(--gold2)}
-.main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
-@media(max-width:760px){.main{grid-template-columns:1fr}}
-/* 金框（凱爾特風只放 UI 框：金釘＋雙線） */
-.frame{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:inset 0 0 0 5px var(--card),inset 0 0 0 8px var(--gold),0 3px 0 rgba(74,47,26,.25);padding:20px}
-.stud{position:absolute;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3a8,var(--gold) 55%,var(--gold2));border:2px solid var(--ink)}
-.stud.a{left:8px;top:8px}.stud.b{right:8px;top:8px}.stud.c{left:8px;bottom:8px}.stud.d{right:8px;bottom:8px}
-.who{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 6px 0}
-.who .nm{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:30px;font-weight:900}
-.who .isl{font-size:15px;font-weight:700;color:#8a6a3a}
-.stage{position:relative;margin:6px auto 0;max-width:520px;aspect-ratio:480/400;border-radius:16px;overflow:hidden;background:#fbf4de}
-.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 #bound{transition:opacity .6s}
 #calmWrap{opacity:0;transition:opacity .6s;pointer-events:none}
 .calm #bound{opacity:0}.calm #calmWrap{opacity:1}
@@ -43,72 +26,15 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 .burst{position:absolute;inset:0;pointer-events:none}
 .spark{position:absolute;width:12px;height:12px;background:#ffd966;border:2px solid var(--ink);clip-path:polygon(50% 0,62% 36%,100% 38%,70% 60%,80% 100%,50% 76%,20% 100%,30% 60%,0 38%,38% 36%);animation:out .8s ease-out forwards}
 @keyframes out{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4)}}
-.msg{min-height:44px;margin:10px 6px 0;font-size:17px;font-weight:700;text-align:center;color:var(--sub)}
-/* 右側操作 */
-.side{display:flex;flex-direction:column;gap:14px}
-.pips{display:flex;gap:10px}
-.pip{flex:1;border:3px solid var(--ink);border-radius:14px;padding:10px 4px;text-align:center;font-weight:900;background:#fff8e4;color:#8a7a5a;opacity:.7;transition:all .3s}
-.pip small{display:block;font-weight:700;font-size:12px}
-.pip .big{font-size:26px;line-height:1.2}
-.pip.cur{opacity:1;color:var(--text);box-shadow:0 0 0 3px var(--gold);}
-.pip.done{opacity:1;background:var(--gold);color:var(--text)}
-.cnt{text-align:center;font-weight:700;font-size:16px;margin:2px 0 0;color:var(--sub)}
 .btn{font-family:inherit;cursor:pointer;border:3px solid var(--ink);border-radius:18px;font-weight:900;color:var(--text)}
-#pass{width:100%;min-height:96px;font-size:40px;letter-spacing:.2em;background:linear-gradient(#ffe48a,var(--gold));box-shadow:0 5px 0 var(--ink);transition:transform .08s,box-shadow .08s}
-#pass:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
-#pass:disabled{opacity:.5;cursor:default}
-.hint{font-size:14px;color:var(--sub);text-align:center;margin:12px 0 0}
-.row2{display:flex;gap:10px}
-.btn.sm{flex:1;min-height:46px;font-size:16px;background:#fff8e4;box-shadow:0 3px 0 var(--ink)}
-.btn.sm:disabled{opacity:.4;cursor:default}
 :focus-visible{outline:4px solid #2b6cb0;outline-offset:2px}
 /* 掉落 */
-.drop{display:none}
-.drop.show{display:block}
-.drop h2{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:24px;margin:0 0 8px;text-align:center}
-.cards{display:flex;gap:10px}
-.dcard{flex:1;background:#fff8e4;border:3px solid var(--ink);border-radius:16px;padding:10px 6px;text-align:center}
-.dcard svg{width:46px;height:46px}
-.dcard .n{font-size:34px;font-weight:900;line-height:1.1}
-.dcard .t{font-size:14px;font-weight:700;color:var(--sub)}
-.dcard .tag{display:inline-block;margin-top:4px;font-size:12px;font-weight:900;background:var(--gold);border:2px solid var(--ink);border-radius:999px;padding:1px 8px}
-.dcard .tag.base{background:#e6dcc0}
-.cap{margin-top:10px;font-size:14px;color:var(--sub)}
-.bar{height:12px;border:2px solid var(--ink);border-radius:8px;background:#fff8e4;overflow:hidden;margin:2px 0 6px}
-.bar i{display:block;height:100%;background:var(--leaf)}
-.capnote{font-weight:900;color:#a8442f}
-/* 航程條 */
-.voy .lab{display:flex;justify-content:space-between;align-items:baseline;font-weight:900;font-size:17px;margin:0 2px 6px}
-.voy .lab small{font-weight:700;color:var(--sub);font-size:13px}
-.vbar{display:flex;gap:6px}
-.vbar i{flex:1;height:22px;border:2px solid var(--ink);border-radius:8px;background:#fff8e4}
-.vbar i.on{background:linear-gradient(#bfe7ff,#5fb0e8)}
-.voyscene{aspect-ratio:480/300;max-width:520px;margin:6px auto 0;border-radius:16px;border:2px solid var(--ink);background:linear-gradient(#1d2a55,#3b4f8f);display:flex;align-items:center;justify-content:center;color:#fff3c4;font-weight:900;font-size:19px;text-align:center;padding:16px;line-height:1.6;position:relative;overflow:hidden}
-.voyscene .st{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff3c4;opacity:.8}
-.sos{animation:sos 1s ease-in-out infinite}
-@keyframes sos{50%{transform:scale(1.06)}}
-.steps{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.stp{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;color:#8a7a5a}
-.stp b{display:inline-flex;width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);align-items:center;justify-content:center;background:#fff8e4;color:var(--sub)}
-.stp.cur{color:var(--text)}.stp.cur b{background:var(--gold);color:var(--text)}
-.stp.ok b{background:var(--leaf);color:#fff}
-.solo{margin-top:10px;text-align:center;font-family:Iansui,'Noto Sans TC',sans-serif;font-size:28px;font-weight:900;min-height:40px}
 .solo small{display:block;font-family:'Noto Sans TC',sans-serif;font-size:13px;color:var(--sub);font-weight:700}
 .hide{display:none!important}
-.cardface{position:relative;max-width:520px;margin:6px auto 0;border-radius:18px;border:3px solid var(--ink);background:linear-gradient(#fff8e4,#f3e3b6);box-shadow:inset 0 0 0 4px #fff8e4,inset 0 0 0 7px var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px 18px;gap:6px;min-height:240px}
-.cardface .frm{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.cardface .cin{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 26px}
-.cardface .gl{width:76px;height:76px;display:block}
-.cardface .ic{font-size:54px;line-height:1}
-.cardface .tt{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:32px;font-weight:900;line-height:1.2}
-.cardface .ds{font-size:18px;font-weight:700;color:var(--sub);line-height:1.5}
-.cardface.fate{background:linear-gradient(#dfe9ff,#b9c9ee)}
-.cardface.wind{background:linear-gradient(#e9f4ff,#c4dff3)}
-.cardface .tag2{font-size:13px;font-weight:900;background:var(--gold);border:2px solid var(--ink);border-radius:999px;padding:1px 10px}
 /* 前情提要 */
 #intro{position:fixed;inset:0;z-index:60;background:linear-gradient(#141f48,#2d3d7a);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;color:#fff3c4}
 #intro.hide{display:none}
-#intro .cb{position:relative;border:0;background:none;padding:0;cursor:pointer;font-family:inherit;font-weight:900;color:var(--text);display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+#intro .cb{position:relative;border:0;background:none;padding:0;cursor:pointer;font-family:inherit;font-weight:900;color:#3a2410;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 #intro .cb svg{position:absolute;inset:0;width:100%;height:100%;display:block;filter:drop-shadow(0 4px 0 #4a2f1a)}
 #intro .cb span{position:relative;letter-spacing:.12em}
 #intro .cb:active{transform:translateY(3px)}
@@ -134,7 +60,7 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 @keyframes tw{50%{opacity:.2}}
 /* 節奏題 */
 .rh{display:flex;justify-content:center;gap:8px;margin:8px 0 2px}
-.rb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:54px;height:58px;border:3px solid var(--ink);border-radius:12px;background:#fff8e4}
+.rb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:54px;height:58px;border:3px solid var(--ink);border-radius:12px;background:var(--card2)}
 .rb small{font-size:11px;color:var(--sub);line-height:1}
 .rb>i{display:inline-block}
 .rq{width:18px;height:18px;border-radius:50%;background:var(--pink);border:2px solid var(--ink)}
@@ -143,20 +69,157 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 .rb small{flex-basis:100%;text-align:center}
 .rr{width:20px;height:5px;background:var(--ink);border-radius:3px}
 /* 星空試煉疊層 */
-#arcOv{position:fixed;inset:0;z-index:50;background:#0f1a3a;display:flex;flex-direction:column}
+#arcOv{position:fixed;inset:0;z-index:50;background:var(--paper);display:flex;flex-direction:column}
 #arcOv.hide{display:none}
-#arcOv .bar2{display:flex;justify-content:flex-end;padding:6px 10px;background:#0f1a3a}
-#arcOv .bar2 button{font-family:inherit;font-weight:900;font-size:18px;min-height:44px;padding:0 18px;border:3px solid var(--ink);border-radius:14px;background:#ffe48a;cursor:pointer}
 #arcOv iframe{flex:1;border:0;width:100%}
-/* 測試用 */
-details.test{margin-top:16px;background:rgba(255,255,255,.5);border:2px dashed var(--ink);border-radius:14px;padding:8px 14px;font-size:14px}
-details.test summary{cursor:pointer;font-weight:700}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-.chip{font-family:inherit;border:2px solid var(--ink);background:#fff8e4;border-radius:999px;padding:5px 12px;font-weight:700;cursor:pointer;font-size:14px}
-.chip[aria-pressed=true]{background:var(--gold)}
-.test label{display:inline-flex;gap:6px;align-items:center;margin-right:14px}
-.test select{font-family:inherit;font-size:14px}
 @media (prefers-reduced-motion:reduce){#bound svg,#calmWrap svg{animation:none}.vine{transition:none}.spark{animation:none;opacity:0}}
+
+html,body{margin:0}
+body{background-color:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingFang TC',sans-serif;min-height:100vh;
+ background-image:radial-gradient(130% 70% at 50% 25%,transparent 55%,var(--edge) 130%)}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 14px 28px}
+/* 頂欄：身分＋今日進度＋工具，一排 */
+.top{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin-bottom:12px}
+.brand{display:flex;align-items:baseline;gap:8px;margin-right:auto}
+.brand b{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:24px;line-height:1.2}
+.brand span{font-size:14px;font-weight:700;color:var(--sub)}
+.pill,.meter,.ibtn{background:var(--card);border:2px solid var(--ink);border-radius:999px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:2px 12px;font-family:inherit;color:var(--text)}
+.pill b{color:var(--gold2)}
+.ibtn{cursor:pointer;min-height:38px}
+.ibtn:active{background:var(--card2)}
+.meter svg{width:20px;height:20px;flex:none}
+.meter .mb{width:54px;height:10px;border:2px solid var(--ink);border-radius:6px;background:var(--card2);overflow:hidden}
+.meter .mb i{display:block;height:100%;width:0;background:var(--leaf);transition:width .4s}
+.meter.full .mb i{background:#c9732f}
+.meter.full b{color:#a8442f}
+/* 主舞台：一張卡，所有狀態都在這裡 */
+#deck{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+#deck .gl{width:120px;height:120px;display:block}
+#deck .tt{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:clamp(34px,5.4vw,54px);font-weight:900;line-height:1.2}
+#deck .ds{font-size:clamp(19px,2.6vw,28px);font-weight:700;color:var(--sub);line-height:1.5;max-width:720px}
+#deck .tag2{font-size:14px;font-weight:900;color:#3a2410;background:var(--gold);border:2px solid var(--ink);border-radius:999px;padding:1px 12px}
+#deck .solo{margin-top:4px;font-size:clamp(24px,3.6vw,36px);font-weight:900;background:var(--card2);border:3px solid var(--ink);border-radius:18px;padding:6px 26px;box-shadow:0 3px 0 var(--bshadow)}
+#deck .solo b{color:var(--pink);font-size:1.3em}
+/* 救援 */
+.who{display:flex;align-items:baseline;justify-content:center;gap:10px;flex-wrap:wrap}
+.who .nm{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:30px;font-weight:900}
+.who .isl{font-size:15px;font-weight:700;color:#8a6a3a}
+.stage{position:relative;margin:6px auto 0;max-width:360px;aspect-ratio:480/400;border-radius:16px;overflow:hidden;background:#fbf4de}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.msg{margin:8px 4px 0;font-size:clamp(16px,2vw,20px);font-weight:700;text-align:center;color:var(--sub);line-height:1.5}
+.msg b{display:block;color:var(--text);font-size:1.12em}
+/* 掉落（在同一張卡裡） */
+#drop h2{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:clamp(28px,4vw,40px);margin:0 0 12px}
+.cards{display:flex;gap:12px}
+.dcard{flex:1;min-width:150px;background:var(--card2);border:3px solid var(--ink);border-radius:16px;padding:12px 6px;box-shadow:0 3px 0 var(--bshadow)}
+.dcard svg{width:44px;height:44px}
+.dcard .n{font-size:42px;font-weight:900;line-height:1.1}
+.dcard .t{font-size:15px;font-weight:700;color:var(--sub)}
+.dcard .tag{white-space:nowrap;display:inline-block;margin-top:4px;font-size:12px;font-weight:900;color:#3a2410;background:var(--gold);border:2px solid var(--ink);border-radius:999px;padding:1px 8px}
+.dcard .tag.base{background:#e6dcc0}
+.capnote{margin-top:10px;font-weight:900;color:#a8442f;font-size:14px}
+.rlinks{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+.lnk{font-family:inherit;font-weight:700;font-size:15px;border:2px solid var(--ink);border-radius:999px;background:var(--card2);padding:6px 16px;min-height:40px;cursor:pointer;color:var(--text)}
+.lnk:active{background:#f0e0b0}
+/* 底部：只有一顆主按鈕，位置永遠不變 */
+.dock{margin-top:16px}
+.btn{font-family:inherit;cursor:pointer;border:3px solid var(--ink);border-radius:20px;font-weight:900;color:#3a2410}
+.fi{stroke:var(--finkc)}
+#act{width:100%;min-height:96px;font-size:clamp(30px,5vw,42px);letter-spacing:.16em;box-shadow:0 5px 0 var(--bshadow);transition:transform .08s,box-shadow .08s,background .2s}
+#act.draw{background:linear-gradient(#ffe48a,var(--gold))}
+#act.pass{background:linear-gradient(#c9efb0,var(--leaf))}
+#act:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+#act:disabled{opacity:.5;cursor:default}
+.hint{font-size:15px;color:var(--sub);text-align:center;margin:10px 0 0;min-height:1.4em}
+:focus-visible{outline:4px solid #2b6cb0;outline-offset:2px}
+.hide{display:none!important}
+/* 老師設定 */
+#setOv{position:fixed;inset:0;z-index:70;background:rgba(40,28,14,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#setOv .pnl{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:18px 20px;width:min(520px,100%);max-height:90vh;overflow:auto;box-shadow:0 5px 0 var(--bshadow)}
+#setOv h3{margin:0 0 10px;font-family:Iansui,'Noto Sans TC',sans-serif;font-size:24px}
+#setOv .small{font-size:13px;color:var(--sub);margin:6px 0 0}
+#setOv details{margin-top:14px;background:rgba(255,255,255,.5);border:2px dashed var(--ink);border-radius:14px;padding:8px 14px;font-size:14px}
+#setOv summary{cursor:pointer;font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{font-family:inherit;border:2px solid var(--ink);background:var(--card2);border-radius:999px;padding:5px 12px;font-weight:700;cursor:pointer;font-size:14px}
+.chip[aria-pressed=true]{background:var(--gold);color:#3a2410}
+#setOv label{display:inline-flex;gap:6px;align-items:center;margin:4px 14px 4px 0}
+#setOv select{font-family:inherit;font-size:14px}
+.sm{font-family:inherit;font-weight:700;font-size:15px;border:2px solid var(--ink);border-radius:12px;background:var(--card2);padding:6px 14px;min-height:40px;cursor:pointer}
+.closeset{margin-top:14px;width:100%;min-height:48px;font-size:18px;background:linear-gradient(#ffe48a,var(--gold));border-radius:14px}
+@media(max-width:760px){.top{gap:6px 8px}.meter .mb{width:40px}}
+/* ===== v3：牌堆＋翻牌 ===== */
+.board{min-height:470px;padding:28px 18px;background:none;box-shadow:none;border-radius:0;flex-direction:column;gap:18px}
+#deckZone{display:flex;flex-direction:column;align-items:center;gap:22px}
+.stack{position:relative;width:250px;height:350px}
+.sc{position:absolute;inset:0;border-radius:22px;border:0;padding:0}
+.sc.s2{transform:rotate(-5deg) translate(-12px,4px)}
+.sc.s3{transform:rotate(4deg) translate(12px,6px)}
+.sc.s2,.sc.s3{background:linear-gradient(#2a5a45,#1c3d2e);box-shadow:0 4px 0 rgba(0,0,0,.35),inset 0 0 0 3px var(--gold)}
+.sc.top{cursor:pointer;font-family:inherit;color:#f6e7b4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(#2E5B46,#1d3a2c);box-shadow:0 6px 0 rgba(0,0,0,.4);transition:transform .15s}
+.sc.top:hover{transform:translateY(-6px) rotate(-1deg)}
+.sc.top:active{transform:translateY(2px)}
+.sc.top .emb,.face.back .emb{position:relative;display:block;width:120px;height:120px}
+.sc.top .emb svg,.face.back .emb svg{width:100%;height:100%;display:block}
+.sc.top .lbl{position:relative;font-family:Iansui,'Noto Sans TC',sans-serif;font-weight:900;font-size:34px;letter-spacing:.12em}
+.frmwrap{position:absolute;inset:0;pointer-events:none;display:block}
+.frmwrap .frm{width:100%;height:100%;display:block}
+.again{width:min(420px,100%);min-height:64px;font-size:26px;letter-spacing:.14em;margin-top:16px;box-shadow:0 4px 0 var(--bshadow)}
+.again.draw{background:linear-gradient(#ffe48a,var(--gold))}
+/* 聚光：背景變暗，只留翻開的卡 */
+#spot{position:fixed;inset:0;z-index:40;background:rgba(10,8,5,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px;animation:fadein .25s}
+@keyframes fadein{from{opacity:0}}
+.flip{perspective:1400px}
+.card3d{display:grid;width:min(92vw,600px);transform-style:preserve-3d;transition:transform 1s cubic-bezier(.45,.05,.3,1)}
+.card3d.closed{transform:rotateY(180deg)}
+.face{grid-area:1/1;position:relative;border-radius:26px;backface-visibility:hidden;-webkit-backface-visibility:hidden;min-height:400px;display:flex;align-items:center;justify-content:center;padding:56px 64px}
+.face.back{transform:rotateY(180deg);background:linear-gradient(#2E5B46,#1d3a2c);box-shadow:0 8px 0 rgba(0,0,0,.4)}
+.face.front{background:linear-gradient(var(--bd1),var(--bd2));box-shadow:0 8px 0 rgba(0,0,0,.4)}
+.card3d.fate .face.front{background:linear-gradient(var(--fate1),var(--fate2))}
+.card3d.wind .face.front{background:linear-gradient(var(--wind1),var(--wind2))}
+.face.front>#deck,.face.front>#rescue{position:relative}
+#rescue{max-width:380px;width:100%}
+#pass{min-height:54px;padding:0 34px;font-size:22px;letter-spacing:.1em;background:linear-gradient(#c9efb0,var(--leaf));box-shadow:0 4px 0 #0c0906;border-radius:16px;transition:opacity .3s}
+#pass.off{opacity:0;pointer-events:none}
+#pass:active{transform:translateY(3px);box-shadow:0 1px 0 #0c0906}
+#drop{text-align:center;width:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+@media(max-width:760px){.face{padding:44px 34px;min-height:340px}}
+@media (prefers-reduced-motion:reduce){.card3d{transition:none}#spot{animation:none}.sc.top{transition:none}}
+
+
+/* ===== v4：圖示化頂欄（凱爾特線稿，跟底部導覽同一風格） ===== */
+button{font-family:inherit;color:inherit}
+.top{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin-bottom:10px}
+.brand{margin-right:auto}
+.brand b{font-size:20px}
+.pill.cls{min-height:40px;font-size:15px}
+.tools{display:flex;gap:8px}
+.tbtn{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--card);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.tbtn svg{width:26px;height:26px}
+.tbtn:active{background:var(--card2)}
+.stats{display:flex;gap:8px;flex-wrap:nowrap}
+.stat{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:2px solid var(--ink);border-radius:999px;min-height:40px;padding:0 12px 0 8px;font-weight:800;font-size:15px;color:var(--ink)}
+.stat svg{width:26px;height:26px;flex:none}
+.stat .mb{width:44px;height:9px;border:2px solid var(--ink);border-radius:6px;background:var(--card2);overflow:hidden}
+.stat .mb i{display:block;height:100%;width:0;background:var(--leaf);transition:width .4s}
+.stat.full .mb i{background:#c9732f}
+.stat.full b{color:#c9732f}
+.meter{display:none}
+@media(min-width:900px){.brand{margin-right:0;margin-left:0}.top{flex-wrap:nowrap}.stats{margin-left:auto}.tools{order:3}.brand{order:0}.pill.cls{order:1}.stats{order:2}}
+@media(max-width:899px){.stats{flex:1 1 100%;justify-content:space-between}.stat{flex:1;justify-content:center}.stat .mb{width:30px}}
+/* 獎勵畫面 */
+.dcard svg{width:56px;height:56px;color:var(--ink)}
+.lnk{display:inline-flex;align-items:center;gap:8px}
+.lnk svg{width:24px;height:24px;color:var(--ink)}
+.again{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:60px;font-size:24px;border-radius:18px}
+.again svg{width:30px;height:30px;color:#3a2410}
+#spot .btn.pass{min-width:150px}
+
+/* v4b：風事件（陶笛精靈哭泣）與頂欄數字不換行 */
+.cryimg{position:relative;display:inline-block;height:170px}
+.cryimg img{height:100%;width:auto;display:block}
+.stat b{white-space:nowrap}
+@media(max-width:899px){.stat{padding:0 8px 0 6px;gap:4px;font-size:14px}.stat .mb{width:22px}.stat svg{width:24px;height:24px}}
 </style>
 </head>
 <body>
@@ -170,6 +233,48 @@ details.test summary{cursor:pointer;font-weight:700}
 </filter>
 </defs></svg>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <symbol id="c-candy" viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 3.5L19.6 11.4L28 12.4L21.8 18.2L23.5 26.6L16 22.4L8.5 26.6L10.2 18.2L4 12.4L12.4 11.4Z" stroke="currentColor" stroke-width="2"/>
+  <circle cx="16" cy="16.3" r="3.6" stroke="var(--gold)" stroke-width="1.7"/>
+  <path d="M16 12.7V19.9M12.4 16.3H19.6" stroke="var(--gold)" stroke-width="1.3"/>
+ </symbol>
+ <symbol id="c-gem" viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9 5H23L29 12L16 28L3 12Z" stroke="currentColor" stroke-width="2"/>
+  <path d="M3 12H29M12 5L9.5 12L16 28L22.5 12L20 5" stroke="var(--gold)" stroke-width="1.5"/>
+ </symbol>
+ <symbol id="c-cards" viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 6.5L24.5 4.5C26 4.3 27.3 5.3 27.5 6.8L29.5 22C29.7 23.5 28.7 24.8 27.2 25L16 26.6" stroke="currentColor" stroke-width="2"/>
+  <rect x="3.5" y="7.5" width="17" height="21" rx="3" stroke="currentColor" stroke-width="2"/>
+  <circle cx="12" cy="18" r="4.2" stroke="var(--gold)" stroke-width="1.7"/>
+  <path d="M12 13.4V22.6M7.4 18H16.6" stroke="var(--gold)" stroke-width="1.4"/>
+ </symbol>
+ <symbol id="c-book" viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6.5 4H23C25 4 26.5 5.2 26.5 7.2V25C26.5 26.8 25 28 23 28H6.5Z" stroke="currentColor" stroke-width="2"/>
+  <path d="M11 4V28" stroke="currentColor" stroke-width="1.6"/>
+  <circle cx="18.7" cy="15.5" r="4.6" stroke="var(--gold)" stroke-width="1.7"/>
+  <path d="M18.7 8.3V22.7M11.8 15.5H25.6" stroke="var(--gold)" stroke-width="1.7"/>
+ </symbol>
+ <symbol id="c-gear" viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16" cy="16" r="8.5" stroke="currentColor" stroke-width="2"/>
+  <path d="M16 3V7.2M16 24.8V29M3 16H7.2M24.8 16H29M6.8 6.8L9.8 9.8M22.2 22.2L25.2 25.2M25.2 6.8L22.2 9.8M9.8 22.2L6.8 25.2" stroke="currentColor" stroke-width="2"/>
+  <circle cx="16" cy="16" r="3.6" stroke="var(--gold)" stroke-width="1.7"/>
+  <path d="M16 12.4V19.6M12.4 16H19.6" stroke="var(--gold)" stroke-width="1.3"/>
+ </symbol>
+ <symbol id="c-ship" viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 20H28C27 24.5 23.5 27 16 27C8.5 27 5 24.5 4 20Z" stroke="currentColor" stroke-width="2"/>
+  <path d="M16 20V5" stroke="currentColor" stroke-width="1.8"/>
+  <path d="M16 6C22 8 24.5 13 24 18H16Z" stroke="currentColor" stroke-width="1.8"/>
+  <path d="M16 9C11.5 11 9.5 14.5 10 18H16" stroke="var(--gold)" stroke-width="1.6"/>
+  <circle cx="20" cy="13" r="1.6" stroke="var(--gold)" stroke-width="1.5"/>
+  <path d="M7 29.5C10 28.5 12 30.5 15 29.5C18 28.5 21 30.5 25 29.5" stroke="var(--gold)" stroke-width="1.5"/>
+ </symbol>
+ <symbol id="c-jar" viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M10 5H22" stroke="currentColor" stroke-width="2"/>
+  <path d="M11.5 5C8 9 7 13 7 18C7 24 11 28 16 28C21 28 25 24 25 18C25 13 24 9 20.5 5" stroke="currentColor" stroke-width="2"/>
+  <path d="M16 12.5L17.7 16.6L22 17L18.7 19.8L19.8 24L16 21.7L12.2 24L13.3 19.8L10 17L14.3 16.6Z" stroke="var(--gold)" stroke-width="1.5"/>
+ </symbol>
+</defs></svg>
 <script src="save-core.js"></script>
 <div id="intro" class="hide" role="dialog" aria-label="前情提要">
  <button type="button" class="cb skip" id="introSkip"><svg viewBox="0 0 112 48" aria-hidden="true"><defs><linearGradient id="cbg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe48a"/><stop offset="1" stop-color="#d4a63a"/></linearGradient></defs><rect x="2" y="2" width="108" height="44" rx="18" fill="url(#cbg1)" stroke="#4a2f1a" stroke-width="3.5"/><rect x="8" y="8" width="96" height="32" rx="12" fill="none" stroke="#fff3a8" stroke-width="2"/><g fill="none" stroke="#4a2f1a" stroke-width="2.2"><circle cx="10.5" cy="26" r="5"/><circle cx="17.5" cy="26" r="5"/><circle cx="14" cy="20.5" r="5"/><circle cx="94.5" cy="26" r="5"/><circle cx="101.5" cy="26" r="5"/><circle cx="98" cy="20.5" r="5"/></g><g fill="none" stroke="#a8447f" stroke-width="1.2"><circle cx="10.5" cy="26" r="5"/><circle cx="17.5" cy="26" r="5"/><circle cx="14" cy="20.5" r="5"/><circle cx="94.5" cy="26" r="5"/><circle cx="101.5" cy="26" r="5"/><circle cx="98" cy="20.5" r="5"/></g></svg><span>略過</span></button>
@@ -178,84 +283,91 @@ details.test summary{cursor:pointer;font-weight:700}
  <div class="dots" id="introDots"><i></i><i></i><i></i><i></i></div>
  <button type="button" class="cb nx" id="introNext"><svg viewBox="0 0 220 64" aria-hidden="true"><defs><linearGradient id="cbg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe48a"/><stop offset="1" stop-color="#d4a63a"/></linearGradient></defs><rect x="2" y="2" width="216" height="60" rx="18" fill="url(#cbg2)" stroke="#4a2f1a" stroke-width="3.5"/><rect x="8" y="8" width="204" height="48" rx="12" fill="none" stroke="#fff3a8" stroke-width="2"/><g fill="none" stroke="#4a2f1a" stroke-width="2.2"><circle cx="10.5" cy="34" r="5"/><circle cx="17.5" cy="34" r="5"/><circle cx="14" cy="28.5" r="5"/><circle cx="202.5" cy="34" r="5"/><circle cx="209.5" cy="34" r="5"/><circle cx="206" cy="28.5" r="5"/></g><g fill="none" stroke="#a8447f" stroke-width="1.2"><circle cx="10.5" cy="34" r="5"/><circle cx="17.5" cy="34" r="5"/><circle cx="14" cy="28.5" r="5"/><circle cx="202.5" cy="34" r="5"/><circle cx="209.5" cy="34" r="5"/><circle cx="206" cy="28.5" r="5"/></g></svg><span id="introNextTx">下一頁</span></button>
 </div>
-<div id="arcOv" class="hide"><div class="bar2"><button type="button" id="arcClose">關閉星空試煉，回到課堂</button></div><iframe id="arcFrame" title="星空試煉" allow="microphone"></iframe></div>
+<div id="arcOv" class="hide"><iframe id="arcFrame" title="星空試煉" allow="microphone"></iframe></div>
 <div class="wrap">
- <div class="top">
-  <h1>課堂模式・老師操作</h1>
-  <span class="pill">班級帳號：<b id="clsName">—</b></span>
-  <button type="button" class="pill" id="introBtn" style="cursor:pointer;font-family:inherit">📖 前情提要</button>
-  <span class="pill" id="sess">今日已抽 <b>0</b> 張</span>
- </div>
-
- <div class="main">
-  <div class="frame">
-   <i class="stud a"></i><i class="stud b"></i><i class="stud c"></i><i class="stud d"></i>
-   <div id="deck">
-     <div class="lab"><span>🎴 課堂任務卡</span><span id="deckN"></span></div>
-     <div class="cardface" id="cardface"></div>
-     <p class="hint" style="margin-top:8px" id="deckHint"></p>
-    </div>
-   <div id="rescue" class="hide">
-   <div class="who"><span class="nm" id="nm"></span><span class="isl" id="isl"></span></div>
-   <div class="stage" id="stage">
-    <div id="bound"></div>
-    <div id="calmWrap" style="position:absolute;inset:0"></div>
-    <div class="burst" id="burst"></div>
-   </div>
-   <div class="msg" id="msg" aria-live="polite"></div>
-   </div>
-   <div class="row2" style="margin-top:12px"><button class="btn sm" id="drawCard" style="min-height:68px;font-size:24px;background:linear-gradient(#ffe48a,var(--gold))">🎴 抽一張卡</button></div>
+ <header class="top">
+  <div class="brand"><b>陶笛失落地圖</b></div>
+  <span class="pill cls"><b id="clsName">—</b></span>
+  <div class="tools">
+   <button type="button" class="tbtn" id="introBtn" aria-label="前情提要" title="前情提要"><svg><use href="#c-book"/></svg></button>
+   <button type="button" class="tbtn" id="setBtn" aria-label="老師設定" title="老師設定"><svg><use href="#c-gear"/></svg></button>
   </div>
+  <div class="stats">
+   <span class="stat" id="sess" title="今日已抽張數"><svg><use href="#c-cards"/></svg><b>0</b></span>
+   <span class="stat" id="meterCandy" title="本班今日星星糖"><svg><use href="#c-candy"/></svg><span class="mb"><i id="mCandy"></i></span><b id="mCandyT">0／24</b></span>
+   <span class="stat" id="meterCry" title="本班今日水晶碎片（含星空試煉）"><svg><use href="#c-gem"/></svg><span class="mb"><i id="mCry"></i></span><b id="mCryT">0／6</b></span>
+  </div>
+ </header>
 
-  <div class="side">
-   <div class="frame" style="padding:18px 16px">
-    <i class="stud a"></i><i class="stud b"></i><i class="stud c"></i><i class="stud d"></i>
-    <div id="rescueCtl">
-    <div class="steps" id="steps">
-     <div class="stp cur" data-s="1"><b>1</b>老師播放配樂，全班一起合奏一遍</div>
-     <div class="stp" data-s="2"><b>2</b>吹完，按「通過」，五條藤蔓一起鬆開</div>
-    </div>
-    </div>
-    <div class="solo" id="solo"></div>
-    <div style="height:10px"></div>
-    <button class="btn" id="pass">通過</button>
-    <p class="hint" id="passHint"></p>
+ <main class="board" id="board">
+  <div id="deckZone">
+   <div class="stack">
+    <i class="sc s3"></i><i class="sc s2"></i>
+    <button type="button" class="sc top" id="deckBtn" aria-label="抽任務卡">
+     <span class="frmwrap" id="deckFrm"></span>
+     <span class="emb" id="deckEmb"></span>
+     <span class="lbl">抽任務卡</span>
+    </button>
    </div>
-
-   <div class="frame drop" id="drop" style="padding:18px 16px">
-    <i class="stud a"></i><i class="stud b"></i><i class="stud c"></i><i class="stud d"></i>
-    <h2 id="dropTitle"></h2>
-    <div class="cards">
-     <div class="dcard">
-      <svg viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,4 30,18 45,19 33,29 37,44 24,36 11,44 15,29 3,19 18,18" fill="#ffd966" stroke="#4a2f1a" stroke-width="3" stroke-linejoin="round"/></svg>
-      <div class="t">星星糖</div><div class="n" id="dCandy"></div><span class="tag" id="tCandy"></span>
-     </div>
-     <div class="dcard">
-      <svg viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,3 42,17 24,45 6,17" fill="#9fd8f0" stroke="#4a2f1a" stroke-width="3" stroke-linejoin="round"/><path d="M6 17H42M24 3L17 17L24 45L31 17Z" fill="none" stroke="#4a2f1a" stroke-width="2" stroke-linejoin="round"/></svg>
-      <div class="t">水晶碎片</div><div class="n" id="dCry"></div><span class="tag" id="tCry"></span>
-      <div class="t" id="cryType" style="margin-top:4px"></div>
-     </div>
+   <p class="hint" id="deckHint">按一下牌堆，翻開這一次的任務</p>
+  </div>
+  <div id="drop" class="hide">
+   <h2 id="dropTitle"></h2>
+   <div class="cards">
+    <div class="dcard"><svg aria-hidden="true"><use href="#c-candy"/></svg>
+     <div class="t">星星糖</div><div class="n" id="dCandy"></div><span class="tag" id="tCandy"></span>
     </div>
-    <div class="cap" id="cap"></div>
-    <div class="row2" style="margin-top:10px"><button class="btn sm" id="ship" style="background:linear-gradient(#ffe48a,var(--gold))">🚀 進入提煉工坊，升級飛行船 →</button></div>
-    <div class="row2" style="margin-top:10px"><button class="btn sm" id="jarGo" style="background:#fff8e4">⭐ 查看星星罐・解鎖地圖進度 →</button></div>
+    <div class="dcard"><svg aria-hidden="true"><use href="#c-gem"/></svg>
+     <div class="t" id="cryType">水晶碎片</div><div class="n" id="dCry"></div><span class="tag" id="tCry"></span>
+    </div>
+   </div>
+   <div class="capnote hide" id="capnote">已達今日上限，這次只發到上限。</div>
+   <button type="button" class="btn draw again" id="again"><svg aria-hidden="true"><use href="#c-cards"/></svg>再抽一張卡</button>
+   <div class="rlinks">
+    <button type="button" class="lnk" id="ship"><svg aria-hidden="true"><use href="#c-ship"/></svg>提煉工坊</button>
+    <button type="button" class="lnk" id="jarGo"><svg aria-hidden="true"><use href="#c-jar"/></svg>星星罐</button>
    </div>
   </div>
- </div>
-
- <details class="test">
-  <summary>老師設定／測試用</summary>
-  <label>全班人數（抽號碼用，1～60；社團請自行編號）：<input id="csize" type="number" min="1" max="60" step="1" style="width:70px;font:inherit"></label>
-  <p class="hint" style="text-align:left">抽號碼只會抽 1～全班人數 的號碼。</p>
-  <hr style="border:0;border-top:1px dashed var(--ink);margin:10px 0">
-  <div><b>測試用（正式站不放）</b></div>
-  <div class="chips" id="chips" role="group" aria-label="指定動物救援"></div>
-  <label>下一次抽到：<select id="force"><option value="">隨機</option><option value="wind">風</option><option value="c0">卡1</option><option value="c1">卡2</option><option value="c2">卡3</option><option value="c3">卡4</option><option value="c4">卡5</option><option value="c5">卡6</option><option value="c6">卡7（打節奏）</option><option value="c7">卡8 星空試煉</option><option value="c8">卡9 慢速／加速</option><option value="c9">卡10 背譜達人</option><option value="c10">卡11 默劇大師</option></select></label>
-  <label>救援掉落：<select id="mode"><option value="rand">隨機（各 25% 加碼）</option><option value="base">只出保底</option><option value="bonus">兩種都加碼</option></select></label>
-  <div class="row2" style="margin-top:8px"><button class="btn sm" id="resetDay" type="button">重設「今天」（張數、本班今日星星糖）</button></div>
- </details>
+ </main>
 </div>
 
+<div id="spot" class="hide" role="dialog" aria-label="任務卡">
+ <div class="flip">
+  <div class="card3d closed" id="c3d">
+   <div class="face back" id="cback"><span class="frmwrap" id="cbackFrm"></span><span class="emb" id="cbackEmb"></span></div>
+   <div class="face front" id="cfront">
+    <span class="frmwrap" id="cfrontFrm"></span>
+    <div id="deck"></div>
+    <div id="rescue" class="hide">
+     <div class="who"><span class="nm" id="nm"></span><span class="isl" id="isl"></span></div>
+     <div class="stage" id="stage">
+      <div id="bound"></div>
+      <div id="calmWrap" style="position:absolute;inset:0"></div>
+      <div class="burst" id="burst"></div>
+     </div>
+     <div class="msg" id="msg" aria-live="polite"></div>
+    </div>
+   </div>
+  </div>
+ </div>
+ <button type="button" class="btn pass off" id="pass">通過</button>
+</div>
+
+<div id="setOv" class="hide" role="dialog" aria-label="老師設定">
+ <div class="pnl">
+  <h3>老師設定</h3>
+  <label>全班人數（抽號碼用，1～60；社團請自行編號）<input id="csize" type="number" min="1" max="60" step="1" style="width:70px;font:inherit"></label>
+  <p class="small">抽號碼只會抽 1～全班人數 的號碼。</p>
+  <details>
+   <summary>測試用（正式站不放）</summary>
+   <div class="chips" id="chips" role="group" aria-label="指定動物救援"></div>
+   <label>下一次抽到：<select id="force"><option value="">隨機</option><option value="wind">風</option><option value="c0">全班合奏</option><option value="c1">英雄獨奏</option><option value="c2">接龍吹奏</option><option value="c3">輕輕吹</option><option value="c4">譜蓋起來吹</option><option value="c5">重複第一段</option><option value="c6">打出節奏</option><option value="c7">星空試煉</option><option value="c8">慢速／加速</option><option value="c9">背譜達人</option><option value="c10">默劇大師</option></select></label>
+   <label>救援掉落：<select id="mode"><option value="rand">隨機（各 25% 加碼）</option><option value="base">只出保底</option><option value="bonus">兩種都加碼</option></select></label>
+   <div style="margin-top:8px"><button class="sm" id="resetDay" type="button">重設「今天」（張數、本班今日星星糖）</button></div>
+  </details>
+  <button type="button" class="btn closeset" id="setClose">完成</button>
+ </div>
+</div>
 
 <script>
 const A = [{"name": "毛球精靈", "island": "第 1 島・星光草原", "isle": "星光草原", "head": "<radialGradient id=\"gfluff\"><stop offset=\"0\" stop-color=\"#f2c94c\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#f2c94c\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gfluff)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><path d=\"M14 28C3 16 -7 22 -4 32C3 31 8 36 13 36Z\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M50 28C61 16 71 22 68 32C61 31 56 36 51 36Z\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M2 24Q6 28 10 32M62 24Q58 28 54 32\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"51.0\" cy=\"34.0\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"49.11840849014597\" cy=\"41.37602356499849\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"43.846306235315936\" cy=\"47.29113520195651\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"36.227897745169976\" cy=\"50.573774507091\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"27.772102254830028\" cy=\"50.573774507091\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"20.153693764684064\" cy=\"47.29113520195651\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"14.88159150985404\" cy=\"41.37602356499849\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"13.0\" cy=\"34.0\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"14.881591509854037\" cy=\"26.623976435001513\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"20.153693764684057\" cy=\"20.708864798043493\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"27.772102254830024\" cy=\"17.426225492908998\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"36.22789774516997\" cy=\"17.426225492908998\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"43.846306235315936\" cy=\"20.708864798043493\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"49.11840849014596\" cy=\"26.62397643500151\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"32\" cy=\"34\" r=\"19\" fill=\"#ffd36e\" stroke=\"none\" stroke-width=\"0\"/><ellipse cx=\"23\" cy=\"54\" rx=\"4.6\" ry=\"3\" fill=\"#e0a93a\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><ellipse cx=\"41\" cy=\"54\" rx=\"4.6\" ry=\"3\" fill=\"#e0a93a\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><path d=\"M32 15V8\" fill=\"none\" stroke=\"#6b4a2f\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M32.0,2.6L33.1,5.5L36.2,5.6L33.8,7.6L34.6,10.6L32.0,8.8L29.4,10.6L30.2,7.6L27.8,5.6L30.9,5.5Z\" fill=\"#fff3a8\" stroke=\"#4a2f1a\" stroke-width=\"1.4\" stroke-linejoin=\"round\"/></g>", "vines": ["<path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"119.0,183.3 116.9,195.2 127.3,189.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"147.6,185.1 155.7,176.2 157.2,188.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"170.6,191.9 174.8,203.2 180.5,192.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"194.8,189.5 198.8,178.1 204.8,188.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"222.4,202.3 229.2,212.4 232.3,200.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"244.2,176.0 247.4,164.3 254.1,174.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"271.5,184.9 277.5,195.4 281.5,184.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"296.0,182.3 301.6,171.6 306.0,182.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"319.0,187.6 320.6,199.6 328.6,190.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.1,182.9 360.4,176.6 358.4,188.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(189.6 197.8) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(290.7 193.2) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><circle cx=\"360.0\" cy=\"205.0\" r=\"11\" fill=\"#7a2f5e\" stroke=\"#4a2f1a\" stroke-width=\"2.6\"/><path d=\"M354.0 205.0Q360.0 197.0 366.0 205.0Q360.0 212.0 357.0 206.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/>", "<path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"122.2,274.7 123.4,286.7 131.7,277.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"150.1,268.9 156.3,258.5 160.1,270.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,271.5 180.1,282.3 184.6,271.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"199.1,266.7 202.4,255.1 209.0,265.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"227.0,278.2 234.1,288.0 236.9,276.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"247.9,251.5 250.9,239.8 257.7,249.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"274.5,260.3 280.6,270.8 284.5,259.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"298.3,257.5 303.7,246.8 308.3,257.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"320.9,262.2 323.1,274.1 330.6,264.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.8,255.4 360.5,248.2 359.5,260.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(194.4 275.4) rotate(83)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(293.4 268.5) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>", "<path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"149.5,140.4 148.8,152.5 158.4,145.1\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,137.8 182.2,128.3 184.3,140.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"193.1,142.6 197.8,153.8 203.1,142.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"211.1,139.8 214.6,128.2 221.0,138.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"232.2,152.7 239.3,162.5 241.9,150.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"245.8,127.1 248.5,115.4 255.6,125.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"266.1,136.5 272.3,146.9 276.1,135.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"284.2,134.0 289.9,123.3 294.2,134.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"302.3,138.6 304.0,150.6 311.9,141.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"329.7,131.7 339.6,124.7 338.4,136.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(208.9 148.0) rotate(86)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(281.6 144.9) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>"], "tA": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><circle cx=\"25\" cy=\"32\" r=\"2.8\" fill=\"#4a2f1a\"/><circle cx=\"25.98\" cy=\"30.88\" r=\"1.0639999999999998\" fill=\"#fff\"/><path d=\"M20.52 26.12L28.919999999999998 28.36\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"39\" cy=\"32\" r=\"2.8\" fill=\"#4a2f1a\"/><circle cx=\"39.98\" cy=\"30.88\" r=\"1.0639999999999998\" fill=\"#fff\"/><path d=\"M43.48 26.12L35.08 28.36\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M28.8 40.2Q32 36.8 35.2 40.2\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linecap=\"round\"/><ellipse cx=\"20\" cy=\"39\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/><ellipse cx=\"44\" cy=\"39\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g>", "tB": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><path d=\"M22.2 29.2L27.24 32L22.2 34.8\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M41.8 29.2L36.76 32L41.8 34.8\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"32\" cy=\"40\" rx=\"2\" ry=\"2.6\" fill=\"#8a4b4b\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/><path d=\"M45.72 28.080000000000002C43.48 32 44.32 35.92 45.72 36.48C47.12 35.92 47.96 32 45.72 28.080000000000002Z\" fill=\"#a8dcf5\" stroke=\"#4a2f1a\" stroke-width=\"1.2\"/><ellipse cx=\"20\" cy=\"39\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/><ellipse cx=\"44\" cy=\"39\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g><polygon points=\"162.3,43.2 163.9,52.2 172.9,54.2 164.8,58.6 165.7,67.7 159.1,61.4 150.6,65.0 154.6,56.8 148.5,49.9 157.6,51.1\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"247.9,21.1 253.0,30.4 263.5,29.4 256.2,37.1 260.4,46.8 250.9,42.2 243.0,49.2 244.3,38.8 235.2,33.4 245.6,31.5\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"347.3,46.1 349.4,54.3 357.7,55.5 350.6,60.0 352.0,68.4 345.5,63.0 338.0,66.9 341.1,59.0 335.0,53.1 343.5,53.6\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M84 96l-14 -10M70 120l-18 -4M396 110l16 -12\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/>", "calm": "<radialGradient id=\"gfluff\"><stop offset=\"0\" stop-color=\"#f2c94c\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#f2c94c\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gfluff)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 232) scale(3.0) translate(-32 -32)\"><circle cx=\"51.0\" cy=\"34.0\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"49.11840849014597\" cy=\"41.37602356499849\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"43.846306235315936\" cy=\"47.29113520195651\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"36.227897745169976\" cy=\"50.573774507091\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"27.772102254830028\" cy=\"50.573774507091\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"20.153693764684064\" cy=\"47.29113520195651\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"14.88159150985404\" cy=\"41.37602356499849\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"13.0\" cy=\"34.0\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"14.881591509854037\" cy=\"26.623976435001513\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"20.153693764684057\" cy=\"20.708864798043493\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"27.772102254830024\" cy=\"17.426225492908998\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"36.22789774516997\" cy=\"17.426225492908998\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"43.846306235315936\" cy=\"20.708864798043493\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"49.11840849014596\" cy=\"26.62397643500151\" r=\"7\" fill=\"#ffd36e\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"32\" cy=\"34\" r=\"19\" fill=\"#ffd36e\" stroke=\"none\" stroke-width=\"0\"/><ellipse cx=\"23\" cy=\"54\" rx=\"4.6\" ry=\"3\" fill=\"#e0a93a\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><ellipse cx=\"41\" cy=\"54\" rx=\"4.6\" ry=\"3\" fill=\"#e0a93a\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><path d=\"M32 15V8\" fill=\"none\" stroke=\"#6b4a2f\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M32.0,2.6L33.1,5.5L36.2,5.6L33.8,7.6L34.6,10.6L32.0,8.8L29.4,10.6L30.2,7.6L27.8,5.6L30.9,5.5Z\" fill=\"#fff3a8\" stroke=\"#4a2f1a\" stroke-width=\"1.4\" stroke-linejoin=\"round\"/><path d=\"M21.92 32.6Q25 27.8 28.08 32.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M35.92 32.6Q39 27.8 42.08 32.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M28.6 38.2Q32 43 35.4 38.2\" fill=\"#ff9aa8\" stroke=\"#4a2f1a\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><ellipse cx=\"20\" cy=\"39\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.8\"/><ellipse cx=\"44\" cy=\"39\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.8\"/></g></g><g transform=\"translate(110 110) scale(1.3)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(372 96) scale(1.1)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#bfe3ff\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(66 236) scale(0.9)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffc2d8\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><polygon points=\"403.9,182.1 406.1,191.8 415.8,193.6 407.3,198.6 408.6,208.4 401.2,201.8 392.3,206.1 396.2,197.0 389.4,189.9 399.2,190.8\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"78.5,299.1 82.2,305.9 89.9,305.2 84.5,310.8 87.6,317.9 80.6,314.6 74.8,319.7 75.8,312.0 69.2,308.1 76.8,306.7\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"240.0,48.0 243.0,55.9 251.4,56.3 244.8,61.6 247.1,69.7 240.0,65.0 232.9,69.7 235.2,61.6 228.6,56.3 237.0,55.9\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><g transform=\"translate(110 120) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(380 140) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(70 250) rotate(0)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(400 260) rotate(-30)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(150 60) rotate(20)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g>"}, {"name": "月亮魚", "island": "第 2 島・月光湖", "isle": "月光湖", "head": "<radialGradient id=\"gfish\"><stop offset=\"0\" stop-color=\"#8fc1ff\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#8fc1ff\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gfish)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><circle cx=\"14\" cy=\"14\" r=\"2.2\" fill=\"#fff\" opacity=\".7\"/><circle cx=\"20\" cy=\"8\" r=\"1.6\" fill=\"#fff\" opacity=\".7\"/><path d=\"M30 22C28 4 14 -4 2 0C8 12 14 20 24 25Z\" fill=\"#7ea6f0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M36 21C38 4 50 -2 62 2C56 12 50 20 42 24Z\" fill=\"#a9c7ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M26 20Q18 8 8 4M40 20Q46 8 56 4\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M10 36C10 22 24 16 38 20C48 23 52 30 52 36C52 42 48 49 38 52C24 55 10 50 10 36Z\" fill=\"#a9c7ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M50 36L61 24L58 36L61 48Z\" fill=\"#7ea6f0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M22 50C26 58 34 58 36 52Z\" fill=\"#7ea6f0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M22 30A8 8 0 1 0 28 44A6.4 6.4 0 1 1 22 30Z\" fill=\"#ffe9a8\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /></g>", "vines": ["<path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"119.0,183.3 116.9,195.2 127.3,189.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"147.6,185.1 155.7,176.2 157.2,188.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"170.6,191.9 174.8,203.2 180.5,192.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"194.8,189.5 198.8,178.1 204.8,188.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"222.4,202.3 229.2,212.4 232.3,200.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"244.2,176.0 247.4,164.3 254.1,174.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"271.5,184.9 277.5,195.4 281.5,184.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"296.0,182.3 301.6,171.6 306.0,182.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"319.0,187.6 320.6,199.6 328.6,190.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.1,182.9 360.4,176.6 358.4,188.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(189.6 197.8) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(290.7 193.2) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><circle cx=\"360.0\" cy=\"205.0\" r=\"11\" fill=\"#7a2f5e\" stroke=\"#4a2f1a\" stroke-width=\"2.6\"/><path d=\"M354.0 205.0Q360.0 197.0 366.0 205.0Q360.0 212.0 357.0 206.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/>", "<path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"122.2,274.7 123.4,286.7 131.7,277.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"150.1,268.9 156.3,258.5 160.1,270.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,271.5 180.1,282.3 184.6,271.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"199.1,266.7 202.4,255.1 209.0,265.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"227.0,278.2 234.1,288.0 236.9,276.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"247.9,251.5 250.9,239.8 257.7,249.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"274.5,260.3 280.6,270.8 284.5,259.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"298.3,257.5 303.7,246.8 308.3,257.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"320.9,262.2 323.1,274.1 330.6,264.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.8,255.4 360.5,248.2 359.5,260.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(194.4 275.4) rotate(83)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(293.4 268.5) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>", "<path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"149.5,140.4 148.8,152.5 158.4,145.1\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,137.8 182.2,128.3 184.3,140.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"193.1,142.6 197.8,153.8 203.1,142.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"211.1,139.8 214.6,128.2 221.0,138.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"232.2,152.7 239.3,162.5 241.9,150.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"245.8,127.1 248.5,115.4 255.6,125.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"266.1,136.5 272.3,146.9 276.1,135.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"284.2,134.0 289.9,123.3 294.2,134.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"302.3,138.6 304.0,150.6 311.9,141.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"329.7,131.7 339.6,124.7 338.4,136.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(208.9 148.0) rotate(86)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(281.6 144.9) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>"], "tA": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><circle cx=\"18\" cy=\"33\" r=\"2.8\" fill=\"#4a2f1a\"/><circle cx=\"18.98\" cy=\"31.88\" r=\"1.0639999999999998\" fill=\"#fff\"/><path d=\"M22.48 27.12L14.08 29.36\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M13.8 42.2Q17 38.8 20.2 42.2\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linecap=\"round\"/><ellipse cx=\"15\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g>", "tB": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><path d=\"M20.8 30.2L15.76 33L20.8 35.8\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"17\" cy=\"42\" rx=\"2\" ry=\"2.6\" fill=\"#8a4b4b\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/><path d=\"M24.72 29.080000000000002C22.48 33 23.32 36.92 24.72 37.48C26.119999999999997 36.92 26.96 33 24.72 29.080000000000002Z\" fill=\"#a8dcf5\" stroke=\"#4a2f1a\" stroke-width=\"1.2\"/><ellipse cx=\"15\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g><polygon points=\"162.3,43.2 163.9,52.2 172.9,54.2 164.8,58.6 165.7,67.7 159.1,61.4 150.6,65.0 154.6,56.8 148.5,49.9 157.6,51.1\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"247.9,21.1 253.0,30.4 263.5,29.4 256.2,37.1 260.4,46.8 250.9,42.2 243.0,49.2 244.3,38.8 235.2,33.4 245.6,31.5\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"347.3,46.1 349.4,54.3 357.7,55.5 350.6,60.0 352.0,68.4 345.5,63.0 338.0,66.9 341.1,59.0 335.0,53.1 343.5,53.6\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M84 96l-14 -10M70 120l-18 -4M396 110l16 -12\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/>", "calm": "<radialGradient id=\"gfish\"><stop offset=\"0\" stop-color=\"#8fc1ff\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#8fc1ff\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gfish)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 232) scale(3.0) translate(-32 -32)\"><circle cx=\"14\" cy=\"14\" r=\"2.2\" fill=\"#fff\" opacity=\".7\"/><circle cx=\"20\" cy=\"8\" r=\"1.6\" fill=\"#fff\" opacity=\".7\"/><path d=\"M28 21C34 12 42 14 44 22Z\" fill=\"#7ea6f0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M10 36C10 22 24 16 38 20C48 23 52 30 52 36C52 42 48 49 38 52C24 55 10 50 10 36Z\" fill=\"#a9c7ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M50 36L61 24L58 36L61 48Z\" fill=\"#7ea6f0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M22 50C26 58 34 58 36 52Z\" fill=\"#7ea6f0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M22 30A8 8 0 1 0 28 44A6.4 6.4 0 1 1 22 30Z\" fill=\"#ffe9a8\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M14.92 33.6Q18 28.8 21.08 33.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M13.6 40.2Q17 45 20.4 40.2\" fill=\"#ff9aa8\" stroke=\"#4a2f1a\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><ellipse cx=\"15\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.8\"/></g></g><g transform=\"translate(110 110) scale(1.3)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(372 96) scale(1.1)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#bfe3ff\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(66 236) scale(0.9)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffc2d8\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><polygon points=\"403.9,182.1 406.1,191.8 415.8,193.6 407.3,198.6 408.6,208.4 401.2,201.8 392.3,206.1 396.2,197.0 389.4,189.9 399.2,190.8\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"78.5,299.1 82.2,305.9 89.9,305.2 84.5,310.8 87.6,317.9 80.6,314.6 74.8,319.7 75.8,312.0 69.2,308.1 76.8,306.7\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"240.0,48.0 243.0,55.9 251.4,56.3 244.8,61.6 247.1,69.7 240.0,65.0 232.9,69.7 235.2,61.6 228.6,56.3 237.0,55.9\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><g transform=\"translate(110 120) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(380 140) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(70 250) rotate(0)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(400 260) rotate(-30)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(150 60) rotate(20)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g>"}, {"name": "小雲羊", "island": "第 4 島・棉花雲島", "isle": "棉花雲島", "head": "<radialGradient id=\"gsheep\"><stop offset=\"0\" stop-color=\"#dfe6f7\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#dfe6f7\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gsheep)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><path d=\"M20 26C6 8 -4 12 -2 24C4 22 9 28 14 32Z\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M44 26C58 8 68 12 66 24C60 22 55 28 50 32Z\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M2 18Q6 24 10 30M62 18Q58 24 54 30\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"24\" cy=\"52\" rx=\"3\" ry=\"4\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><ellipse cx=\"40\" cy=\"52\" rx=\"3\" ry=\"4\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"18\" cy=\"34\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"46\" cy=\"34\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"26\" cy=\"24\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"40\" cy=\"24\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"32\" cy=\"38\" r=\"14\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"32\" cy=\"30\" r=\"13\" fill=\"#fff\" stroke=\"none\" stroke-width=\"0\"/><ellipse cx=\"32\" cy=\"36\" rx=\"13\" ry=\"11\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><path d=\"M21 28C19 22 22 19 25 22\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M43 28C45 22 42 19 39 22\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /></g>", "vines": ["<path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"119.0,183.3 116.9,195.2 127.3,189.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"147.6,185.1 155.7,176.2 157.2,188.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"170.6,191.9 174.8,203.2 180.5,192.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"194.8,189.5 198.8,178.1 204.8,188.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"222.4,202.3 229.2,212.4 232.3,200.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"244.2,176.0 247.4,164.3 254.1,174.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"271.5,184.9 277.5,195.4 281.5,184.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"296.0,182.3 301.6,171.6 306.0,182.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"319.0,187.6 320.6,199.6 328.6,190.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.1,182.9 360.4,176.6 358.4,188.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(189.6 197.8) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(290.7 193.2) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><circle cx=\"360.0\" cy=\"205.0\" r=\"11\" fill=\"#7a2f5e\" stroke=\"#4a2f1a\" stroke-width=\"2.6\"/><path d=\"M354.0 205.0Q360.0 197.0 366.0 205.0Q360.0 212.0 357.0 206.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/>", "<path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"122.2,274.7 123.4,286.7 131.7,277.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"150.1,268.9 156.3,258.5 160.1,270.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,271.5 180.1,282.3 184.6,271.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"199.1,266.7 202.4,255.1 209.0,265.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"227.0,278.2 234.1,288.0 236.9,276.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"247.9,251.5 250.9,239.8 257.7,249.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"274.5,260.3 280.6,270.8 284.5,259.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"298.3,257.5 303.7,246.8 308.3,257.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"320.9,262.2 323.1,274.1 330.6,264.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.8,255.4 360.5,248.2 359.5,260.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(194.4 275.4) rotate(83)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(293.4 268.5) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>", "<path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"149.5,140.4 148.8,152.5 158.4,145.1\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,137.8 182.2,128.3 184.3,140.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"193.1,142.6 197.8,153.8 203.1,142.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"211.1,139.8 214.6,128.2 221.0,138.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"232.2,152.7 239.3,162.5 241.9,150.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"245.8,127.1 248.5,115.4 255.6,125.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"266.1,136.5 272.3,146.9 276.1,135.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"284.2,134.0 289.9,123.3 294.2,134.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"302.3,138.6 304.0,150.6 311.9,141.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"329.7,131.7 339.6,124.7 338.4,136.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(208.9 148.0) rotate(86)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(281.6 144.9) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>"], "tA": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><circle cx=\"27\" cy=\"34\" r=\"2.8\" fill=\"#4a2f1a\"/><circle cx=\"27.98\" cy=\"32.88\" r=\"1.0639999999999998\" fill=\"#fff\"/><path d=\"M22.52 28.12L30.919999999999998 30.36\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"37\" cy=\"34\" r=\"2.8\" fill=\"#4a2f1a\"/><circle cx=\"37.98\" cy=\"32.88\" r=\"1.0639999999999998\" fill=\"#fff\"/><path d=\"M41.48 28.12L33.08 30.36\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M28.8 42.2Q32 38.8 35.2 42.2\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linecap=\"round\"/><ellipse cx=\"23\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/><ellipse cx=\"41\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g>", "tB": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><path d=\"M24.2 31.2L29.24 34L24.2 36.8\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M39.8 31.2L34.76 34L39.8 36.8\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"32\" cy=\"42\" rx=\"2\" ry=\"2.6\" fill=\"#8a4b4b\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/><path d=\"M43.72 30.080000000000002C41.48 34 42.32 37.92 43.72 38.48C45.12 37.92 45.96 34 43.72 30.080000000000002Z\" fill=\"#a8dcf5\" stroke=\"#4a2f1a\" stroke-width=\"1.2\"/><ellipse cx=\"23\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/><ellipse cx=\"41\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g><polygon points=\"162.3,43.2 163.9,52.2 172.9,54.2 164.8,58.6 165.7,67.7 159.1,61.4 150.6,65.0 154.6,56.8 148.5,49.9 157.6,51.1\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"247.9,21.1 253.0,30.4 263.5,29.4 256.2,37.1 260.4,46.8 250.9,42.2 243.0,49.2 244.3,38.8 235.2,33.4 245.6,31.5\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"347.3,46.1 349.4,54.3 357.7,55.5 350.6,60.0 352.0,68.4 345.5,63.0 338.0,66.9 341.1,59.0 335.0,53.1 343.5,53.6\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M84 96l-14 -10M70 120l-18 -4M396 110l16 -12\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/>", "calm": "<radialGradient id=\"gsheep\"><stop offset=\"0\" stop-color=\"#dfe6f7\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#dfe6f7\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gsheep)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 232) scale(3.0) translate(-32 -32)\"><ellipse cx=\"24\" cy=\"52\" rx=\"3\" ry=\"4\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><ellipse cx=\"40\" cy=\"52\" rx=\"3\" ry=\"4\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"18\" cy=\"34\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"46\" cy=\"34\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"26\" cy=\"24\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"40\" cy=\"24\" r=\"11\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"32\" cy=\"38\" r=\"14\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"32\" cy=\"30\" r=\"13\" fill=\"#fff\" stroke=\"none\" stroke-width=\"0\"/><ellipse cx=\"32\" cy=\"36\" rx=\"13\" ry=\"11\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><path d=\"M21 28C19 22 22 19 25 22\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M43 28C45 22 42 19 39 22\" fill=\"#cfd8ff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M23.92 34.6Q27 29.8 30.08 34.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M33.92 34.6Q37 29.8 40.08 34.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M28.6 40.2Q32 45 35.4 40.2\" fill=\"#ff9aa8\" stroke=\"#4a2f1a\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><ellipse cx=\"23\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.8\"/><ellipse cx=\"41\" cy=\"40\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.8\"/></g></g><g transform=\"translate(110 110) scale(1.3)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(372 96) scale(1.1)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#bfe3ff\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(66 236) scale(0.9)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffc2d8\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><polygon points=\"403.9,182.1 406.1,191.8 415.8,193.6 407.3,198.6 408.6,208.4 401.2,201.8 392.3,206.1 396.2,197.0 389.4,189.9 399.2,190.8\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"78.5,299.1 82.2,305.9 89.9,305.2 84.5,310.8 87.6,317.9 80.6,314.6 74.8,319.7 75.8,312.0 69.2,308.1 76.8,306.7\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"240.0,48.0 243.0,55.9 251.4,56.3 244.8,61.6 247.1,69.7 240.0,65.0 232.9,69.7 235.2,61.6 228.6,56.3 237.0,55.9\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><g transform=\"translate(110 120) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(380 140) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(70 250) rotate(0)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(400 260) rotate(-30)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(150 60) rotate(20)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g>"}, {"name": "小貓頭鷹", "island": "第 7 島・星系燈塔", "isle": "星系燈塔", "head": "<radialGradient id=\"gowl\"><stop offset=\"0\" stop-color=\"#a3b1c6\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#a3b1c6\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gowl)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><path d=\"M14 30C2 22 -8 32 -5 46C3 46 9 49 15 51Z\" fill=\"#6f61c0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M50 30C62 22 72 32 69 46C61 46 55 49 49 51Z\" fill=\"#6f61c0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M-1 36Q5 38 9 42M0 42Q6 44 10 47M65 36Q59 38 55 42M64 42Q58 44 54 47\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M16 22L12 8L26 16Z\" fill=\"#8d7fd6\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M48 22L52 8L38 16Z\" fill=\"#8d7fd6\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><ellipse cx=\"32\" cy=\"34\" rx=\"19\" ry=\"21\" fill=\"#8d7fd6\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><ellipse cx=\"32\" cy=\"42\" rx=\"12\" ry=\"13\" fill=\"#d8d0ff\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/><path d=\"M32.0,40.0L33.2,43.3L36.8,43.5L34.0,45.6L34.9,49.0L32.0,47.1L29.1,49.0L30.0,45.6L27.2,43.5L30.8,43.3Z\" fill=\"#ffe066\" stroke=\"#4a2f1a\" stroke-width=\"1.2\" stroke-linejoin=\"round\"/><circle cx=\"24\" cy=\"28\" r=\"7.4\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"40\" cy=\"28\" r=\"7.4\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><path d=\"M29 33L35 33L32 38Z\" fill=\"#ffb347\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M26 55V58M32 55V58M38 55V58\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></g>", "vines": ["<path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 170.0 L121.8 174.1 L123.9 178.0 L126.3 181.7 L129.0 184.8 L132.1 187.5 L135.4 189.6 L139.0 191.1 L142.9 191.9 L146.8 192.1 L150.7 191.9 L154.7 191.2 L158.5 190.3 L162.2 189.3 L165.8 188.3 L169.2 187.5 L172.6 186.9 L175.9 186.7 L179.2 186.9 L182.5 187.5 L185.9 188.5 L189.3 189.8 L192.9 191.4 L196.5 193.0 L200.3 194.6 L204.1 196.0 L207.9 197.2 L211.7 198.0 L215.5 198.3 L219.2 198.1 L222.9 197.3 L226.5 196.1 L229.9 194.4 L233.3 192.3 L236.7 190.0 L240.0 187.5 L243.3 185.0 L246.7 182.7 L250.1 180.6 L253.6 178.9 L257.1 177.7 L260.8 176.9 L264.5 176.7 L268.3 177.0 L272.2 177.8 L276.0 179.0 L279.7 180.4 L283.4 182.0 L287.1 183.7 L290.6 185.2 L294.0 186.5 L297.4 187.5 L300.7 188.1 L304.0 188.3 L307.3 188.1 L310.6 187.5 L314.1 186.7 L317.7 185.7 L321.5 184.7 L325.4 183.8 L329.3 183.1 L333.3 182.9 L337.3 183.2 L341.1 184.0 L344.8 185.5 L348.1 187.6 L351.2 190.3 L353.8 193.4 L356.2 197.0 L358.2 200.9 L360.0 205.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"119.0,183.3 116.9,195.2 127.3,189.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"147.6,185.1 155.7,176.2 157.2,188.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"170.6,191.9 174.8,203.2 180.5,192.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"194.8,189.5 198.8,178.1 204.8,188.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"222.4,202.3 229.2,212.4 232.3,200.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"244.2,176.0 247.4,164.3 254.1,174.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"271.5,184.9 277.5,195.4 281.5,184.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"296.0,182.3 301.6,171.6 306.0,182.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"319.0,187.6 320.6,199.6 328.6,190.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.1,182.9 360.4,176.6 358.4,188.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(189.6 197.8) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(290.7 193.2) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><circle cx=\"360.0\" cy=\"205.0\" r=\"11\" fill=\"#7a2f5e\" stroke=\"#4a2f1a\" stroke-width=\"2.6\"/><path d=\"M354.0 205.0Q360.0 197.0 366.0 205.0Q360.0 212.0 357.0 206.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/>", "<path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M120.0 262.0 L122.7 265.3 L125.6 268.3 L128.7 271.1 L132.0 273.3 L135.5 275.1 L139.2 276.2 L143.0 276.7 L146.8 276.6 L150.7 276.0 L154.5 274.9 L158.2 273.5 L161.9 271.9 L165.5 270.3 L169.0 268.7 L172.5 267.4 L175.9 266.4 L179.3 265.8 L182.7 265.6 L186.2 265.9 L189.8 266.5 L193.5 267.5 L197.2 268.7 L201.0 270.1 L204.9 271.4 L208.7 272.6 L212.6 273.6 L216.4 274.2 L220.2 274.3 L223.9 274.0 L227.4 273.2 L230.9 271.8 L234.3 270.0 L237.6 267.9 L240.8 265.5 L244.0 263.0 L247.2 260.5 L250.5 258.1 L253.8 256.0 L257.1 254.3 L260.6 253.0 L264.2 252.3 L267.8 252.1 L271.5 252.4 L275.2 253.2 L278.9 254.3 L282.6 255.8 L286.2 257.4 L289.8 259.0 L293.2 260.5 L296.6 261.7 L299.9 262.7 L303.1 263.2 L306.3 263.4 L309.5 263.1 L312.8 262.5 L316.2 261.5 L319.8 260.4 L323.4 259.2 L327.1 258.1 L331.0 257.3 L334.8 256.8 L338.7 256.8 L342.4 257.4 L346.0 258.5 L349.4 260.3 L352.5 262.6 L355.3 265.4 L357.8 268.7 L360.0 272.2 L362.0 276.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"122.2,274.7 123.4,286.7 131.7,277.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"150.1,268.9 156.3,258.5 160.1,270.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,271.5 180.1,282.3 184.6,271.0\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"199.1,266.7 202.4,255.1 209.0,265.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"227.0,278.2 234.1,288.0 236.9,276.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"247.9,251.5 250.9,239.8 257.7,249.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"274.5,260.3 280.6,270.8 284.5,259.3\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"298.3,257.5 303.7,246.8 308.3,257.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"320.9,262.2 323.1,274.1 330.6,264.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"350.8,255.4 360.5,248.2 359.5,260.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(194.4 275.4) rotate(83)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(293.4 268.5) rotate(88)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>", "<path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"17\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#3f7a4a\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path d=\"M150.0 128.0 L152.0 131.5 L154.2 134.9 L156.5 137.9 L159.1 140.5 L161.9 142.5 L165.0 144.0 L168.2 144.9 L171.5 145.3 L174.8 145.0 L178.2 144.3 L181.4 143.3 L184.6 142.1 L187.5 140.7 L190.4 139.5 L193.1 138.4 L195.7 137.7 L198.2 137.3 L200.7 137.4 L203.2 137.9 L205.8 138.7 L208.4 140.0 L211.1 141.4 L213.9 143.0 L216.7 144.6 L219.6 146.0 L222.5 147.2 L225.4 148.0 L228.2 148.3 L230.9 148.2 L233.5 147.5 L235.9 146.3 L238.3 144.7 L240.6 142.7 L242.8 140.5 L245.0 138.1 L247.2 135.8 L249.4 133.5 L251.7 131.6 L254.1 130.0 L256.7 128.8 L259.3 128.2 L262.0 128.0 L264.8 128.4 L267.7 129.3 L270.5 130.5 L273.3 132.0 L276.1 133.7 L278.8 135.3 L281.4 136.9 L283.9 138.2 L286.4 139.2 L288.9 139.8 L291.3 139.9 L293.9 139.7 L296.5 139.0 L299.3 138.1 L302.3 137.0 L305.4 135.8 L308.7 134.7 L312.1 133.9 L315.5 133.4 L318.9 133.4 L322.3 133.9 L325.5 135.0 L328.5 136.7 L331.3 139.0 L333.8 141.7 L336.0 144.9 L338.1 148.3 L340.0 152.0\" fill=\"none\" stroke=\"#6fae78\" stroke-width=\"2.4\" stroke-linecap=\"round\" /><polygon points=\"149.5,140.4 148.8,152.5 158.4,145.1\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"174.6,137.8 182.2,128.3 184.3,140.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"193.1,142.6 197.8,153.8 203.1,142.9\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"211.1,139.8 214.6,128.2 221.0,138.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"232.2,152.7 239.3,162.5 241.9,150.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"245.8,127.1 248.5,115.4 255.6,125.2\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"266.1,136.5 272.3,146.9 276.1,135.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"284.2,134.0 289.9,123.3 294.2,134.6\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"302.3,138.6 304.0,150.6 311.9,141.4\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><polygon points=\"329.7,131.7 339.6,124.7 338.4,136.7\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><g transform=\"translate(208.9 148.0) rotate(86)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g><g transform=\"translate(281.6 144.9) rotate(89)\"><ellipse cx=\"9\" cy=\"0\" rx=\"10\" ry=\"5\" fill=\"#5aa86a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/><path d=\"M0 0H17\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/></g>"], "tA": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><circle cx=\"24\" cy=\"28\" r=\"3.4\" fill=\"#4a2f1a\" stroke=\"none\" stroke-width=\"0\"/><circle cx=\"40\" cy=\"28\" r=\"3.4\" fill=\"#4a2f1a\" stroke=\"none\" stroke-width=\"0\"/><circle cx=\"25.2\" cy=\"26.8\" r=\"1.2\" fill=\"#fff\" stroke=\"none\" stroke-width=\"0\"/><circle cx=\"41.2\" cy=\"26.8\" r=\"1.2\" fill=\"#fff\" stroke=\"none\" stroke-width=\"0\"/><path d=\"M18.56 20.86L28.759999999999998 23.58\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M45.44 20.86L35.24 23.58\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M28.8 45.2Q32 41.8 35.2 45.2\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linecap=\"round\"/><ellipse cx=\"15\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/><ellipse cx=\"49\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g>", "tB": "<g transform=\"translate(240 218) scale(4.3) translate(-32 -32)\"><path d=\"M19.4 23.4L27.68 28L19.4 32.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M44.6 23.4L36.32 28L44.6 32.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"32\" cy=\"45\" rx=\"2\" ry=\"2.6\" fill=\"#8a4b4b\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/><path d=\"M51.04 21.560000000000002C47.36 28 48.739999999999995 34.44 51.04 35.36C53.339999999999996 34.44 54.72 28 51.04 21.560000000000002Z\" fill=\"#a8dcf5\" stroke=\"#4a2f1a\" stroke-width=\"1.2\"/><ellipse cx=\"15\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/><ellipse cx=\"49\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.55\"/></g><polygon points=\"162.3,43.2 163.9,52.2 172.9,54.2 164.8,58.6 165.7,67.7 159.1,61.4 150.6,65.0 154.6,56.8 148.5,49.9 157.6,51.1\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"247.9,21.1 253.0,30.4 263.5,29.4 256.2,37.1 260.4,46.8 250.9,42.2 243.0,49.2 244.3,38.8 235.2,33.4 245.6,31.5\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"347.3,46.1 349.4,54.3 357.7,55.5 350.6,60.0 352.0,68.4 345.5,63.0 338.0,66.9 341.1,59.0 335.0,53.1 343.5,53.6\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M84 96l-14 -10M70 120l-18 -4M396 110l16 -12\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/>", "calm": "<radialGradient id=\"gowl\"><stop offset=\"0\" stop-color=\"#a3b1c6\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#a3b1c6\" stop-opacity=\"0\"/></radialGradient><circle cx=\"240\" cy=\"215\" r=\"200\" fill=\"url(#gowl)\"/><g filter=\"url(#wax)\"><g transform=\"translate(240 232) scale(3.0) translate(-32 -32)\"><path d=\"M13 32C7 38 8 48 14 50C20 46 20 36 15 31Z\" fill=\"#6f61c0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M51 32C57 38 56 48 50 50C44 46 44 36 49 31Z\" fill=\"#6f61c0\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M16 22L12 8L26 16Z\" fill=\"#8d7fd6\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M48 22L52 8L38 16Z\" fill=\"#8d7fd6\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><ellipse cx=\"32\" cy=\"34\" rx=\"19\" ry=\"21\" fill=\"#8d7fd6\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><ellipse cx=\"32\" cy=\"42\" rx=\"12\" ry=\"13\" fill=\"#d8d0ff\" stroke=\"#4a2f1a\" stroke-width=\"1.4\"/><path d=\"M32.0,40.0L33.2,43.3L36.8,43.5L34.0,45.6L34.9,49.0L32.0,47.1L29.1,49.0L30.0,45.6L27.2,43.5L30.8,43.3Z\" fill=\"#ffe066\" stroke=\"#4a2f1a\" stroke-width=\"1.2\" stroke-linejoin=\"round\"/><circle cx=\"24\" cy=\"28\" r=\"7.4\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><circle cx=\"40\" cy=\"28\" r=\"7.4\" fill=\"#fff\" stroke=\"#4a2f1a\" stroke-width=\"1.8\"/><path d=\"M29 33L35 33L32 38Z\" fill=\"#ffb347\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\" /><path d=\"M26 55V58M32 55V58M38 55V58\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M18.94 28.6Q24 21.1 29.06 28.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M34.94 28.6Q40 21.1 45.06 28.6\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M28.6 43.2Q32 48 35.4 43.2\" fill=\"#ff9aa8\" stroke=\"#4a2f1a\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><ellipse cx=\"15\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.8\"/><ellipse cx=\"49\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#ff9aa8\" opacity=\"0.8\"/></g></g><g transform=\"translate(110 110) scale(1.3)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(372 96) scale(1.1)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#bfe3ff\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><g transform=\"translate(66 236) scale(0.9)\"><ellipse cx=\"0\" cy=\"0\" rx=\"9\" ry=\"6.5\" transform=\"rotate(-20)\" fill=\"#ffc2d8\" stroke=\"#4a2f1a\" stroke-width=\"3\"/><path d=\"M7 -3V-32Q20 -28 18 -14\" fill=\"none\" stroke=\"#4a2f1a\" stroke-width=\"4\" stroke-linecap=\"round\"/></g><polygon points=\"403.9,182.1 406.1,191.8 415.8,193.6 407.3,198.6 408.6,208.4 401.2,201.8 392.3,206.1 396.2,197.0 389.4,189.9 399.2,190.8\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"78.5,299.1 82.2,305.9 89.9,305.2 84.5,310.8 87.6,317.9 80.6,314.6 74.8,319.7 75.8,312.0 69.2,308.1 76.8,306.7\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><polygon points=\"240.0,48.0 243.0,55.9 251.4,56.3 244.8,61.6 247.1,69.7 240.0,65.0 232.9,69.7 235.2,61.6 228.6,56.3 237.0,55.9\" fill=\"#ffd966\" stroke=\"#4a2f1a\" stroke-width=\"3\" stroke-linejoin=\"round\"/><g transform=\"translate(110 120) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(380 140) rotate(10)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(70 250) rotate(0)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(400 260) rotate(-30)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#a8447f\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g><g transform=\"translate(150 60) rotate(20)\"><ellipse rx=\"10\" ry=\"5.5\" fill=\"#8ed17a\" stroke=\"#4a2f1a\" stroke-width=\"2.4\"/></g>"}];
@@ -277,7 +389,7 @@ const CARDS=[
  {ic:'book',t:'譜蓋起來吹',d:'把譜蓋起來，全班憑記憶吹一遍'},
  {ic:'loop',t:'重複第一段',d:'回到第一段，全班再吹一次'},
  {ic:'drum',t:'打出節奏',d:'全班跟著下面的節奏，拍手（或敲桌）打 4 遍',rh:true},
- {ic:'star',t:'星空試煉',d:'打開星空試煉，大家一起挑戰（可以不收音玩）',arc:true},
+ {ic:'star',t:'星空試煉',d:'',arc:true},
  {ic:'slow',t:'慢速挑戰',d:'全班一起，比平常慢很多，穩穩把整首歌吹一遍',v:[{ic:'slow',t:'慢速挑戰',d:'全班一起，比平常慢很多，穩穩把整首歌吹一遍'},{ic:'fast',t:'加速挑戰',d:'全班一起，比平常快一點，把整首歌吹一遍'}]},
  {ic:'eye',t:'背譜達人',d:'全班閉上眼睛，把整首歌吹一遍'},
  {ic:'mime',t:'默劇大師',d:'只按指法、不吹氣，把整首歌「演」一遍'}
@@ -294,19 +406,21 @@ const $ = id => document.getElementById(id);
 function braid(x1,x2,y){
   let a='',b='';
   for(let x=x1;x<=x2;x+=2){ const t=(x-x1)/14*Math.PI; const yy1=y+Math.sin(t)*4.5, yy2=y-Math.sin(t)*4.5; a+=(x===x1?'M':'L')+x+' '+yy1.toFixed(1); b+=(x===x1?'M':'L')+x+' '+yy2.toFixed(1); }
-  return '<path d="'+a+'" fill="none" stroke="#4a2f1a" stroke-width="4.2" stroke-linecap="round"/><path d="'+a+'" fill="none" stroke="#d4a63a" stroke-width="2.4" stroke-linecap="round"/><path d="'+b+'" fill="none" stroke="#4a2f1a" stroke-width="4.2" stroke-linecap="round"/><path d="'+b+'" fill="none" stroke="#f2cf6a" stroke-width="2.4" stroke-linecap="round"/>';
+  return '<path d="'+a+'" fill="none" class="fi" stroke-width="4.2" stroke-linecap="round"/><path d="'+a+'" fill="none" stroke="#d4a63a" stroke-width="2.4" stroke-linecap="round"/><path d="'+b+'" fill="none" class="fi" stroke-width="4.2" stroke-linecap="round"/><path d="'+b+'" fill="none" stroke="#f2cf6a" stroke-width="2.4" stroke-linecap="round"/>';
 }
 function knot(cx,cy){
   const r=8.5, pts=[[0,-5],[-4.6,3],[4.6,3]];
-  return pts.map(p=>'<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="'+r+'" fill="none" stroke="#4a2f1a" stroke-width="4.4"/>').join('')
+  return pts.map(p=>'<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="'+r+'" fill="none" class="fi" stroke-width="4.4"/>').join('')
         +pts.map((p,i)=>'<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="'+r+'" fill="none" stroke="'+['#d4a63a','#f2cf6a','#b98a22'][i]+'" stroke-width="2.4"/>').join('')
-        +'<circle cx="'+cx+'" cy="'+(cy+0.5)+'" r="2.6" fill="#a8447f" stroke="#4a2f1a" stroke-width="1.4"/>';
+        +'<circle cx="'+cx+'" cy="'+(cy+0.5)+'" r="2.6" fill="#a8447f" class="fi" stroke-width="1.4"/>';
 }
-const FRAME='<svg class="frm" viewBox="0 0 480 300" preserveAspectRatio="none" aria-hidden="true">'
- +'<rect x="8" y="8" width="464" height="284" rx="20" fill="none" stroke="#4a2f1a" stroke-width="3.5"/>'
- +'<rect x="16" y="16" width="448" height="268" rx="14" fill="none" stroke="#d4a63a" stroke-width="3"/>'
- +braid(78,402,25)+braid(78,402,275)
- +knot(40,40)+knot(440,40)+knot(40,260)+knot(440,260)+'</svg>';
+function frameSVG(w,h){
+  return '<svg class="frm" viewBox="0 0 '+w+' '+h+'" aria-hidden="true">'
+   +'<rect class="fi" x="8" y="8" width="'+(w-16)+'" height="'+(h-16)+'" rx="22" fill="none" stroke-width="3.5"/>'
+   +'<rect x="16" y="16" width="'+(w-32)+'" height="'+(h-32)+'" rx="15" fill="none" stroke="#d4a63a" stroke-width="3"/>'
+   +braid(78,w-78,25)+braid(78,w-78,h-25)
+   +knot(40,40)+knot(w-40,40)+knot(40,h-40)+knot(w-40,h-40)+'</svg>';
+}
 
 /* 凱爾特風圖示：雙線（深褐外線＋金內線）＋編繩圓環；每個圖示 64x64 */
 function dbl(d,w){w=w||4;return '<path d="'+d+'" fill="none" stroke="#4a2f1a" stroke-width="'+(w+2.6)+'" stroke-linecap="round" stroke-linejoin="round"/><path d="'+d+'" fill="none" stroke="#e0b64a" stroke-width="'+w*0.6+'" stroke-linecap="round" stroke-linejoin="round"/>';}
@@ -335,9 +449,10 @@ const GLYPH={
  wind:dbl('M32 40 Q54 30 62 40 Q70 52 58 54',4)+dbl('M30 54 Q50 48 58 54',4)+dbl('M36 66 Q56 72 68 62',4)
 };
 function icon(k){ return GLYPH[k] ? '<svg viewBox="0 0 100 100" class="gl" aria-hidden="true">'+ring()+GLYPH[k]+'</svg>' : k; }
-function face(cls,ic,t,d,tag){
-  const f=$('cardface'); f.className='cardface'+(cls?' '+cls:'');
-  f.innerHTML=FRAME+'<div class="cin"><div class="ic">'+icon(ic)+'</div><div class="tt">'+t+'</div>'+(d?'<div class="ds">'+d+'</div>':'')+(tag?'<span class="tag2">'+tag+'</span>':'')+'</div>';
+function face(cls,ic,t,d,tag,extra){
+  $('c3d').className='card3d'+(cls?' '+cls:'');
+  $('deck').classList.remove('hide'); $('rescue').classList.add('hide');
+  $('deck').innerHTML='<div class="ic">'+icon(ic)+'</div><div class="tt">'+t+'</div>'+(d?'<div class="ds">'+d+'</div>':'')+(tag?'<span class="tag2">'+tag+'</span>':'')+(extra||'');
 }
 function dayStr(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 /* 班級存檔 olm_class_v1：{size,day,n(今天抽了幾張),used(星星糖今日),phase:idle|card|wind|rescue|drop,card,solo,i,pass,drop,wind,last} 每天自動換新 */
@@ -346,31 +461,76 @@ function fresh(size){return {size:size||20,day:dayStr(),n:0,used:0,phase:'idle',
 if(C.day!==dayStr()||typeof C.n!=='number')C=fresh(C.size);
 if(!(C.size>=1&&C.size<=60))C.size=20;
 function save(){OLMSave.write(KEY,C);}
-const S = {busy:false, mode:'rand', force:'', forceAnimal:-1};
+const S = {fw:0,fh:0,busy:false, mode:'rand', force:'', forceAnimal:-1};
 function arcN(){const a=OLMSave.read(ARC);return a.day===dayStr()?(a.n|0):0;}
 function vines5(a){
   const v=a.vines;
   return [v[2], v[0], '<g transform="translate(480,46) scale(-1,1)">'+v[0]+'</g>', v[1], '<g transform="translate(480,40) scale(-1,1)">'+v[1]+'</g>'];
 }
-function drawLabel(){ return C.n>0 ? '🎴 再抽一張卡' : '🎴 抽一張卡'; }
-function setDraw(on){ const b=$('drawCard'); b.disabled=!on; b.textContent=drawLabel(); }
-/* ---- 畫面切換 ---- */
-function view(ph){
-  const rescue = ph==='rescue' || ph==='drop';
-  $('deck').classList.toggle('hide', rescue);
-  $('rescue').classList.toggle('hide', !rescue);
-  $('rescueCtl').classList.toggle('hide', ph!=='rescue');
-  $('sess').innerHTML='今日已抽 <b>'+C.n+'</b> 張';
+function drawLabel(){ return C.n>0 ? '再抽一張卡' : '抽一張卡'; }
+function sessTxt(){ $('sess').querySelector('b').textContent=C.n; }
+function meters(){
+  const cu=Math.min(C.used,CAP.candy), cr=Math.min(arcN(),CAP.cry);
+  $('mCandy').style.width=(cu/CAP.candy*100)+'%'; $('mCandyT').textContent=cu+'／'+CAP.candy;
+  $('mCry').style.width=(cr/CAP.cry*100)+'%'; $('mCryT').textContent=cr+'／'+CAP.cry;
+  $('meterCandy').classList.toggle('full',cu>=CAP.candy); $('meterCry').classList.toggle('full',cr>=CAP.cry);
 }
-function setPass(txt,off,hint){ $('pass').textContent=txt; $('pass').disabled=!!off; $('passHint').textContent=hint||''; }
-function idle(){
+/* 唯一的主按鈕：抽一張卡／再抽一張卡（金）、通過（綠），位置永遠不變 */
+/* 畫面：牌堆區（idle）／獎勵區（drop）；翻開的卡在聚光層 #spot（通過鈕在卡下方，小小一顆） */
+function zone(z){ $('deckZone').classList.toggle('hide',z!=='deck'); $('drop').classList.toggle('hide',z!=='drop'); sessTxt(); meters(); }
+function paintFrameOf(hid,sid){ const el=$(sid),hd=$(hid),w=Math.round(el.clientWidth),h=Math.round(el.clientHeight); if(!w||!h) return; const k=w+'x'+h; if(hd.dataset.k===k) return; hd.dataset.k=k; hd.innerHTML=frameSVG(w,h); }
+function paintFrame(){ paintFrameOf('cfrontFrm','cfront'); paintFrameOf('cbackFrm','cback'); }
+function emblem(){ return '<svg viewBox="0 0 100 100" aria-hidden="true">'+ring()+GLYPH.star+'</svg>'; }
+function passOff(on){ $('pass').classList.toggle('off',!!on); }
+let AC=null;
+function flipSound(){   /* 翻牌：沙沙一掃＋落下輕輕「啪」 */
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume();
+    const t=AC.currentTime+.25, len=.55, n=Math.floor(AC.sampleRate*len), buf=AC.createBuffer(1,n,AC.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+    const src=AC.createBufferSource(); src.buffer=buf;
+    const bp=AC.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=1.1; bp.frequency.setValueAtTime(800,t); bp.frequency.exponentialRampToValueAtTime(4200,t+len);
+    const g=AC.createGain(); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.32,t+.18); g.gain.exponentialRampToValueAtTime(.0001,t+len);
+    src.connect(bp); bp.connect(g); g.connect(AC.destination); src.start(t);
+    const o=AC.createOscillator(), g2=AC.createGain(), t2=AC.currentTime+1.2;
+    o.type='triangle'; o.frequency.setValueAtTime(420,t2); o.frequency.exponentialRampToValueAtTime(210,t2+.12);
+    g2.gain.setValueAtTime(.0001,t2); g2.gain.exponentialRampToValueAtTime(.2,t2+.015); g2.gain.exponentialRampToValueAtTime(.0001,t2+.14);
+    o.connect(g2); g2.connect(AC.destination); o.start(t2); o.stop(t2+.16);
+  }catch(e){}
+}
+function showSpot(anim){
+  const c=$('c3d');
+  if(anim){ c.style.transition='none'; c.classList.add('closed'); passOff(true); flipSound(); }
+  $('spot').classList.remove('hide');
+  paintFrame(); void c.offsetWidth;
+  if(anim){ c.style.transition=''; setTimeout(function(){ c.classList.remove('closed'); },250); setTimeout(function(){ passOff(false); },1400); }
+  else { c.classList.remove('closed'); passOff(false); }
+  setTimeout(paintFrame,30);
+}
+function hideSpot(){ $('spot').classList.add('hide'); }
+
+
+/* ---- 畫面切換 ---- */
+
+
+function idle(msg){
   C.phase='idle'; C.drop=null; C.wind=null; C.card=-1; save(); S.busy=false;
-  view('idle'); $('drop').classList.remove('show');
-  face('','deck','準備好了嗎？','按「'+(C.n>0?'再抽一張卡':'抽一張卡')+'」，看看這一次是什麼任務');
-  setDraw(true); $('deckHint').textContent='完成任務、老師按「通過」就會掉落星星糖和水晶碎片';
-  $('solo').innerHTML=''; setPass('通過',true);
+  hideSpot(); zone('deck');
+  $('deckHint').textContent = msg || (C.n>0 ? '按一下牌堆，再抽一張任務卡' : '按一下牌堆，翻開這一次的任務');
 }
 /* ---- 抽卡 ---- */
+/* 牌庫：全部任務卡各 1 張＋風 1 張＋動物救援 2 張，洗牌後一張一張抽（抽完才重洗），不會連續同一種、風與救援不會太頻繁 */
+function newBag(prev){
+  const bag=[]; CARDS.forEach(function(c,k){ bag.push('c'+k); }); bag.push('wind','animal','animal');
+  for(let t=0;t<80;t++){
+    for(let i=bag.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const x=bag[i]; bag[i]=bag[j]; bag[j]=x; }
+    let ok = bag[0]!==prev;
+    for(let i=1;i<bag.length&&ok;i++) if(bag[i]===bag[i-1]) ok=false;
+    if(ok) break;
+  }
+  return bag;
+}
+function nextKind(){ if(!C.bag||!C.bag.length) C.bag=newBag(C.lastKind); const k=C.bag.shift(); C.lastKind=k; return k; }
 function drawCard(){
   if(S.busy) return;
   if(C.phase!=='idle'&&C.phase!=='drop') return;
@@ -378,7 +538,7 @@ function drawCard(){
   const f=S.force;
   let kind;
   if(f==='animal') kind='animal'; else if(f==='wind') kind='wind'; else if(/^c\d+$/.test(f)) kind=f;
-  else { const r=Math.random(); kind = r<P_ANIMAL?'animal' : r<P_ANIMAL+P_WIND?'wind' : 'card'; }
+  else kind=nextKind();   /* 從牌庫抽（不放回）：每輪每張卡最多一次，抽完才重洗 */
   S.force=''; const fs=$('force'); if(fs) fs.value='';
   C.n++;
   if(kind==='animal'){ startRescue(); return; }
@@ -388,36 +548,38 @@ function drawCard(){
   else { const pool=CARDS.map((x,k)=>k).filter(k=>k!==C.last); ix=pool[Math.floor(Math.random()*pool.length)]; }
   showCard(ix);
 }
+/* 星空試煉＝10 款小遊戲隨機挑一款（不連續同一款），直接進遊戲畫面 */
+const ARC_GAMES=[['fall','旋律瀑布'],['fly','音高飛行'],['ninja','音符忍者'],['dragon','長音養龍'],['echo','回音森林'],['finger','指法拼圖'],['rhythm','節奏鼓手'],['ear','聽音偵探'],['sprint','指法衝刺'],['follow','跟著吹']];
+function pickArc(){ const pool=ARC_GAMES.filter(function(g){return g[0]!==C.lastArc;}); const g=pool[Math.floor(Math.random()*pool.length)]; C.lastArc=g[0]; return g; }
 function showCard(ix){
-  const c=CARDS[ix]; C.phase='card'; C.card=ix; C.last=ix; C.solo=c.solo?1+Math.floor(Math.random()*C.size):0;
+  const c=CARDS[ix]; C.last=ix;
+  if(c.arc){ C.arcGame=pickArc()[0]; }
+  C.phase='card'; C.card=ix; C.solo=c.solo?1+Math.floor(Math.random()*C.size):0;
   C.v=c.v?Math.floor(Math.random()*c.v.length):0;
   if(c.rh){ const pool=RHYTHMS.map(function(x,k){return k;}).filter(function(k){return k!==C.lastRh;}); C.rh=pool[Math.floor(Math.random()*pool.length)]; C.lastRh=C.rh; } else C.rh=-1;
   save();
-  paintCard();
+  paintCard(true);
 }
-function paintCard(){
-  const c0=CARDS[C.card], c=cardView(c0); view('card'); face('',c.ic,c.t,c.d);
-  setDraw(false); $('deckHint').innerHTML='';
-  if(c0.arc){ $('deckHint').innerHTML='<button type="button" class="btn sm" id="arcGo" style="width:100%;min-height:64px;font-size:26px">開始星空試煉</button><br>星空試煉的水晶碎片會自動入帳，玩完老師再按「通過」（這張卡不另外掉星星糖）'; $('arcGo').onclick=openArc; }
-  $('solo').innerHTML = c.solo&&C.solo ? '請 <span style="color:var(--pink)">'+C.solo+' 號</span> 獨奏<small>沒吹過？全班一起吹支援</small>' : '';
-  setPass('通過',false,'完成後按這一顆（獨奏沒過、全班一起吹支援，也是按這一顆）');
+function paintCard(anim){
+  const c0=CARDS[C.card], c=cardView(c0); zone('deck');
+  face('',c.ic,c.t,c0.arc?'':c.d,'',(c.solo&&C.solo)?'<div class="solo">請 <b>'+C.solo+'</b> 號獨奏</div>':'');
+  $('pass').textContent=c0.arc?'進入試煉':'通過'; showSpot(anim);
 }
 function passCard(){
-  if(S.busy) return; S.busy=true; $('pass').disabled=true;
   const c=CARDS[C.card];
-  if(c&&c.arc){ idle(); $('deckHint').textContent='星空試煉的水晶碎片已自動入帳。'; return; }   /* 機會牌：只靠試煉掉落水晶碎片 */
+  if(c&&c.arc){ openArc(C.arcGame||pickArc()[0]); return; }   /* 星空試煉：進遊戲，成績掉落由遊戲自己結算 */
+  if(S.busy) return; S.busy=true; passOff(true);
   giveDrop({candy:CARD_CANDY,candyBonus:0,cry:CARD_CRY,cryBonus:0,title:'任務完成！'+(c?c.t:''),cryIsle:null,kind:'card'});
 }
 /* ---- 命運：風 ---- */
 function showWind(){
   const t=OLMSave.read(TEST); const have=(t.jar==null?9:(t.jar|0)); const lose=Math.min(WIND_LOSS,have);
-  C.phase='wind'; C.wind={lose:lose,from:have,to:have-lose}; save(); paintWind();
+  C.phase='wind'; C.wind={lose:lose,from:have,to:have-lose}; save(); paintWind(true);
 }
-function paintWind(){
-  const w=C.wind; view('wind');
-  face('fate wind','wind','一陣大風！',w.lose>0?'風把 '+w.lose+' 顆星星糖刮走了…':'風呼呼地吹過，但星星罐是空的，什麼也沒被刮走','命運事件');
-  setDraw(false); $('deckHint').textContent='';
-  $('solo').innerHTML=''; setPass('好吧…',false);
+function paintWind(anim){
+  const w=C.wind; zone('deck');
+  face('fate wind','<span class="cryimg"><img src="assets/intro/sp_sad.webp" alt="哭泣的陶笛精靈">'+tears()+'</span>','一陣大風！',w.lose>0?'風把 '+w.lose+' 顆星星糖刮走了…':'風呼呼地吹過，但星星罐是空的，什麼也沒被刮走','命運事件');
+  $('pass').textContent='好吧…'; showSpot(anim);
 }
 function windOk(){
   if(S.busy) return; S.busy=true;
@@ -430,8 +592,9 @@ function startRescue(){
   const pool=A.map((x,k)=>k).filter(k=>k!==C.i);
   C.i = S.forceAnimal>=0 ? S.forceAnimal : pool[Math.floor(Math.random()*pool.length)]; S.forceAnimal=-1;
   C.phase='rescue'; C.pass=0; C.drop=null; save(); S.busy=false;
-  view('rescue'); $('drop').classList.remove('show'); $('drawCard').classList.add('hide'); mount();
+  zone('deck'); rescueFace(); mount(); $('pass').textContent='通過'; showSpot(true);
 }
+function rescueFace(){ $('c3d').className='card3d rescue'; $('deck').classList.add('hide'); $('rescue').classList.remove('hide'); }
 function mount(){
   const a = A[C.i];
   $('nm').textContent = a.name; $('isl').textContent = a.island;
@@ -440,18 +603,14 @@ function mount(){
     + '<g class="tail" id="tA">'+a.tA+'</g><g class="tail off" id="tB">'+a.tB+'</g></g></svg>';
   $('calmWrap').innerHTML = a.calm.replace(/^/,'<svg viewBox="0 0 480 400" role="img" aria-label="'+a.name+'恢復了">')+'</svg>';
   $('stage').classList.remove('calm');
-  $('solo').innerHTML=''; $('drop').classList.remove('show');
   renderRescue();
 }
 function renderRescue(){
   const p=C.pass;
   [0,1,2,3,4].forEach(k=>{ const v=$('vine'+k); if(v) v.classList.toggle('cut', p>=HP); });
   if($('tA')){ $('tA').classList.toggle('off', p>=HP); $('tB').classList.toggle('off', p<HP); }
-  $('sess').innerHTML='今日已抽 <b>'+C.n+'</b> 張';
-  if(C.phase==='rescue'){
-    $('msg').textContent='求救訊號！'+A[C.i].name+'被走音音浪纏住了！老師播放配樂，全班一起合奏一遍';
-    setPass('通過',S.busy,'全班合奏完，按這一顆');
-  }
+  sessTxt();
+  $('msg').innerHTML='<b>求救訊號！'+A[C.i].name+'被纏住了</b>老師播放配樂，全班一起合奏一遍';
 }
 function burst(){
   const b = $('burst'); const w = $('stage').clientWidth, h=$('stage').clientHeight;
@@ -467,7 +626,7 @@ function doPass(){
   if(C.phase==='wind'){ windOk(); return; }
   if(C.phase==='card'){ passCard(); return; }
   if(C.phase!=='rescue'||S.busy) return;
-  S.busy=true; $('pass').disabled=true;
+  S.busy=true; passOff(true);
   [0,1,2,3,4].forEach(k=>setTimeout(()=>{ const v=$('vine'+k); if(v){v.classList.add('shake');burst();setTimeout(()=>v.classList.add('cut'),120);} },k*170));
   setTimeout(()=>{ C.pass=HP; save(); finishRescue(); },5*170+600);
 }
@@ -476,7 +635,8 @@ function finishRescue(){
   const cb = m==='bonus' || (m==='rand' && Math.random()<.25);
   const xb = m==='bonus' || (m==='rand' && Math.random()<.25);
   $('stage').classList.add('calm'); burst();
-  giveDrop({candy:8,candyBonus:cb?4:0,cry:1,cryBonus:xb?1:0,title:'安撫成功！掉落',cryIsle:ISLE_N[C.i],kind:'rescue'});
+  $('msg').innerHTML='<b>'+A[C.i].name+'變回原本的樣子了！</b>藤蔓枯萎了';
+  setTimeout(function(){ giveDrop({candy:8,candyBonus:cb?4:0,cry:1,cryBonus:xb?1:0,title:'安撫成功！'+A[C.i].name+'平安了',cryIsle:ISLE_N[C.i],kind:'rescue'}); },1300);
 }
 /* 掉落：寫進班級存檔（星星糖→罐、水晶碎片→飛船背包；水晶碎片每日上限與星空試煉共用） */
 function giveDrop(o){
@@ -499,25 +659,20 @@ function giveDrop(o){
 }
 function showDrop(){
   const d=C.drop; if(!d) return;
+  const resc=d.kind==='rescue';
+  hideSpot(); zone('drop');
   $('dropTitle').textContent = d.title;
   $('dCandy').textContent = '+'+d.candyOk; $('dCry').textContent = '+'+d.cryOk;
-  $('tCandy').textContent = d.cb ? '✨ 加碼 +4' : (d.kind==='rescue'?'保底':'任務獎勵'); $('tCandy').className='tag'+(d.cb?'':' base');
-  $('tCry').textContent = d.xb ? '✨ 加碼 +1' : (d.kind==='rescue'?'保底':'任務獎勵'); $('tCry').className='tag'+(d.xb?'':' base');
+  $('tCandy').textContent = d.cb ? '加碼 +4' : (resc?'保底':'任務獎勵'); $('tCandy').className='tag'+(d.cb?'':' base');
+  $('tCry').textContent = d.xb ? '加碼 +1' : (resc?'保底':'任務獎勵'); $('tCry').className='tag'+(d.xb?'':' base');
   const nm = ELEM[(d.base||1)-1][1];
-  $('cryType').textContent = nm + (d.xb&&d.bonusN ? '（加碼：'+ELEM[d.bonusN-1][1]+'）' : '');
-  const cn = d.candyOk<d.candy, yn = d.cryOk<d.cry;
-  $('cap').innerHTML =
-    '本班今日　星星糖 '+C.used+'／'+CAP.candy+'<div class="bar"><i style="width:'+(C.used/CAP.candy*100)+'%"></i></div>'
-   +'水晶碎片 '+arcN()+'／'+CAP.cry+'（含星空試煉）<div class="bar"><i style="width:'+(arcN()/CAP.cry*100)+'%"></i></div>'
-   +((cn||yn)?'<span class="capnote">已達今日上限，這次只發到上限。</span>':'');
-  $('drop').classList.add('show');
+  $('cryType').textContent = nm + (d.xb&&d.bonusN&&d.bonusN!==d.base ? '＋'+ELEM[d.bonusN-1][1] : '');
+  $('capnote').classList.toggle('hide', !(d.candyOk<d.candy || d.cryOk<d.cry));
   S.busy=false;
-  $('drawCard').classList.remove('hide'); setDraw(true);   /* 通過後，「抽一張卡」自動變成「再抽一張卡」 */
-  $('sess').innerHTML='今日已抽 <b>'+C.n+'</b> 張';
-  if(d.kind==='rescue'){ renderRescue(); $('msg').textContent='藤蔓枯萎了，'+A[C.i].name+'變回原本的樣子！'; }
-  else { setPass('通過',true); $('passHint').textContent=''; }
 }
-$('pass').onclick=doPass; $('drawCard').onclick=drawCard;
+$('deckBtn').onclick=drawCard; $('again').onclick=drawCard; $('pass').onclick=doPass;
+$('setBtn').onclick=function(){ $('setOv').classList.remove('hide'); };
+$('setClose').onclick=function(){ $('setOv').classList.add('hide'); };
 /* ---- 前情提要：3 頁圖卡、每頁一句話；每天第一次進課堂頁自動出現，可略過；右上角「前情提要」可重看 ---- */
 /* 前情提要：只留小男孩（不同表情，像在說故事），最後一頁加小小的陶笛精靈；無背景、無外框 */
 function tears(){ return '<i class="tear" style="left:41%;top:50%;animation-delay:0s"></i><i class="tear" style="left:63%;top:50%;animation-delay:.9s"></i>'; }
@@ -544,9 +699,12 @@ function introClose(){ $('intro').classList.add('hide'); if(!C.intro){ C.intro=1
 $('introNext').onclick=function(){ if(introI>=INTRO.length-1) introClose(); else { introI++; introPaint(); } };
 $('introSkip').onclick=introClose;
 $('introBtn').onclick=introOpen;
-function openArc(){ $('arcFrame').src='ocarina-playground.html?class=1'; $('arcOv').classList.remove('hide'); }
-function closeArc(){ $('arcOv').classList.add('hide'); $('arcFrame').src='about:blank'; }
-$('arcClose').onclick=closeArc;
+function openArc(id){ $('arcFrame').src='ocarina-playground.html?class=1&game='+encodeURIComponent(id); $('arcOv').classList.remove('hide'); }
+function closeArc(){
+  if($('arcOv').classList.contains('hide')) return;
+  $('arcOv').classList.add('hide'); $('arcFrame').src='about:blank';
+  idle('星空試煉結束，水晶碎片會依成績自動入帳');
+}
 addEventListener('message',function(e){ if(e.data&&e.data.type==='arcade-close') closeArc(); });
 $('ship').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'ship'},'*');}catch(e){} };
 $('jarGo').onclick=()=>{ try{parent.postMessage({type:'class-go',v:'map'},'*');}catch(e){} };   /* 地圖頁同一頁有星空地圖與星星罐 */
@@ -561,17 +719,15 @@ function rep(){try{parent.postMessage({type:'class-h',h:document.documentElement
 try{new ResizeObserver(rep).observe(document.body);}catch(e){}
 rep();
 /* 開啟：依存檔回到上次的畫面 */
+$('deckFrm').innerHTML=frameSVG(250,350); $('deckEmb').innerHTML=emblem(); $('cbackEmb').innerHTML=emblem();
+try{ new ResizeObserver(paintFrame).observe($('cfront')); }catch(e){}
 if(!C.intro) introOpen();
 (function(){
   const ph=C.phase;
-  if(ph==='card'&&CARDS[C.card]){ paintCard(); }
-  else if(ph==='wind'&&C.wind){ paintWind(); }
-  else if(ph==='rescue'){ view('rescue'); $('drawCard').classList.add('hide'); mount(); }
-  else if(ph==='drop'&&C.drop){
-    if(C.drop.kind==='rescue'){ view('rescue'); mount(); C.pass=HP; $('stage').classList.add('calm'); renderRescue(); }
-    else { const c=CARDS[C.card]; view('card'); if(c){ const cv=cardView(c); face('',cv.ic,cv.t,''); } $('deckHint').textContent=''; }
-    showDrop();
-  }
+  if(ph==='card'&&CARDS[C.card]){ paintCard(false); }
+  else if(ph==='wind'&&C.wind){ paintWind(false); }
+  else if(ph==='rescue'){ zone('deck'); rescueFace(); mount(); $('pass').textContent='通過'; showSpot(false); }
+  else if(ph==='drop'&&C.drop){ showDrop(); }
   else idle();
 })();
 </script>

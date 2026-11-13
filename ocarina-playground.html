@@ -598,7 +598,7 @@ function showResult(res){
   h+='<div class="res">'+(res.stats||[]).map(s=>'<div>'+s[1]+'<span>'+s[0]+'</span></div>').join('')+'</div>';
   if(!demo)h+=dropHTML(res.drop);
   if(res.note)h+='<p>'+res.note+'</p>';
-  h+='<div class="chips"><button class="btn" id="again">'+(demo?'換我玩':'再玩一次')+'</button>'+(demo?'<button class="btn ghost" id="again2">再看一次</button>':'')+'<button class="btn ghost" id="home">回選單</button></div></div>';
+  h+='<div class="chips"><button class="btn" id="again">'+(demo?'換我玩':'再玩一次')+'</button>'+(demo?'<button class="btn ghost" id="again2">再看一次</button>':'')+'<button class="btn ghost" id="home">'+(CLASS_MODE?'回課堂':'回選單')+'</button></div></div>';
   ov.innerHTML=h;ov.hidden=false;
   $('#again').addEventListener('click',()=>{if(demo)setDemo(false);startRound();});
   const a2=$('#again2');if(a2)a2.addEventListener('click',()=>startRound());
@@ -673,7 +673,7 @@ function goHub(){
   $('#stage').hidden=true;$('#hub').hidden=false;
   renderHub();
 }
-$('#back').addEventListener('click',goHub);
+$('#back').addEventListener('click',CLASS_MODE?function(){try{parent.postMessage({type:'arcade-close'},'*');}catch(e){}}:goHub);   /* 課堂模式：左上角箭頭＝回課堂 */
 $('#mode').addEventListener('click',()=>{
   if(!cur)return;
   Snd.init();Snd.resume();
@@ -2493,6 +2493,8 @@ GAMES.push({id:'tube',name:'複管指法（測試版）',tag:'複管 · 測試',
 
 {const ti=GAMES.findIndex(g=>g.id==='tube');if(ti>=0)GAMES.splice(ti,1);}
 renderHub();
+/* 課堂模式：?class=1&game=<id> 直接進該款遊戲（跳過選單），停在遊戲自己的開始畫面讓老師按「開始遊戲」（瀏覽器需要一次點擊才能出聲） */
+if(CLASS_MODE){try{const gid=new URLSearchParams(location.search).get('game');const gg=GAMES.find(x=>x.id===gid);if(gg)openGame(gg,false);}catch(e){}}
 })();
 </script>
 

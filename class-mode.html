@@ -460,7 +460,9 @@ let C=OLMSave.read(KEY);
 function fresh(size){return {size:size||20,day:dayStr(),n:0,used:0,phase:'idle',card:-1,solo:0,i:0,pass:0,drop:null,wind:null,last:-1};}
 if(C.day!==dayStr()||typeof C.n!=='number')C=fresh(C.size);
 if(!(C.size>=1&&C.size<=60))C.size=20;
-function save(){OLMSave.write(KEY,C);}
+function save(){C.ts=Date.now();OLMSave.write(KEY,C);}
+/* 重開時：上次停在某張卡中途，10 分鐘內回到那張卡（防不小心重整）；超過 10 分鐘（或沒有時間紀錄）一律回牌堆 */
+if(C.phase!=='idle'&&!(C.ts>0&&Date.now()-C.ts<10*60e3)){C.phase='idle';C.drop=null;C.wind=null;C.card=-1;}
 const S = {fw:0,fh:0,busy:false, mode:'rand', force:'', forceAnimal:-1};
 function arcN(){const a=OLMSave.read(ARC);return a.day===dayStr()?(a.n|0):0;}
 function vines5(a){

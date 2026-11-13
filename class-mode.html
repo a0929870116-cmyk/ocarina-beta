@@ -98,6 +98,7 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 .cardface{position:relative;aspect-ratio:480/300;max-width:520px;margin:6px auto 0;border-radius:18px;border:3px solid var(--ink);background:linear-gradient(#fff8e4,#f3e3b6);box-shadow:inset 0 0 0 4px #fff8e4,inset 0 0 0 7px var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;gap:8px}
 .cardface .frm{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .cardface .cin{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 26px}
+.cardface .gl{width:88px;height:88px;display:block}
 .cardface .ic{font-size:54px;line-height:1}
 .cardface .tt{font-family:Iansui,'Noto Sans TC',sans-serif;font-size:32px;font-weight:900;line-height:1.2}
 .cardface .ds{font-size:18px;font-weight:700;color:var(--sub);line-height:1.5}
@@ -217,13 +218,13 @@ const CARD_CANDY=4, CARD_CRY=1, WIND_LOSS=5;
 const P_ANIMAL=.15, P_WIND=.10;   /* 命運事件機率（Claude 暫定，未確認）：動物 15%、風 10%、其餘是普通任務卡 */
 /* 普通任務卡（新增請加在最後面，存檔用順序編號記錄） */
 const CARDS=[
- {ic:'🎺',t:'全班合奏',d:'全班一起，把整首歌吹一遍'},
- {ic:'🦸',t:'英雄獨奏',d:'被抽到的號碼，獨自吹這首歌（沒吹過？全班一起吹支援）',solo:true},
- {ic:'🔗',t:'接龍吹奏',d:'一個接一個，每人吹一小句，把整首歌接完'},
- {ic:'🤫',t:'輕輕吹',d:'全班一起，輕輕地把整首歌吹一遍'},
- {ic:'🙈',t:'譜蓋起來吹',d:'把譜蓋起來，全班憑記憶吹一遍'},
- {ic:'🔁',t:'重複第一段',d:'回到第一段，全班再吹一次'},
- {ic:'🥁',t:'打出節奏',d:'選歌曲任一段落，全班拍手（或敲桌）打出它的節奏'}
+ {ic:'ens',t:'全班合奏',d:'全班一起，把整首歌吹一遍'},
+ {ic:'hero',t:'英雄獨奏',d:'被抽到的號碼，獨自吹這首歌（沒吹過？全班一起吹支援）',solo:true},
+ {ic:'chain',t:'接龍吹奏',d:'一個接一個，每人吹一小句，把整首歌接完'},
+ {ic:'soft',t:'輕輕吹',d:'全班一起，輕輕地把整首歌吹一遍'},
+ {ic:'book',t:'譜蓋起來吹',d:'把譜蓋起來，全班憑記憶吹一遍'},
+ {ic:'loop',t:'重複第一段',d:'回到第一段，全班再吹一次'},
+ {ic:'drum',t:'打出節奏',d:'選歌曲任一段落，全班拍手（或敲桌）打出它的節奏'}
 ];
 const $ = id => document.getElementById(id);
 /* 凱爾特風卡框：雙線金框＋上下編繩＋四角三圓結（凱爾特風只放 UI 框） */
@@ -243,9 +244,32 @@ const FRAME='<svg class="frm" viewBox="0 0 480 300" aria-hidden="true">'
  +'<rect x="16" y="16" width="448" height="268" rx="14" fill="none" stroke="#d4a63a" stroke-width="3"/>'
  +braid(78,402,25)+braid(78,402,275)
  +knot(40,40)+knot(440,40)+knot(40,260)+knot(440,260)+'</svg>';
+
+/* 凱爾特風圖示：雙線（深褐外線＋金內線）＋編繩圓環；每個圖示 64x64 */
+function dbl(d,w){w=w||4;return '<path d="'+d+'" fill="none" stroke="#4a2f1a" stroke-width="'+(w+2.6)+'" stroke-linecap="round" stroke-linejoin="round"/><path d="'+d+'" fill="none" stroke="#e0b64a" stroke-width="'+w*0.6+'" stroke-linecap="round" stroke-linejoin="round"/>';}
+function dot(x,y,r){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#a8447f" stroke="#4a2f1a" stroke-width="1.6"/>';}
+function ring(){ /* 編繩圓環：兩條相位相反的波浪沿圓周 */
+  let a='',b='';
+  for(let i=0;i<=120;i++){const t=i/120*Math.PI*2, w=Math.sin(t*8)*3.2, r1=44+w, r2=44-w;
+    a+=(i?'L':'M')+(50+r1*Math.cos(t)).toFixed(1)+' '+(50+r1*Math.sin(t)).toFixed(1);
+    b+=(i?'L':'M')+(50+r2*Math.cos(t)).toFixed(1)+' '+(50+r2*Math.sin(t)).toFixed(1);}
+  return dbl(a+'Z',3.4)+dbl(b+'Z',3.4);
+}
+const GLYPH={
+ ens:dbl('M30 62 Q22 50 34 40 Q52 30 70 46 Q76 56 64 64 Q48 74 30 62Z',3.6)+dbl('M62 42 L74 30',3.6)+dot(40,54,2.6)+dot(50,58,2.6)+dot(58,52,2.6)+dot(48,48,2.6),
+ hero:dbl('M50 26 L72 34 L72 54 Q72 70 50 78 Q28 70 28 54 L28 34Z',3.6)+dbl('M50 38 L53 47 L63 47 L55 53 L58 63 L50 57 L42 63 L45 53 L37 47 L47 47Z',2.4),
+ chain:dbl('M34 50 a12 12 0 1 1 0.1 0',3.6)+dbl('M50 50 a12 12 0 1 1 0.1 0',3.6)+dbl('M66 50 a12 12 0 1 1 0.1 0',3.6),
+ soft:dbl('M34 38 Q42 50 34 62',4)+dbl('M46 32 Q58 50 46 68',4)+dbl('M58 38 Q66 50 58 62',4)+dbl('M70 34 Q80 50 70 66',4),
+ book:dbl('M30 32 L70 32 L70 70 L30 70Z',3.6)+dbl('M30 32 Q50 24 70 32',3.2)+dbl('M42 44 L58 58 M58 44 L42 58',3.2)+dot(50,51,3),
+ loop:dbl('M66 38 A19 19 0 1 0 69 52',4)+dbl('M58 36 L68 38 L66 28',3.4)+dbl('M34 62 A19 19 0 0 0 32 48',0.1),
+ drum:dbl('M30 46 a20 8 0 1 0 40 0 a20 8 0 1 0 -40 0',3.6)+dbl('M30 46 L30 64 Q50 76 70 64 L70 46',3.6)+dbl('M36 30 L50 44',3.6)+dbl('M64 30 L50 44',3.6),
+ deck:dbl('M32 30 L68 30 L68 70 L32 70Z',3.6)+dbl('M42 50 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0',3)+dot(50,50,3),
+ wind:dbl('M32 40 Q54 30 62 40 Q70 52 58 54',4)+dbl('M30 54 Q50 48 58 54',4)+dbl('M36 66 Q56 72 68 62',4)
+};
+function icon(k){ return GLYPH[k] ? '<svg viewBox="0 0 100 100" class="gl" aria-hidden="true">'+ring()+GLYPH[k]+'</svg>' : k; }
 function face(cls,ic,t,d,tag){
   const f=$('cardface'); f.className='cardface'+(cls?' '+cls:'');
-  f.innerHTML=FRAME+'<div class="cin"><div class="ic">'+ic+'</div><div class="tt">'+t+'</div>'+(d?'<div class="ds">'+d+'</div>':'')+(tag?'<span class="tag2">'+tag+'</span>':'')+'</div>';
+  f.innerHTML=FRAME+'<div class="cin"><div class="ic">'+icon(ic)+'</div><div class="tt">'+t+'</div>'+(d?'<div class="ds">'+d+'</div>':'')+(tag?'<span class="tag2">'+tag+'</span>':'')+'</div>';
 }
 function dayStr(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 /* 班級存檔 olm_class_v1：{size,day,n(今天抽了幾張),used(星星糖今日),phase:idle|card|wind|rescue|drop,card,solo,i,pass,drop,wind,last} 每天自動換新 */
@@ -274,7 +298,7 @@ function setPass(txt,off,hint){ $('pass').textContent=txt; $('pass').disabled=!!
 function idle(){
   C.phase='idle'; C.drop=null; C.wind=null; C.card=-1; save(); S.busy=false;
   view('idle'); $('drop').classList.remove('show');
-  face('','🎴','準備好了嗎？','按「'+(C.n>0?'再抽一張卡':'抽一張卡')+'」，看看這一次是什麼任務');
+  face('','deck','準備好了嗎？','按「'+(C.n>0?'再抽一張卡':'抽一張卡')+'」，看看這一次是什麼任務');
   setDraw(true); $('deckHint').textContent='完成任務、老師按「通過」就會掉落星星糖和水晶碎片';
   $('solo').innerHTML=''; setPass('通過',true);
 }
@@ -318,7 +342,7 @@ function showWind(){
 }
 function paintWind(){
   const w=C.wind; view('wind');
-  face('fate wind','🌬️','一陣大風！',w.lose>0?'風把 '+w.lose+' 顆星星糖刮走了…':'風呼呼地吹過，但星星罐是空的，什麼也沒被刮走','命運事件');
+  face('fate wind','wind','一陣大風！',w.lose>0?'風把 '+w.lose+' 顆星星糖刮走了…':'風呼呼地吹過，但星星罐是空的，什麼也沒被刮走','命運事件');
   setDraw(false); $('deckHint').textContent='';
   $('solo').innerHTML=''; setPass('好吧…',false);
 }

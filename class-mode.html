@@ -116,6 +116,11 @@ body{background:var(--paper);color:var(--text);font-family:'Noto Sans TC','PingF
 #intro .dots i{width:12px;height:12px;border-radius:50%;background:#fff3c4;opacity:.35}
 #intro .dots i.on{opacity:1}
 #intro .nx{font-family:inherit;font-weight:900;font-size:26px;min-height:60px;padding:0 44px;border:3px solid var(--ink);border-radius:18px;background:linear-gradient(#ffe48a,var(--gold));color:var(--text);box-shadow:0 5px 0 var(--ink);cursor:pointer}
+#intro .pic.wide{width:min(92vw,520px);aspect-ratio:480/300}
+#intro .sc{position:absolute;inset:0;border-radius:18px;overflow:hidden;background:linear-gradient(#141f48,#3b4f8f)}
+#intro .sc>img,#intro .sc>svg.jar{position:absolute;display:block}
+#intro .sc>svg.bg{position:absolute;inset:0;width:100%;height:100%}
+#intro .frm{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #intro .tw{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff3c4;animation:tw 2.4s ease-in-out infinite}
 @keyframes tw{50%{opacity:.2}}
 /* 節奏題 */
@@ -520,17 +525,42 @@ const SC={
  /* ④ 星星罐：吹出的音符飛進罐子，星星亮起 */
  jar:dbl('M36 40 L64 40 L64 46 Q74 52 72 66 Q70 78 50 78 Q30 78 28 66 Q26 52 36 46Z',3.4)+dbl('M34 34 L66 34',3.4)+dbl(stp(44,64,6),2.2)+dbl(stp(58,60,5),2.2)+dbl(stp(52,72,4),2)+note(28,30)+note(40,20)+note(72,26)
 };
+function spts(cx,cy,R,r){let p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,k=i%2?r:R;p.push((cx+k*Math.cos(a)).toFixed(1)+','+(cy+k*Math.sin(a)).toFixed(1));}return p.join(' ');}
+function jarSVG(n){ /* 與地圖頁星星罐同款：玻璃罐＋金蓋＋彩色星星糖 */
+  const COL=['#F28B82','#F7C948','#7CC6E8','#8FD19E','#C9A0E8','#F4A261'], xs=[36,58,80,102,124], ys=[166,142,118,94];
+  const body='M44 40C20 46 14 64 14 82V164C14 180 24 188 40 188H120C136 188 146 180 146 164V82C146 64 140 46 116 40Z';
+  let o='<path d="'+body+'" fill="rgba(165,210,222,.30)"/>';
+  for(let i=0;i<n;i++){const row=Math.floor(i/5),col=i%5,x=xs[col]+(row%2?5:0),y=ys[row]-(col%2?2:0),rot=(i*37)%50-25;
+    o+='<g transform="rotate('+rot+' '+x+' '+y+')"><polygon points="'+spts(x,y,10.5,5.1)+'" fill="'+COL[i%6]+'" stroke="#3A2A1A" stroke-width="1.6" stroke-linejoin="round"/></g>';}
+  o+='<path d="'+body+'" fill="none" stroke="#3A2A1A" stroke-width="3.2" stroke-linejoin="round"/><path d="M24 86V160" stroke="rgba(255,255,255,.75)" stroke-width="5" stroke-linecap="round" fill="none"/>';
+  o+='<rect x="46" y="28" width="68" height="14" rx="3" fill="rgba(165,210,222,.30)" stroke="#3A2A1A" stroke-width="3"/><rect x="40" y="8" width="80" height="22" rx="6" fill="#C8963A" stroke="#3A2A1A" stroke-width="3"/>';
+  return o;
+}
+function sky(){let t='';for(let k=0;k<16;k++){t+='<i class="tw" style="left:'+((k*41+9)%94)+'%;top:'+((k*29+5)%70)+'%;animation-delay:'+((k%5)*.4)+'s"></i>';}return t;}
+const SCENE={
+ meet:function(){ /* ② 男孩與陶笛精靈，沿著星辰足跡尋找 */
+   let tr='';[[70,236],[118,214],[168,186],[214,156],[262,128],[316,98],[372,72],[428,46]].forEach(function(p,i){tr+='<polygon points="'+spts(p[0],p[1],i%2?9:12,i%2?4.2:5.5)+'" fill="'+(i%2?'#f2cf6a':'#d9b3ff')+'" stroke="#4a2f1a" stroke-width="1.6" stroke-linejoin="round"/>';});
+   return sky()+'<svg class="bg" viewBox="0 0 480 300" preserveAspectRatio="none" aria-hidden="true"><path d="M30 262 Q150 210 240 160 T450 40" fill="none" stroke="#a77bd6" stroke-width="16" stroke-linecap="round" opacity=".45"/><path d="M30 262 Q150 210 240 160 T450 40" fill="none" stroke="#e3ccff" stroke-width="5" stroke-linecap="round" opacity=".7"/>'+tr+'<ellipse cx="170" cy="272" rx="150" ry="20" fill="#5e7f4a" stroke="#4a2f1a" stroke-width="3"/></svg>'
+    +'<img src="assets/intro/spirit_welcome.webp" alt="" style="left:9%;bottom:13%;height:58%"><img src="assets/intro/boy_point.webp" alt="" style="left:36%;bottom:13%;height:70%">'+FRAME;
+ },
+ jar:function(){ /* ④ 化身精靈分身，吹奏、集滿星星罐 */
+   return sky()+'<svg class="bg" viewBox="0 0 480 300" preserveAspectRatio="none" aria-hidden="true"><ellipse cx="240" cy="270" rx="200" ry="16" fill="#5e7f4a" stroke="#4a2f1a" stroke-width="3"/></svg>'
+    +'<svg class="jar" viewBox="0 0 160 196" aria-hidden="true" style="left:50%;transform:translateX(-50%);bottom:9%;height:74%">'+jarSVG(17)+'</svg>'
+    +'<img src="assets/intro/spirit_cheer.webp" alt="" style="left:6%;bottom:13%;height:55%"><img src="assets/intro/boy_cheer.webp" alt="" style="right:5%;bottom:13%;height:64%">'+FRAME;
+ }
+};
 const INTRO=[
  {s:'isles',t:'夜空有十二座小島，住著一開口就會下水晶雨的星星。'},
- {s:'spirit',t:'有座島的星星不見了，男孩喚醒陶笛精靈，跟著星辰足跡去尋找。'},
+ {sc:'meet',t:'有座島的星星不見了，男孩喚醒陶笛精靈，跟著星辰足跡去尋找。'},
  {s:'broken',t:'可是地圖碎了，其他星星也忘了歌聲，想不起它的蹤跡。'},
- {s:'jar',t:'請化身精靈分身，吹奏笛音、集滿星星罐，點亮小島吧！'}
+ {sc:'jar',t:'請化身精靈分身，吹奏笛音、集滿星星罐，點亮小島吧！'}
 ];
 let introI=0;
 function introPaint(){
   const it=INTRO[introI];
   let tw=''; for(let k=0;k<14;k++){ tw+='<i class="tw" style="left:'+((k*37+11)%92)+'%;top:'+((k*53+7)%88)+'%;animation-delay:'+((k%5)*.4)+'s"></i>'; }
-  $('introPic').innerHTML=tw+'<svg viewBox="0 0 100 100" aria-hidden="true">'+ring()+SC[it.s]+'</svg>';
+  $('introPic').classList.toggle('wide',!!it.sc);
+  $('introPic').innerHTML = it.sc ? '<div class="sc">'+SCENE[it.sc]()+'</div>' : tw+'<svg viewBox="0 0 100 100" aria-hidden="true">'+ring()+SC[it.s]+'</svg>';
   $('introTx').textContent=it.t;
   [].forEach.call($('introDots').children,function(d,k){d.classList.toggle('on',k===introI);});
   $('introNext').textContent = introI===INTRO.length-1 ? '開始' : '下一頁';

@@ -519,9 +519,11 @@ function idle(msg){
   $('deckHint').textContent = msg || (C.n>0 ? '按一下牌堆，再抽一張任務卡' : '按一下牌堆，翻開這一次的任務');
 }
 /* ---- 抽卡 ---- */
+const ARC_IX=7, ARC_COPIES=4;   /* 星空試煉在 CARDS 的編號、牌庫張數（4/17≈24%） */
 /* 牌庫：全部任務卡各 1 張＋風 1 張＋動物救援 2 張，洗牌後一張一張抽（抽完才重洗），不會連續同一種、風與救援不會太頻繁 */
 function newBag(prev){
   const bag=[]; CARDS.forEach(function(c,k){ bag.push('c'+k); }); bag.push('wind','animal','animal');
+  for(let n=1;n<ARC_COPIES;n++) bag.push('c'+ARC_IX);   /* 星空試煉共 ARC_COPIES 張（每張抽到都隨機換一款遊戲） */
   for(let t=0;t<80;t++){
     for(let i=bag.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const x=bag[i]; bag[i]=bag[j]; bag[j]=x; }
     let ok = bag[0]!==prev;
@@ -562,7 +564,8 @@ function showCard(ix){
 }
 function paintCard(anim){
   const c0=CARDS[C.card], c=cardView(c0); zone('deck');
-  face('',c.ic,c.t,c0.arc?'':c.d,'',(c.solo&&C.solo)?'<div class="solo">請 <b>'+C.solo+'</b> 號獨奏</div>':'');
+  const arcName=c0.arc?(ARC_GAMES.filter(function(g){return g[0]===C.arcGame;})[0]||[0,''])[1]:'';
+  face('',c.ic,arcName||c.t,c0.arc?'':c.d,c0.arc?'星空試煉':'',(c.solo&&C.solo)?'<div class="solo">請 <b>'+C.solo+'</b> 號獨奏</div>':'');
   $('pass').textContent=c0.arc?'進入試煉':'通過'; showSpot(anim);
 }
 function passCard(){

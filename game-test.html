@@ -404,7 +404,7 @@ Sfx.probe=function(){
       <h1 id="uname">王小明</h1>
       <small>示範資料</small>
     </div>
-    <span class="pill num"><svg><use href="#i-coin"/></svg><span id="coins">86</span></span>
+    <span class="pill num"><svg><use href="#i-coin"/></svg><span id="coins">0</span></span>
   </header>
   <svg class="braid" aria-hidden="true"><rect width="100%" height="14" fill="url(#braid)"/></svg>
 
@@ -626,12 +626,12 @@ const STORY={1:['星光草原的小星星，一顆也不亮了。男孩吹起喚
 const SVK='olm_test_v1';
 function rdSave(){return OLMSave.read(SVK);}
 function wrSave(p){OLMSave.patch(SVK,p);}
-const COIN0=86, OPEN_COIN=30, MAXOPEN=9, NEED=40;   /* 金幣初始 86（測試版示範值）；開島謝禮每島 30；目前只有第 1～9 島可開；星星罐 40 顆 */
+const COIN0=0, OPEN_COIN=30, MAXOPEN=9, NEED=40;   /* 金幣初始 0（新存檔從頭開始）；開島謝禮每島 30；目前只有第 1～9 島可開；星星罐 40 顆 */
 const OPEN_Q=(()=>{const v=Math.floor(Number(new URLSearchParams(location.search).get('open')));return v>=1&&v<=12?v:0;})();   /* ?open=N：只改畫面（測圖鑑），不結算、不存檔 */
-let JAR=9; const PEND=[];   /* PEND：這次載入時剛開的島（載入完成後依序播開島畫面） */
+let JAR=0; const PEND=[];   /* PEND：這次載入時剛開的島（載入完成後依序播開島畫面） */
 const OPEN=(()=>{
-  const sv=rdSave();let o=(sv.open>=1&&sv.open<=MAXOPEN)?(sv.open|0):3;
-  let j=sv.jar==null?9:Math.max(0,sv.jar|0);
+  const sv=rdSave();let o=(sv.open>=0&&sv.open<=MAXOPEN)?(sv.open|0):0;
+  let j=sv.jar==null?0:Math.max(0,sv.jar|0);
   if(!OPEN_Q){
     let c=sv.coins==null?COIN0:(sv.coins|0);
     while(j>=NEED&&o<MAXOPEN){j-=NEED;o++;PEND.push(o);c+=OPEN_COIN;}
@@ -777,8 +777,8 @@ const SHOP=[
  {id:'bg_island',g:'more',name:'浮空島',price:30,fn:''},
  {id:'bg_rcloud',g:'more',name:'彩虹雲',price:30,fn:''}
 ];
-const OWN0=['hat_straw','bow','book'];   /* 一開始就有的道具 */
-function shopState(){const v=rdSave();return {own:Array.isArray(v.own)?v.own:OWN0.slice(),worn:(v.worn&&typeof v.worn==='object')?v.worn:{head:'hat_straw'}};}
+const OWN0=[];   /* 一開始就有的道具 */
+function shopState(){const v=rdSave();return {own:Array.isArray(v.own)?v.own:OWN0.slice(),worn:(v.worn&&typeof v.worn==='object')?v.worn:{}};}
 /* 精靈衣櫥預覽：道具是向量圖（props-art.js，畫在精靈 200×300 座標上）。精靈圖高 160px、左 22px，換算成 SVG 座標的取景框＝viewBox「-41.25 -56.25 281.25 356.25」；背景與披風畫在精靈後面（svg.lay.back，z-index 1），其餘畫在前面（z-index 6） */
 const DRESS_VB='-41.25 -56.25 281.25 356.25';
 function renderDress(){
@@ -929,7 +929,7 @@ const SCALE_MIDI=[69,71,72,74,76,77,79,81,83,84,86,88,89,91,93,95,96,98,100,101,
 const SCALE_NUM=['6̣', '7̣', '1', '2', '3', '4', '5', '6', '7', '1̇', '2̇', '3̇', '4̇', '5̇', '6̇', '7̇', '1̈', '2̈', '3̈', '4̈', '5̈'];
 const MN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const mname=m=>MN[((m%12)+12)%12]+(Math.floor(m/12)-1);
-let SUCC=12;
+let SUCC=0;
 try{const sv=OLMSave.read(SVK);if(Object.keys(sv).length){SUCC=sv.succ|0;if(sv.jar!=null)JAR=Math.max(0,Math.min(NEED,sv.jar|0));}}catch(e){}
 function saveP(){wrSave({succ:SUCC,jar:JAR});}
 /* 任務清單、權重、週界、存檔都在共用的 wk-core.js（與 weekly-practice.html、song-practice.html 一致） */
@@ -1143,7 +1143,7 @@ function blowLoop(){
 $('start-blow').addEventListener('click',()=>{if(B.on)stopBlow();else startBlow();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopBlow();});
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});   /* 從別頁（練習頁）返回：重載一次，讓開島結算與金幣同步 */
-$('reset-p').addEventListener('click',()=>{SUCC=12;JAR=9;B.tries=[];saveP();wrSave({open:3,coins:COIN0,own:OWN0.slice(),worn:{head:'hat_straw'}});location.reload();});
+$('reset-p').addEventListener('click',()=>{SUCC=0;JAR=0;B.tries=[];saveP();wrSave({open:0,coins:COIN0,own:OWN0.slice(),worn:{}});location.reload();});
 
 /* ===== 小遊戲：直接嵌入收音版遊樂場（同一個網站，麥克風權限可往下傳） ===== */
 function closeGame(){

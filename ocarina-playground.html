@@ -305,7 +305,7 @@ function arcSettle(wrong){
       out.coin=sw?ARC_COIN_SWORD:ARC_COIN;out.sword=sw;
       T.coins=(T.coins==null?86:(T.coins|0))+out.coin;});}catch(e){out.coin=ARC_COIN;}   /* 金幣入帳（商店錢包） */
   }
-  const isle=(S.isle>=1&&S.isle<=12)?S.isle:4;
+  const isle=(S.isle>=1&&S.isle<=12)?S.isle:1;
   S.el=S.el||{};S.isle=isle;
   const ids=[];
   if(out.want>=1)ids.push(isle);

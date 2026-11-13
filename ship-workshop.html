@@ -187,7 +187,7 @@ function weekDone(w){return TASKS.every(t=>(w.tasks[t.id]|0)>=t.T)&&w.has;}
 
 /* ===== 狀態 ===== */
 const KEY='olm_ship_v1';
-const DEFAULT_ISLE=4;   /* 測試版不真的開島，「目前練習的島」暫定為地圖上的第 4 島；weekly-practice.html 讀同一個欄位決定掉哪種元素 */
+const DEFAULT_ISLE=1;   /* 測試版不真的開島，「目前練習的島」暫定為地圖上的第 4 島；weekly-practice.html 讀同一個欄位決定掉哪種元素 */
 function fresh(){
   return {el:Object.fromEntries(EL.map(e=>[e.id,0])),
     lv:{hull:1,sail:1,wing:1,engine:1,prow:1},cr:{},isle:DEFAULT_ISLE,claimed:-1,fake:-1};
@@ -440,7 +440,7 @@ function bagPanel(){
 <button class="btn alt" style="margin-top:8px" data-act="jar10">星星罐 +10（測試開島，罐滿 40 就會開島）</button>
 <div style="margin-top:8px;display:flex;gap:8px"><select id="jumpsel" style="flex:1">${[1,2,3,4,5,6,7,8,9].map(n=>`<option value="${n}">跳到第 ${n} 島前</option>`).join('')}</select><button class="btn alt" style="flex:1" data-act="jumpN">跳過去</button></div>
 <button class="btn alt" style="margin-top:8px" data-act="coin100">金幣 +100</button>
-<button class="btn alt" style="margin-top:8px" data-act="resetOpen">重設開島進度（回第 3 島、星星罐 9、金幣 86）</button></div></details>
+<button class="btn alt" style="margin-top:8px" data-act="resetOpen">重設開島進度（從頭：0 島、星星罐 0、金幣 0、無裝備）</button></div></details>
 <h2>這版的暫定假設</h2><ul class="notes">
 <li>水晶碎片名稱第 5～12 島是暫擬。每次升級放入任意 3 顆水晶碎片（Lv1→2、Lv2→3 各一次）。</li>
 <li>放入的位置決定該部位的顏色：上方＝主色、右下＝紋飾、左下＝光暈。滿級後仍可重新提煉換色。</li>
@@ -573,8 +573,8 @@ document.addEventListener('click',e=>{
   }
   else if(act==='jar10'||act==='resetOpen'){
     try{OLMSave.patch(OLMSave.K.TEST,function(T){
-      if(act==='jar10'){T.jar=Math.min(79,(T.jar==null?9:(T.jar|0))+10);setMsg('星星罐 +10（現在 '+T.jar+'）。罐滿 40 顆，回地圖頁會開島。');}
-      else{T.jar=9;T.open=3;T.coins=86;T.own=['hat_straw','bow','book'];T.worn={head:'hat_straw'};S.isle=4;setMsg('開島進度已重設。');}
+      if(act==='jar10'){T.jar=Math.min(79,(T.jar==null?0:(T.jar|0))+10);setMsg('星星罐 +10（現在 '+T.jar+'）。罐滿 40 顆，回地圖頁會開島。');}
+      else{T.jar=0;T.open=0;T.coins=0;T.own=[];T.worn={};S.isle=1;setMsg('開島進度已重設。');}
     });}catch(e){setMsg('寫入失敗');}
   }
   save();render();

@@ -81,7 +81,7 @@ const ISLE_ELEM=[['stardust','星塵'],['moonwater','月光水'],['rainbow','彩
 function addTypedElem(n){
   let name='';
   OLMSave.patch(OLMSave.K.SHIP,function(o){
-    const isle=(o.isle>=1&&o.isle<=12)?o.isle:4,e=ISLE_ELEM[isle-1];
+    const isle=(o.isle>=1&&o.isle<=12)?o.isle:1,e=ISLE_ELEM[isle-1];
     o.el=o.el||{};o.el[e[0]]=(o.el[e[0]]|0)+n;o.isle=isle;name=e[1];
   });
   return name;

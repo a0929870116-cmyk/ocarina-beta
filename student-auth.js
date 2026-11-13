@@ -4,7 +4,7 @@
    · Firebase Auth 要 email，所以用 <key>[-世代]@olm-students.example.com 當帳號（example.com 是保留網域，不會寄信）。
    · Firebase 密碼至少 6 字，但專案規格是 4 字，所以實際送出的是「密碼＋固定尾巴」（PAD）。
    · 老師重設密碼＝後台把 gens/<key>.g 加 1、students/<key>.uid 清空；學生用「同樣的名字」重新建立帳號（世代 +1 的新 email），認領原本的文件，進度保留。
-   · 同名同姓：第二位在名字後面加學校第一個字（例：王小明北），鑰匙就不同。
+   · 同名同姓：後註冊的人在名字後面加校名縮寫 2～4 字（例：王小明復興），鑰匙就不同；先註冊的人不動。
    文件格式、規則見 firestore.rules。
    錯誤一律丟 Error，e.code 是：badname、weak、noack、dup、wrong、many、net、config、denied、nodoc、other。 */
 (function(g){
@@ -71,7 +71,7 @@ function make(sdk,auth,db){
     /* 建立帳號（或老師重設後重新設定密碼：同樣的名字） */
     register:function(rawName,pw,ack){
       var name=cleanName(rawName);
-      if(!name||name.length>12||/[<>&"'\/\\]/.test(name))return Promise.reject(E('badname'));
+      if(!name||name.length>16||/[<>&"'\/\\]/.test(name))return Promise.reject(E('badname'));
       if(String(pw||'').length<4)return Promise.reject(E('weak'));
       if(!ack)return Promise.reject(E('noack'));
       var key,user=null;

@@ -7,7 +7,7 @@
 
    資料格式
    students: [{id, name, school1, note, start, ack, created}]    → Firestore：students/{id}（文件內容不含 id）
-     name   真實姓名；school1 學校第一個字（只有同名時才需要）；start 該生開始日 YYYY-MM-DD（週界起算，與 wk-core.js 同規則）
+     name   真實姓名；school1 校名縮寫 2～4 字（只有同名且後來加入者才需要）；start 該生開始日 YYYY-MM-DD（週界起算，與 wk-core.js 同規則）
      ack    註冊時「家長知悉」已勾選；created 建立時間
      uid    （雲端）學生登入帳號的 uid；null＝還沒註冊（或剛重設），學生用同樣名字註冊會認領。學生自己註冊的 id ＝ 名字的鑰匙，見 student-auth.js
    tasks: { 學生id: {tasks:[{id,type,name,song,from,to,T,speed}], updated} }   → Firestore：tasks/{學生id}
@@ -54,7 +54,7 @@ function fail(m){return Promise.reject(new Error(m));}
 function todayKey(){return new Date(Date.now()+8*3600e3).toISOString().slice(0,10);}
 function dayKeyOf(ts){return new Date(Date.parse(ts)+8*3600e3).toISOString().slice(0,10);}
 
-/* 顯示名稱：同名時，姓名後面加學校第一個字（例：王小明北） */
+/* 顯示名稱：同名時，姓名後面加校名縮寫（例：王小明復興） */
 function displayNames(students){
   var cnt={};students.forEach(function(s){cnt[s.name]=(cnt[s.name]||0)+1;});
   var m={};students.forEach(function(s){m[s.id]=cnt[s.name]>1&&s.school1?s.name+s.school1:s.name;});
@@ -154,13 +154,11 @@ var Store={
   },
   /* ---- 學生 ---- */
   addStudent:function(d){
-    var o=load(),name=(d.name||'').trim(),sc=(d.school1||'').trim().slice(0,1);
+    var o=load(),name=(d.name||'').trim(),sc=(d.school1||'').trim().slice(0,4);
     if(!name)return fail('請輸入姓名');
     var same=o.students.filter(function(s){return s.name===name;});
     if(same.length){
-      if(!sc)return fail('已有同名學生「'+name+'」，請填學校第一個字');
-      var noSc=same.filter(function(s){return !s.school1;});
-      if(noSc.length)return fail('已有同名學生「'+name+'」但沒填學校第一個字，請先到名單補上，再新增這位');
+      if(!sc)return fail('名稱已有人使用，請加上校名縮寫（2～4 字）');
       if(same.some(function(s){return s.school1===sc;}))return fail('「'+name+sc+'」已存在');
     }
     /* 雲端模式：學生 id ＝ 名字（含學校字）的鑰匙，學生之後用同樣名字註冊就會認領這一筆；本機模式用隨機 id */
@@ -168,7 +166,7 @@ var Store={
     if(mode==='cloud'){
       if(!S)return fail('缺少 student-auth.js');
       var full=S.cleanName(name+sc);
-      if(full.length>12)return fail('名字加學校字最多 12 個字');
+      if(full.length>16)return fail('名字加校名最多 16 個字');
       idP=S.keyOf(full);
     }else idP=ok(uid('s-'));
     return idP.then(function(id){
@@ -182,10 +180,9 @@ var Store={
   updateStudent:function(id,d){
     var o=load(),s=o.students.filter(function(x){return x.id===id;})[0];
     if(!s)return fail('找不到學生');
-    var name=d.name!=null?String(d.name).trim():s.name,sc=d.school1!=null?String(d.school1).trim().slice(0,1):s.school1;
+    var name=d.name!=null?String(d.name).trim():s.name,sc=d.school1!=null?String(d.school1).trim().slice(0,4):s.school1;
     if(!name)return fail('姓名不能空白');
     var same=o.students.filter(function(x){return x.id!==id&&x.name===name;});
-    if(same.length&&!sc)return fail('同名學生需要學校第一個字');
     if(same.some(function(x){return x.school1===sc;}))return fail('「'+name+sc+'」已存在');
     s.name=name;s.school1=sc;
     if(d.note!=null)s.note=String(d.note).trim();

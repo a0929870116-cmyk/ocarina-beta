@@ -99,13 +99,13 @@ header .hbtn button{font:inherit;font-size:13px;border:1px solid rgba(255,255,25
     <h2>新增學生</h2>
     <div class="row">
       <label>真實姓名<input id="ns-name" maxlength="12" placeholder="例：王小明"></label>
-      <label>學校第一個字（同名時才填）<input id="ns-sc" maxlength="1" style="width:130px" placeholder="例：北"></label>
+      <label>校名縮寫 2～4 字（同名時才填）<input id="ns-sc" maxlength="4" style="width:130px" placeholder="例：復興"></label>
       <label>開始日（週界起算）<input id="ns-start" type="date"></label>
       <label>備註<input id="ns-note" maxlength="40" placeholder="選填，例：週三班"></label>
       <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)"><input id="ns-ack" type="checkbox" checked>家長已知悉</label>
       <button class="b" id="ns-add">新增</button>
     </div>
-    <p class="muted" style="margin:8px 0 0">同名時，名單會顯示「姓名＋學校第一個字」（例：王小明北）。已有同名學生時，新增者與原有那位都要填學校第一個字。</p>
+    <p class="muted" style="margin:8px 0 0">同名時，名單會顯示「姓名＋校名縮寫」（例：王小明復興）。先建的同名學生不動，後新增的要填校名縮寫（2～4 字）。</p>
     <p class="msg" id="ns-msg"></p>
   </div>
   <div class="card">
@@ -301,7 +301,7 @@ $('st-body').addEventListener('click',function(e){
   if(b.dataset.e)editStudent(s);else if(b.dataset.r)resetPw(s);else delStudent(s);
 });
 function editStudent(s){
-  openModal('<h3>編輯學生</h3><div class="row" style="flex-direction:column;align-items:stretch"><p class="muted" style="margin:0 0 6px">學生登入時，名字要和他<b>註冊（或你建名單）時的名字＋學校字</b>一樣；在這裡改名只會改名單上的顯示，不會改他的登入名字。</p><label>真實姓名<input id="e-name" value="'+esc(s.name)+'" maxlength="12"></label><label>學校第一個字<input id="e-sc" value="'+esc(s.school1)+'" maxlength="1"></label><label>開始日<input id="e-start" type="date" value="'+esc(s.start)+'"></label><label>備註<input id="e-note" value="'+esc(s.note)+'" maxlength="40"></label></div><p class="msg err" id="e-msg"></p><div class="acts"><button class="b ghost" id="m-no">取消</button><button class="b" id="m-ok">儲存</button></div>',function(b){
+  openModal('<h3>編輯學生</h3><div class="row" style="flex-direction:column;align-items:stretch"><p class="muted" style="margin:0 0 6px">學生登入時，名字要和他<b>註冊（或你建名單）時的名字＋校名縮寫</b>一樣；在這裡改名只會改名單上的顯示，不會改他的登入名字。</p><label>真實姓名<input id="e-name" value="'+esc(s.name)+'" maxlength="16"></label><label>校名縮寫（2～4 字）<input id="e-sc" value="'+esc(s.school1)+'" maxlength="4"></label><label>開始日<input id="e-start" type="date" value="'+esc(s.start)+'"></label><label>備註<input id="e-note" value="'+esc(s.note)+'" maxlength="40"></label></div><p class="msg err" id="e-msg"></p><div class="acts"><button class="b ghost" id="m-no">取消</button><button class="b" id="m-ok">儲存</button></div>',function(b){
     b.querySelector('#m-no').onclick=closeModal;
     b.querySelector('#m-ok').onclick=function(){
       A.updateStudent(s.id,{name:b.querySelector('#e-name').value,school1:b.querySelector('#e-sc').value,start:b.querySelector('#e-start').value,note:b.querySelector('#e-note').value}).then(function(){closeModal();return reload();}).catch(function(er){b.querySelector('#e-msg').textContent=er.message;});
@@ -478,7 +478,7 @@ function download(name,text,type){
   a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
 }
 $('ex-prog').onclick=function(){
-  var head=['姓名','學校第一個字','備註','開始日','第幾週','任務數','完成度%','預計星星糖','練習天數','練習次數','全對次數','全對率%','最近練習日','各任務（全對/目標）'];
+  var head=['姓名','校名縮寫','備註','開始日','第幾週','任務數','完成度%','預計星星糖','練習天數','練習次數','全對次數','全對率%','最近練習日','各任務（全對/目標）'];
   var lines=[head].concat(D.students.map(function(s){
     var st=curStats(s);
     return [nm(s),s.school1,s.note,s.start,st.idx+1,st.tasks.length,Math.round(st.comp*100),st.candy,st.days,st.tries,st.perf,st.rate==null?'':Math.round(st.rate*100),st.last?A.dayKeyOf(st.last):'',st.detail.map(function(d){return d.t.name+' '+d.n+'/'+d.t.T;}).join('；')];

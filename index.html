@@ -574,7 +574,7 @@ let storyFromGame=false;
 function setGameVisible(on){const f=$('#gamefr');f.hidden=!on;$('#app').style.visibility=on?'hidden':'visible';inGame=!!on;bgm();}
 function enterGame(){
   const f=$('#gamefr');
-  const want='game-test.html?n='+encodeURIComponent(USER)+(SESSION&&SESSION.note==='班級'?'&class=1':'');   /* 班級帳號：遊戲頁多一個「課堂」分頁 */
+  const want='game-test.html?n='+encodeURIComponent(USER)+(SESSION&&SESSION.note==='班級'?'&class=1':(SESSION?'':'&class=1&g=1'));   /* 班級帳號：多一個「課堂」分頁並預設開在課堂；訪客（沒登入）也有課堂分頁體驗，但預設開在地圖（g=1）；學生帳號沒有 */
   if(f.getAttribute('src')!==want)f.setAttribute('src',want);
   setGameVisible(true);
 }

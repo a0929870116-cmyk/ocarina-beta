@@ -1283,7 +1283,7 @@ window.addEventListener('storage',e=>{
   if(!OPEN_Q&&(((v.jar|0)>=NEED&&OPEN<MAXOPEN)||(v.open!=null&&(v.open|0)!==OPEN)))location.reload();
   else drawShop(shopG);
 });
-show(location.hash.slice(1)||(CLASS_MODE?'class':''));
+show(location.hash.slice(1)||(CLASS_MODE&&new URLSearchParams(location.search).get('g')!=='1'?'class':''));   /* 訪客體驗課堂（g=1）預設開在地圖 */
 </script>
 
 </body></html>

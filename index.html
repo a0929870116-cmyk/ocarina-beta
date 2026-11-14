@@ -506,8 +506,17 @@ function show(v){
   document.querySelectorAll('.pv [data-v]').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===(open?v:'splash')));
   try{history.replaceState(null,'','#'+(open?v:'splash'))}catch(e){}
 }
+/* 訪客：全新空白暫時存檔（sessionStorage g:*），不動手機上學生的存檔、不上雲、不記紀錄 */
+function guestOn(){
+  try{Object.keys(sessionStorage).forEach(k=>{if(k.indexOf('g:')===0)sessionStorage.removeItem(k)});sessionStorage.removeItem('olm_live_sid');sessionStorage.setItem('olm_guest','1')}catch(e){}
+  try{OLMSync.detach(false).catch(()=>{})}catch(e){}   /* 已登入過：先把學生進度推完並停止同步（登入狀態保留，「繼續冒險」會重新接上） */
+  try{OLMTasks.detach().catch(()=>{})}catch(e){}
+  GUEST=true;
+}
+function guestOff(){try{sessionStorage.removeItem('olm_guest')}catch(e){}GUEST=false}
+let GUEST=false;
 document.addEventListener('click',e=>{
-  const g=e.target.closest('[data-v]'); if(g){if(g.dataset.guest)USER='訪客';if(g.dataset.v==='story')storyFromGame=false;show(g.dataset.v);const pv=g.closest('.pv');if(pv)pv.open=false;return}
+  const g=e.target.closest('[data-v]'); if(g){if(g.dataset.guest){USER='訪客';guestOn()}if(g.dataset.v==='story')storyFromGame=false;show(g.dataset.v);const pv=g.closest('.pv');if(pv)pv.open=false;return}
   const ey=e.target.closest('[data-eye]');
   if(ey){const i=document.getElementById(ey.dataset.eye);const h=i.type==='password';i.type=h?'text':'password';ey.textContent=h?'隱藏':'顯示'}
 });
@@ -540,7 +549,7 @@ async function authSubmit(f,act){
     if(act==='classreg')u=await svc.register(v('cn2'),v('cp2'),true,'班級');   /* 班級帳號：老師自己建、note 記「班級」 */
     else if(act==='classlogin'){u=await svc.login(v('cn'),v('cp'));if(u.note!=='班級'){try{await svc.logout();}catch(x){}throw {code:'notclass'};}}   /* 學生帳號不能用班級登入 */
     else u=act==='login'?await svc.login(v('n'),v('p')):await svc.register(v('n2'),v('p2'),f.querySelector('#ack').checked);
-    await OLMSync.attach(svc,u);   /* 進度：決定用雲端或這支手機的存檔（失敗只有 net／denied） */
+    guestOff();await OLMSync.attach(svc,u);   /* 進度：決定用雲端或這支手機的存檔（失敗只有 net／denied） */
     await OLMTasks.attach(svc,u);   /* 後台任務與練習紀錄（不會失敗、最多等 4 秒） */
     USER=u.name;SESSION=u;show('home');
   }catch(e){showErr(f,(e&&e.code)||'other');btn.disabled=false;btn.textContent=label}
@@ -553,7 +562,7 @@ document.addEventListener('click',e=>{
   const d=e.target.closest('[data-do]');if(!d)return;
   if(d.dataset.do==='resume'&&SESSION){
     d.disabled=true;const t=d.textContent;d.textContent='請稍等…';
-    OLMStudent.service().then(s=>OLMSync.attach(s,SESSION).then(()=>OLMTasks.attach(s,SESSION))).then(()=>{USER=SESSION.name;show('home')},e=>{d.disabled=false;d.textContent=t;const a=ERR[(e&&e.code)||'other']||ERR.other;$('#resume').insertAdjacentHTML('afterbegin',err(a[0],a[1],a[2]))});
+    guestOff();OLMStudent.service().then(s=>OLMSync.attach(s,SESSION).then(()=>OLMTasks.attach(s,SESSION))).then(()=>{USER=SESSION.name;show('home')},e=>{d.disabled=false;d.textContent=t;const a=ERR[(e&&e.code)||'other']||ERR.other;$('#resume').insertAdjacentHTML('afterbegin',err(a[0],a[1],a[2]))});
   }
   else if(d.dataset.do==='logout'){
     OLMSync.detach(true).then(ok=>{
@@ -566,7 +575,7 @@ document.addEventListener('click',e=>{
 OLMStudent.service().then(s=>s.current()).then(u=>{SESSION=u;if(curV==='login')renderResume()}).catch(()=>{});
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,act=f.dataset.act;
   if(act){authSubmit(f,act);return}
-  const g=f.dataset.go;if(g){try{sessionStorage.removeItem('olm_live_sid')}catch(e){}   /* 訪客：這個分頁不記練習紀錄、用預設任務 */
+  const g=f.dataset.go;if(g){guestOn();   /* 訪客：全新暫時存檔、不記練習紀錄、用預設任務 */
     const inp=f.querySelector('input');USER=(inp&&inp.value.trim())||'同學';show(g)}});
 
 /* ===== 遊戲頁（game-test.html）：登入後載入；音樂與故事序章由這一層負責 ===== */
@@ -574,7 +583,7 @@ let storyFromGame=false;
 function setGameVisible(on){const f=$('#gamefr');f.hidden=!on;$('#app').style.visibility=on?'hidden':'visible';inGame=!!on;bgm();}
 function enterGame(){
   const f=$('#gamefr');
-  const want='game-test.html?n='+encodeURIComponent(USER)+(SESSION&&SESSION.note==='班級'?'&class=1':(SESSION?'':'&class=1&g=1'));   /* 班級帳號：多一個「課堂」分頁並預設開在課堂；訪客（沒登入）也有課堂分頁體驗，但預設開在地圖（g=1）；學生帳號沒有 */
+  const want='game-test.html?n='+encodeURIComponent(USER)+((SESSION&&!GUEST&&SESSION.note==='班級')?'&class=1':((SESSION&&!GUEST)?'':'&class=1&g=1'));   /* 班級帳號：多一個「課堂」分頁並預設開在課堂；訪客（沒登入）也有課堂分頁體驗，但預設開在地圖（g=1）；學生帳號沒有 */
   if(f.getAttribute('src')!==want)f.setAttribute('src',want);
   setGameVisible(true);
 }

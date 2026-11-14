@@ -10,12 +10,18 @@
   var K={TEST:'olm_test_v1',SHIP:'olm_ship_v1',WK:'olm_wk_v2',ARC:'olm_arcade_v1',
          SFX:'olm_sfx_off',SONG:'olm_song_proto_v1',PG:'ocarina_playground_v1',OLDWK:'olm_weekly_v1'};
 
-  function rawGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  /* 訪客模式：sessionStorage.olm_guest==='1' 時，遊戲資料改存「這個分頁的暫時空間」（鍵加 g: 前綴），
+     不碰手機上學生的存檔、不記 olm_sync_ts（不會上雲）；關掉分頁或重新按「訪客」就是全新空白。
+     裝置設定（音效開關、PIN、麥克風）不屬於進度，仍照舊存手機。 */
+  var DEVICE=/^(olm_sfx_off|ocarina_pin|ocarina_mic_off)$/;
+  function guest(){try{return sessionStorage.getItem('olm_guest')==='1';}catch(e){return false;}}
+  function useSess(k){return guest()&&!DEVICE.test(k);}
+  function rawGet(k){try{return useSess(k)?sessionStorage.getItem('g:'+k):localStorage.getItem(k);}catch(e){return null;}}
   /* 每次寫入（非內部鍵）都記下「最後修改時間」olm_sync_ts，給 cloud-sync.js 判斷要不要上傳、哪邊比較新 */
   var META=/^(olm_save_ver|olm_backup|olm_sync|olm_owner|olm_tasks|olm_logq)/;
-  function stamp(k){if(!META.test(k)){try{var p=parseInt(localStorage.getItem('olm_sync_ts'),10)||0;localStorage.setItem('olm_sync_ts',String(Math.max(Date.now(),p+1)));}catch(e){}}}   /* 單調遞增：同一毫秒內連寫也會變 */
-  function rawSet(k,v){try{localStorage.setItem(k,v);stamp(k);return true;}catch(e){return false;}}
-  function rawDel(k){try{localStorage.removeItem(k);stamp(k);return true;}catch(e){return false;}}
+  function stamp(k){if(useSess(k))return;if(!META.test(k)){try{var p=parseInt(localStorage.getItem('olm_sync_ts'),10)||0;localStorage.setItem('olm_sync_ts',String(Math.max(Date.now(),p+1)));}catch(e){}}}   /* 單調遞增：同一毫秒內連寫也會變 */
+  function rawSet(k,v){try{if(useSess(k))sessionStorage.setItem('g:'+k,v);else{localStorage.setItem(k,v);stamp(k);}return true;}catch(e){return false;}}
+  function rawDel(k){try{if(useSess(k))sessionStorage.removeItem('g:'+k);else{localStorage.removeItem(k);stamp(k);}return true;}catch(e){return false;}}
 
   /* 讀物件：壞掉或不是物件 → {} */
   function read(k){
@@ -36,6 +42,7 @@
 
   /* ===== 舊存檔搬移 ===== */
   function migrate(){
+    if(guest())return;   /* 訪客不搬移手機上的存檔 */
     if((parseInt(rawGet(VERKEY),10)||0)>=VER)return;
     var ok=true;
     function step(fn){try{fn();}catch(e){ok=false;}}
@@ -63,5 +70,5 @@
   }
   try{migrate();}catch(e){}
 
-  g.OLMSave={K:K,VER:VER,read:read,write:write,patch:patch,flag:flag,setFlag:setFlag,raw:{get:rawGet,set:rawSet,del:rawDel},migrate:migrate};
+  g.OLMSave={K:K,VER:VER,read:read,write:write,patch:patch,flag:flag,setFlag:setFlag,raw:{get:rawGet,set:rawSet,del:rawDel},migrate:migrate,guest:guest};
 })(window);

@@ -39,12 +39,12 @@ th{color:var(--ink-2);font-weight:600}
 small{color:var(--ink-2)}
 </style></head><body>
 <h1>陶笛失落地圖</h1>
-<p class="sub">最終呈現（測試版）｜2026/11/11｜所有頁面都在同一個網址下，可直接玩、可收音</p>
+<p class="sub">最終呈現（測試版）｜2026/11/14 更新｜所有頁面都在同一個網址下，可直接玩、可收音</p>
 
 <div class="card warn" id="inapp"><b>請改用 Safari／Chrome 開啟。</b><br>你現在可能在 LINE／Facebook／Instagram 內建瀏覽器，這類瀏覽器常常擋住麥克風。點右上角選單，選「用瀏覽器開啟」。</div>
 
 <a class="btn" href="index.html">▶ 進入遊戲（完整流程）</a>
-<p class="sub" style="margin-top:8px">首頁 → 登入（目前是測試用假登入，名字密碼隨便填）→ 故事序章 → 地圖／練習／商店／飛行船</p>
+<p class="sub" style="margin-top:8px">首頁 → 登入（姓名＋自設密碼＋家長勾選，也可用訪客模式）→ 故事序章 → 地圖／練習／商店／飛行船（訪客另有課堂）</p>
 
 <h2>① 先確認麥克風</h2>
 <div class="card">
@@ -63,21 +63,25 @@ small{color:var(--ink-2)}
 <div class="card">
 <table>
 <tr><th>項目</th><th>版本</th></tr>
-<tr><td>交接摘要</td><td>11/11 21:45（最新版）</td></tr>
-<tr><td>故事大綱</td><td>v2.10（11/11 21:40）</td></tr>
-<tr><td>遊戲設計書</td><td>第 26 版（11/11 21:40）</td></tr>
-<tr><td>程式（GitHub main）</td><td>最新 commit 1ed9921（11/11 21:32，簡譜排版修正）</td></tr>
+<tr><td>交接摘要</td><td>11/13 23:4x（最新版）</td></tr>
+<tr><td>故事大綱</td><td>v2.14（11/13）</td></tr>
+<tr><td>遊戲設計書</td><td>第 29 版（11/13 23:3x）</td></tr>
+<tr><td>程式（正式站 main）</td><td>最新 commit 270f57c（11/14 14:18，訪客改用全新暫時存檔；地圖「去解任務」分流）</td></tr>
 </table>
-<p class="sub" style="margin:10px 0 0">⚠️ 文件尚未登記：分段練習（數星星、豬之歌）與聽示範，只寫在另外兩份決議／交接檔。</p>
+<p class="sub" style="margin:10px 0 0">分段練習（數星星、豬之歌）已併入每週任務；下方「分段練習」兩項為舊原型，只供展示。</p>
 </div>
 
-<h2>④ 還沒做（下一階段：後台管理）</h2>
+<h2>④ 進度（☑ 已做　☐ 待做）</h2>
 <div class="card">
 <table>
-<tr><td>☐</td><td>真實登入（現在是假登入）</td></tr>
-<tr><td>☐</td><td>Firebase 後台：老師派每週任務、看練習進度、匯出 CSV</td></tr>
-<tr><td>☐</td><td>統一存檔（現在存在各人手機，換手機就沒了）</td></tr>
-<tr><td>☐</td><td>書面授權與家長告知文字</td></tr>
+<tr><td>☑</td><td>真實登入（姓名＋自設密碼＋家長勾選），正式站 11/13 上線</td></tr>
+<tr><td>☑</td><td>Firebase 後台：老師派每週任務、看練習進度、匯出</td></tr>
+<tr><td>☑</td><td>存檔上雲（換裝置登入進度一致）</td></tr>
+<tr><td>☑</td><td>課堂模式（訪客可用）、提煉工坊翻牌升級</td></tr>
+<tr><td>☐</td><td>手機真機整批實測（課堂、工坊翻牌、音效、觸控）</td></tr>
+<tr><td>☐</td><td>先 3～5 位學生試用 1～2 週</td></tr>
+<tr><td>☐</td><td>任務曲目資料庫（規劃中）、第 10～12 島隨歌上架</td></tr>
+<tr><td>☐</td><td>家長告知文字配合校名規則改寫</td></tr>
 </table>
 </div>
 
@@ -99,6 +103,9 @@ var MODS=[
  {g:'玩',items:[
   {u:'ocarina-playground.html',t:'星空試煉（陶笛遊樂場）',d:'10 款小遊戲，結算會掉水晶碎片。整頁開啟收音最穩。',mic:1,s:'wait'},
   {u:'observe-test.html',t:'圖鑑互動觀察',d:'螢光蕨、月光睡蓮（吹陶笛）、音符花（點一點）。',mic:1,s:'ok'}
+ ]},
+ {g:'課堂',items:[
+  {u:'game-test.html?class=1&n=測試班',t:'課堂模式（訪客體驗）',d:'老師抽任務卡、全班完成後按「通過」，不收音。',s:'wait'}
  ]},
  {g:'收集與養成',items:[
   {u:'ship-workshop.html',t:'飛行船・提煉工坊',d:'用水晶碎片升級 5 個部位、換配色。',s:'wait'},

@@ -504,7 +504,6 @@ Sfx.probe=function(){
         <button class="btn alt" id="game-close" style="min-height:48px;font-size:18px">收起小遊戲</button>
       </div>
       <a class="btn alt" href="ocarina-playground.html" target="_blank" rel="noopener">用整頁開啟（收音更穩）</a>
-      <p class="hint">這裡直接放收音版遊樂場。可以跳著玩，不給星星；依答錯次數掉水晶碎片（全對 2 顆、答錯 1–2 次 1 顆），每天最多 6 顆；每天第一次玩金幣 +5（測試版金幣還沒接商店，先記錄）。</p>
     </section>
   </div>
 
@@ -600,6 +599,7 @@ Sfx.probe=function(){
       </div>
       <p id="sh-text" class="hint"></p>
       <button class="btn" id="sh-go"></button>
+      <button class="btn alt" id="sh-go2" hidden></button>
       <button class="btn alt" id="sh-close" style="min-height:48px;font-size:18px">關閉</button>
     </div>
   </div>
@@ -716,17 +716,24 @@ ISLES.forEach(I=>{
   b.addEventListener('click',()=>openSheet(I));
   cells.appendChild(b);
 });
-function sheet(img,k,t,txt,btn,fn){
+function sheet(img,k,t,txt,btn,fn,btn2,fn2){
   $('sh-img').src=img;$('sh-kicker').textContent=k;$('sh-title').textContent=t;$('sh-text').textContent=txt;
   const g=$('sh-go');
   if(btn){g.hidden=false;g.textContent=btn;g.onclick=()=>{closeSheet();fn();};}else g.hidden=true;
+  const g2=$('sh-go2');
+  if(btn2){g2.hidden=false;g2.textContent=btn2;g2.onclick=()=>{closeSheet();fn2();};}else g2.hidden=true;
   $('layer').hidden=false;$('sh-close').focus();
+}
+/* 去解任務：有「課堂」分頁（班級帳號、訪客）時分兩條路：課堂任務（抽任務卡）／星空試煉；學生帳號照舊去練習 */
+function questSheet(img,k,name,txt){
+  if(CLASS_MODE)sheet(img,k,name,txt+' 選一條路去解任務：','課堂任務（抽任務卡）',()=>go('class'),'星空試煉',()=>go('practice'));
+  else sheet(img,k,name,txt,'去解任務',()=>go('practice'));
 }
 function openSheet(I){
   const k='第 '+I.n+' 島';
   if(I.n<=OPEN)sheet(IMG['s04'],k,I.name,'星星找回了旋律，島嶼重獲生機！循著微光足跡與鑰匙碎片，一同探索這座島嶼的奇幻生態。','翻閱日記',()=>openIsle(I.n));
-  else if(I.n===NEXT)sheet(IMG['s07'],k,I.name,'再 '+(NEED-JAR)+' 顆星星糖就能開啟這座島。','去解任務',()=>go('practice'));
-  else if(I.n<=9)sheet(IMG['s12'],k,I.name,'要先開啟前面的島。','去解任務',()=>go('practice'));
+  else if(I.n===NEXT)questSheet(IMG['s07'],k,I.name,'再 '+(NEED-JAR)+' 顆星星糖就能開啟這座島。');
+  else if(I.n<=9)questSheet(IMG['s12'],k,I.name,'要先開啟前面的島。');
   else sheet(IMG['boss_sit'],k,I.name,'還沒上架，小影子在偷看。');
 }
 function closeSheet(){$('layer').hidden=true;}

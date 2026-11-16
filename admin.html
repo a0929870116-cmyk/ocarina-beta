@@ -203,6 +203,7 @@ header .hbtn button{font:inherit;font-size:13px;border:1px solid rgba(255,255,25
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 
 <script src="songs.js"></script>
+<script src="songs-index.js"></script>
 <script src="firebase-config.js"></script>
 <script src="student-auth.js"></script>
 <script src="admin-data.js"></script>
@@ -319,9 +320,25 @@ function delStudent(s){
 }
 
 /* ===== 指派任務 ===== */
-function songOptions(sel){return Object.keys(SONGS).map(function(k){return '<option value="'+k+'"'+(k===sel?' selected':'')+'>'+esc(SONGS[k].title)+'（共 '+SONGS[k].bars.length+' 小節）</option>';}).join('');}
-function newRow(){return {type:'drill',song:'pig',from:1,to:4,T:20,speed:''};}
-function rowFromTask(t){return t.type==='song'?{type:'song',song:t.song,from:t.from,to:t.to,T:t.T,speed:t.speed||''}:{type:'drill',song:'pig',from:1,to:4,T:t.T,speed:t.speed||''};}
+/* 曲目索引（songs-index.js）：冊別 → 曲目；已建檔 ＝ songs.js 的 SONGS 有這個 id，才能指派 */
+var IDX=window.OLM_SONG_INDEX,SIDX={};
+IDX.SONGS.forEach(function(s){SIDX[s.id]=s;});
+Object.keys(SONGS).forEach(function(k){if(!SIDX[k]){var e={id:k,book:'f',no:'',title:SONGS[k].title};IDX.SONGS.push(e);SIDX[k]=e;}});
+function bookOf(id){return SIDX[id]?SIDX[id].book:'f';}
+function songTitle(id){return SONGS[id]?SONGS[id].title:(SIDX[id]?SIDX[id].title:id);}
+function bookName(b){var x=IDX.BOOKS.filter(function(k){return k.id===b;})[0];return x?x.name:b;}
+function firstBuilt(book){var x=IDX.SONGS.filter(function(s){return s.book===book&&SONGS[s.id];})[0];return x?x.id:'';}
+function bookOptions(sel){return IDX.BOOKS.map(function(b){var n=IDX.SONGS.filter(function(s){return s.book===b.id;}),m=n.filter(function(s){return SONGS[s.id];}).length;return '<option value="'+b.id+'"'+(b.id===sel?' selected':'')+'>'+esc(b.name)+'（已建檔 '+m+'／'+n.length+'）</option>';}).join('');}
+/* 歌曲下拉：搜尋框有字 → 跨冊搜歌名；沒字 → 只列該冊。未建檔的灰掉不能選 */
+function songOptions(r){
+  var q=(r.q||'').trim(),list=IDX.SONGS.filter(function(s){return q?s.title.indexOf(q)>=0:s.book===r.book;});
+  var h=r.song&&SONGS[r.song]?'':'<option value="">請選曲目</option>';
+  if(!list.length)return h+'<option value="" disabled>'+(q?'找不到符合的歌':'這一冊還沒有登記曲目')+'</option>';
+  return h+list.map(function(s){var ok=!!SONGS[s.id];
+    return '<option value="'+s.id+'"'+(ok?'':' disabled')+(s.id===r.song?' selected':'')+'>'+(q?esc(bookName(s.book))+' ':'')+esc((s.no?s.no+' ':'')+s.title+(ok?'（共 '+SONGS[s.id].bars.length+' 小節）':'（未建檔）'))+'</option>';}).join('');
+}
+function newRow(){return {type:'drill',book:'f',song:'pig',q:'',from:1,to:4,T:20,speed:''};}
+function rowFromTask(t){return t.type==='song'?{type:'song',book:bookOf(t.song),song:t.song,q:'',from:t.from,to:t.to,T:t.T,speed:t.speed||''}:{type:'drill',book:'f',song:'pig',q:'',from:1,to:4,T:t.T,speed:t.speed||''};}
 /* 任務編號：基本指法 basic-1-1；歌曲第一次出現 song-歌名（與遊戲現有編號相容），同一首歌第 2、3… 個任務加 -2、-3 */
 function rowsToTasks(){
   var cnt={};
@@ -356,7 +373,7 @@ function renderRows(){
     var q=BUDGET*w[i]/sw,per=q/(r.T||1);
     return '<div class="trow" data-i="'+i+'"><div><b>任務 '+(i+1)+'</b><div class="muted">份額 '+q.toFixed(1)+' 顆<br>每次全對 +'+per.toFixed(2)+'</div></div><div class="f">'+
       '<label>類型<select data-f="type"><option value="drill"'+(r.type==='drill'?' selected':'')+'>基本指法 1-1</option><option value="song"'+(r.type==='song'?' selected':'')+'>歌曲＋小節範圍</option></select></label>'+
-      (r.type==='song'?'<label>歌曲<select data-f="song">'+songOptions(r.song)+'</select></label><label>起小節<input class="num" type="number" min="1" data-f="from" value="'+r.from+'"></label><label>到小節<input class="num" type="number" min="1" data-f="to" value="'+r.to+'"></label>':'')+
+      (r.type==='song'?'<label>冊別<select data-f="book">'+bookOptions(r.book)+'</select></label><label>搜尋歌名<input type="search" data-f="q" value="'+esc(r.q||'')+'" placeholder="跨冊搜尋"></label><label>歌曲<select data-f="song">'+songOptions(r)+'</select></label><label>起小節<input class="num" type="number" min="1" data-f="from" value="'+r.from+'"></label><label>到小節<input class="num" type="number" min="1" data-f="to" value="'+r.to+'"></label>':'')+
       '<label>目標次數 T<input class="num" type="number" min="1" max="99" data-f="T" value="'+r.T+'"></label><label>速度 BPM（選填）<input class="num" type="number" min="30" max="200" data-f="speed" value="'+esc(r.speed)+'" placeholder="學生選"></label></div>'+
       '<div><button class="b ghost sm" data-rm="'+i+'" style="color:var(--red);border-color:var(--red)">移除</button></div></div>';
   }).join('');
@@ -365,8 +382,17 @@ function renderRows(){
 $('as-rows').addEventListener('change',function(e){
   var f=e.target.dataset.f,box=e.target.closest('.trow');if(!f||!box)return;
   var r=rows[+box.dataset.i],v=e.target.value;
-  if(f==='type'||f==='song')r[f]=v;else if(f==='speed')r.speed=v===''?'':Math.max(30,Math.min(200,+v|0));else r[f]=+v|0;
+  if(f==='q')return;   /* 搜尋框用 input 事件即時更新，不重畫整列 */
+  if(f==='book'){r.book=v;r.q='';r.song=firstBuilt(v);}
+  else if(f==='song'){r.song=v;if(v)r.book=bookOf(v);r.q='';}
+  else if(f==='type'){r.type=v;if(v==='song'&&!SONGS[r.song]){r.book='f';r.song='pig';}}
+  else if(f==='speed')r.speed=v===''?'':Math.max(30,Math.min(200,+v|0));else r[f]=+v|0;
   renderRows();
+});
+$('as-rows').addEventListener('input',function(e){
+  if(e.target.dataset.f!=='q')return;
+  var box=e.target.closest('.trow'),r=rows[+box.dataset.i];r.q=e.target.value;
+  box.querySelector('select[data-f="song"]').innerHTML=songOptions(r);
 });
 $('as-rows').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(!b)return;rows.splice(+b.dataset.rm,1);renderRows();});
 $('as-addrow').onclick=function(){if(rows.length<5){rows.push(newRow());renderRows();}};
@@ -375,6 +401,7 @@ function validateRows(){
   for(var i=0;i<rows.length;i++){
     var r=rows[i],lab='任務 '+(i+1)+'：';
     if(!(r.T>=1&&r.T<=99))return lab+'目標次數要 1～99';
+    if(r.type==='song'&&!SONGS[r.song])return lab+'請選擇已建檔的曲目（未建檔的歌還不能指派）';
     var key=r.type==='drill'?'drill':'song-'+r.song+'-'+r.from+'-'+r.to;
     if(seen[key])return lab+(r.type==='drill'?'基本指法 1-1 只能指派一次':'「'+SONGS[r.song].title+'」第 '+r.from+'–'+r.to+' 小節已經有一個任務了');
     seen[key]=1;
@@ -442,7 +469,7 @@ function taskLabelOf(sid,taskId){
   var tk=studentTasks(sid).filter(function(t){return t.id===taskId;})[0];
   if(tk)return tk.name;
   if(taskId==='basic-1-1')return '基本指法 1-1';
-  var m=/^song-([a-z]+)(?:-(\d+))?$/.exec(taskId);
+  var m=/^song-([a-z0-9]+)(?:-(\d+))?$/.exec(taskId);
   if(m&&SONGS[m[1]])return SONGS[m[1]].title+(m[2]?'（'+m[2]+'）':'');
   return taskId;
 }

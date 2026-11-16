@@ -236,6 +236,10 @@ function drawScore(){
         const my=bottom-16;
         if(n.dur>=4)el('rect',{x:x-6,y:top+8,width:12,height:4,fill:ink},gEl);
         else if(n.dur>=2)el('rect',{x:x-6,y:top+12,width:12,height:4,fill:ink},gEl);
+        else if(n.dur>=1){   /* 四分休止符：鋸齒＋小彎勾（附點 1.5 拍加點） */
+          const Y=k=>bottom-k*STEP;
+          el('path',{d:`M ${x-2.5} ${Y(7)} L ${x+2.5} ${Y(5.4)} L ${x-2.5} ${Y(3.8)} L ${x+2} ${Y(2.6)} Q ${x-3.5} ${Y(2.4)} ${x-1} ${Y(1)}`,stroke:ink,'stroke-width':2.2,'stroke-linecap':'round','stroke-linejoin':'round',fill:'none'},gEl);
+          if(n.dur>1)el('circle',{cx:x+7,cy:Y(4.6),r:1.6,fill:ink},gEl);}
         else{el('circle',{cx:x-2,cy:my-4,r:2,fill:ink},gEl);el('path',{d:`M ${x+3} ${my-8} L ${x-3} ${my+8}`,stroke:ink,'stroke-width':2,'stroke-linecap':'round',fill:'none'},gEl);
           if(n.dur<1)el('circle',{cx:x-3,cy:my+3,r:1.8,fill:ink},gEl);}
         n.head=null;n.stems=[];

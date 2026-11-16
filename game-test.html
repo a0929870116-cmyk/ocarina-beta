@@ -930,7 +930,7 @@ $('q-dex').addEventListener('click',()=>go('dex'));
 $('q-story').addEventListener('click',()=>{if(!toParent({type:'replay-story'}))toast('示範：要在整合測試頁才會播放故事序章');});
 
 /* 動態樂譜：只是連結。頻道網址貼進 YT_URL 即可 */
-const YT_URL='';
+const YT_URL='https://www.youtube.com/channel/UCKpdv84PBG9coC-JqvG0e1g';
 $('yt-go').addEventListener('click',()=>{if(YT_URL)window.open(YT_URL,'_blank','noopener');else toast('示範稿，頻道連結尚未設定');});
 
 /* ===== 練習：麥克風判音（偵測器沿用「音準測試頁」）===== */

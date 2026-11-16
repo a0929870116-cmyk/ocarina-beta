@@ -687,7 +687,10 @@ function openClass(){
   const f=$('class-frame');
   if(!f.getAttribute('src'))f.src='class-mode.html?n='+encodeURIComponent(new URLSearchParams(location.search).get('n')||'');
 }
+/* 別的頁（課堂 iframe）可能已改了存檔的星星罐：重讀並重畫，避免畫面舊值、之後又被舊值蓋回去 */
+function syncJar(){try{if(OPEN_Q)return;const sv=rdSave();if(sv.jar==null)return;const nj=Math.max(0,Math.min(NEED,sv.jar|0));if(nj!==JAR){JAR=nj;renderProgress();}}catch(e){}}
 function show(v){
+  if(v==='map'||v==='practice')syncJar();
   if(!VIEWS.includes(v)||(v==='class'&&!CLASS_MODE))v='map';
   if(v==='class')openClass();
   if(v!=='practice'){try{stopBlow();closeGame();}catch(e){}}
@@ -1288,7 +1291,7 @@ window.addEventListener('storage',e=>{
   renderCoins();
   const v=rdSave();
   if(!OPEN_Q&&(((v.jar|0)>=NEED&&OPEN<MAXOPEN)||(v.open!=null&&(v.open|0)!==OPEN)))location.reload();
-  else drawShop(shopG);
+  else{syncJar();drawShop(shopG);}
 });
 show(location.hash.slice(1)||(CLASS_MODE&&new URLSearchParams(location.search).get('g')!=='1'?'class':''));   /* 訪客體驗課堂（g=1）預設開在地圖 */
 </script>
